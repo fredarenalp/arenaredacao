@@ -1386,6 +1386,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
     <p class="desc" id="desc" aria-live="polite"></p>
 
+    <div class="fld" id="fEmail">
+      <label class="lab" for="email">E-mail</label>
+      <div class="inp" id="iEmail"><input id="email" type="email" autocomplete="username" placeholder="voce@escola.com"></div>
+    </div>
     <div class="fld hide" id="fMat">
       <label class="lab" for="mat">Matrícula</label>
       <div class="inp" id="iMat"><input id="mat" inputmode="numeric" autocomplete="username" placeholder="Ex.: 20260187" maxlength="10"></div>
@@ -1585,7 +1589,9 @@ function ic(n){return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">'
 
 var PERFIS={
  corretor:{l:'Corretor(a)',i:'pen',c:'#d9822b',s:'rgba(217,130,43,.08)',d:'Lançar notas dos pacotes recebidos',ph:'Senha do corretor'},
- aluno:{l:'Aluno',i:'book',c:'#3c7678',s:'rgba(60,118,120,.08)',d:'Envie suas redações e acompanhe as correções',ph:'Sua senha',novo:true}
+ aluno:{l:'Aluno',i:'book',c:'#3c7678',s:'rgba(60,118,120,.08)',d:'Envie suas redações e acompanhe as correções',ph:'Sua senha',novo:true},
+ coord:{l:'Coordenação',i:'school',c:'#4a5568',s:'rgba(74,85,104,.08)',d:'Acessos, pacotes, desempenho e ganchos',ph:'Sua senha'},
+ prof:{l:'Professor',i:'cap',c:'#1a4888',s:'rgba(26,72,136,.08)',d:'Corrigir os ganchos e liberar as notas 0 e 10 da sua série',ph:'Sua senha'}
 };
 var PRIM=['corretor','aluno'],SEC=[];
 var cur='corretor',loading=false;
@@ -1604,9 +1610,8 @@ function render(){
  $('desc').textContent=p.d;
  $('pwd').placeholder=p.ph;
  $('fMat').classList.toggle('hide',cur!=='aluno');
- if(!$('pwd').value&&DEMO[cur])$('pwd').value=DEMO[cur];
- if(cur==='aluno'&&!$('mat').value)$('mat').value='20260187';
- $('help').innerHTML=cur==='corretor'?'Demo: entra como <b>Marina Souza</b> (senha <b>exemplo123</b>, já preenchida).':cur==='aluno'?'Primeiro acesso? Peça sua senha à coordenação.':'';
+ $('fEmail').classList.toggle('hide',cur==='aluno');
+ $('help').innerHTML=cur==='aluno'?'Primeiro acesso? Peça sua senha à coordenação.':'';
 }
 function alertas(h){$('alerts').innerHTML=h||''}
 function limpa(){alertas('');$('iPwd').classList.remove('bad');$('iMat').classList.remove('bad');}
@@ -1622,7 +1627,7 @@ function erro(){
  var e=$('iPwd');e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');$('pwd').focus();
 }
 function sys(){setLoad(false);alertas('<div class="alert sys">'+ic('wifi')+'<span>Não foi possível conectar ao sistema agora. Não é problema da sua senha — verifique sua conexão e tente novamente.</span></div>');}
-function ok(){setLoad(false);if(cur==='corretor'){alertas('');window.abrePortal();return;}if(cur==='aluno'){alertas('');window.abreAluno();return;}alertas('<div class="alert ok">'+ic('ok')+'<span>Demonstração: entraria como <b>'+PERFIS[cur].l+'</b>.</span></div>');}
+function ok(){setLoad(false);if(cur==='corretor'){alertas('');window.abrePortal();return;}if(cur==='aluno'){alertas('');window.abreAluno();return;}if(cur==='coord'||cur==='prof'){alertas('');window.__entraRole(cur);return;}}
 
 document.addEventListener('click',function(e){
  var b=e.target.closest('.p');
@@ -1643,16 +1648,17 @@ function eye(){$('pwd').type=eyeOn?'text':'password';$('eye').innerHTML=ic(eyeOn
 $('eye').addEventListener('click',function(){eyeOn=!eyeOn;eye();$('pwd').focus();});
 $('pwd').addEventListener('input',limpa);$('mat').addEventListener('input',limpa);
 $('esqueci').addEventListener('click',function(){alertas('<div class="alert sys">'+ic('alert')+'<span>Para redefinir a senha, fale com a coordenação.</span></div>');});
-// regra da demo: senha "arena" entra; "falha" simula servidor fora; qualquer outra erra
+// login real (Supabase): ARENA.entrar devolve 'ok' | 'erro' | 'sys'
 $('form').addEventListener('submit',function(e){
  e.preventDefault();if(loading)return;limpa();
  var v=$('pwd').value.trim();
- if(!v){erro();return;}
+ if(!v||(cur==='aluno'?!$('mat').value.trim():!$('email').value.trim())){erro();return;}
  setLoad(true);
- setTimeout(function(){(v==='arena'||v==='exemplo123')?ok():v==='falha'?sys():erro();},900);
+ if(!window.ARENA){sys();return}
+ window.ARENA.entrar(cur,{email:$('email').value.trim(),mat:$('mat').value.trim(),senha:v}).then(function(r){r==='ok'?ok():r==='sys'?sys():erro()});
 });
 function resp(){var m=matchMedia('(max-width:640px)').matches;$('dtitle').style.display=m?'none':'';$('mtitle').style.display=m?'':'none';}
-window.resetLogin=function(){$('pwd').value='';$('mat').value='';limpa();render();};
+window.resetLogin=function(){if(window.ARENA)window.ARENA.sair();$('pwd').value='';$('mat').value='';$('email').value='';limpa();render();};
 addEventListener('resize',resp);resp();eye();render();
 </script>
 <script>
@@ -4776,9 +4782,10 @@ $('coMain').addEventListener('change',function(e){var t=e.target;
  if(t.dataset&&t.dataset.pac){var x=PACS.filter(function(p){return String(p.id)===t.dataset.pac})[0];var nm=CORR.filter(function(c){return c.id===t.value})[0];x.c=t.value||null;(function(m){if(m)DT[m[1]+m[2]]=x.c})(/(\d)º ano ([A-I])/.exec(x.turma));reg(t.value?'Atribuiu o pacote '+x.id+' ('+x.turma+') a '+nm.n:'Tirou o corretor do pacote '+x.id,'dist');toast(t.value?'Pacote '+x.id+' atribuído a '+nm.n:'Pacote '+x.id+' sem corretor');render();return}
  if(t.dataset&&t.dataset.gp){var q=t.dataset.gp.split(':');gOf(q[0]).prof[+q[1]]=+t.value;render();return}
  if(t.id==='coR1'){var v=parseFloat(String(t.value).replace(',','.'));if(!(v>=0))v=S.r1;S.r1=v;render()}});
+window.__entraRole=entra;
 document.querySelector('.cobar').addEventListener('click',function(e){var b=e.target.closest('[data-top]');if(!b)return;S.top=b.dataset.top;render()});
 function entra(role){S.role=role;S.top=role==='prof'?'pgeral':'acessos';S.pf={pac:null,idx:null,niv:[null,null,null,null,null]};$('roleMdl').classList.add('hide');$('coLogo').src=document.querySelector('#al .ph img').src;render();document.body.classList.add('in-coord');window.scrollTo(0,0);$('co').scrollTop=0}
-$('restrBtn').onclick=function(){$('roleMdl').classList.remove('hide')};
+$('restrBtn').onclick=function(){SEC=SEC.length?[]:['coord','prof'];cur=SEC.length?'coord':'corretor';$('pwd').value='';limpa();render()};
 $('lbBox').addEventListener('click',function(e){if(e.target===$('lbBox')||e.target.closest('[data-lbx]'))$('lbBox').classList.add('hide')});
 $('roleMdl').addEventListener('click',function(e){var b=e.target.closest('[data-role]');if(b){entra(b.dataset.role);return}if(e.target.id==='roleX'||e.target===$('roleMdl'))$('roleMdl').classList.add('hide')});
 $('coSair').onclick=function(){document.body.classList.remove('in-coord');if(window.resetLogin)window.resetLogin()};

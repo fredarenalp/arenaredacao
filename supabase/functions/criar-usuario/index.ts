@@ -21,7 +21,15 @@ Deno.serve(async (req) => {
   const { data: eu } = await admin.from('perfis').select('tipo, ativo').eq('id', quem.user.id).maybeSingle()
   if (eu?.tipo !== 'coordenacao' || !eu.ativo) return json({ erro: 'Sem permissão' }, 403)
 
-  const { email, senha, nome, tipo, aluno_id, turma_ids } = await req.json().catch(() => ({}))
+  const corpo = await req.json().catch(() => ({}))
+  const { senha, nome, tipo, aluno_id, turma_ids } = corpo
+  let email = corpo.email
+  // Aluno entra com a matrícula: o e-mail de login é derivado dela.
+  if (tipo === 'aluno' && aluno_id) {
+    const { data: al } = await admin.from('alunos').select('matricula').eq('id', aluno_id).maybeSingle()
+    if (!al) return json({ erro: 'Aluno não encontrado' }, 400)
+    email = `${String(al.matricula).trim().toLowerCase()}@aluno.arena.com`
+  }
   if (!email || !senha || !nome || !TIPOS.includes(tipo)) return json({ erro: 'Dados inválidos' }, 400)
   if (String(senha).length < 6) return json({ erro: 'A senha precisa de 6 caracteres ou mais' }, 400)
 
