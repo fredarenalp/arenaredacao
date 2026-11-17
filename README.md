@@ -16,11 +16,16 @@ npm run lint && npm test && npm run build
 2. No SQL Editor: `insert into perfis(id,tipo,nome) values ('<uuid do usuário>','coordenacao','Seu nome');`
 3. Entre no app; os demais perfis são cadastrados da mesma forma.
 
-## Testes de tela
-`npm run build && npx vite preview --port 4173 &` e depois `node e2e/fluxo.cjs` (Supabase simulado; requer Playwright instalado globalmente).
+## Como o app funciona
+O app **é o protótipo** (`prototipo/app.html`, fonte única do visual e do comportamento). O Vite empacota só a
+ponte com o Supabase (`src/ponte.js` → `dist/ponte.iife.js`) e `scripts/montar.mjs` gera `dist/index.html`.
+Os dados de exemplo do protótipo estão sendo substituídos, área por área, por dados reais do banco.
+`prototipo/prototipo-v144-original.html` é a cópia congelada da referência.
+
+Ciclo de dados contra o banco real: `NODE_USE_ENV_PROXY=1 node e2e/ciclo-real.mjs`.
 
 ## Publicação (Vercel)
-Importe o repositório na Vercel (framework Vite, `npm run build`, saída `dist`) e defina as variáveis
+Importe o repositório na Vercel (framework Other, comando `npm run build`, saída `dist`) e defina as variáveis
 `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (valores em `.env.example`; a chave é pública, a proteção é a RLS).
 
 Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PROXY=1 node e2e/ciclo-real.mjs`.
