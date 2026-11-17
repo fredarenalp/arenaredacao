@@ -4,6 +4,7 @@ import { supabase } from './lib/supabase.js'
 const TIPO_POR_LOGIN = { corretor: 'corretor', aluno: 'aluno', coord: 'coordenacao', prof: 'professor' }
 const emailAluno = (matricula) => `${String(matricula).trim().toLowerCase()}@aluno.arena.com`
 
+const serTur = (a) => [a.s ?? Number(/(\d)º/.exec(a.turma || '')?.[1]), a.t ?? String(a.turma || '').trim().slice(-1)]
 const fmtData = (d) => (d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '')
 
 const ARENA = {
@@ -308,7 +309,15 @@ const ARENA = {
     // regras gravadas
     const { data: regras } = await supabase.from('regras').select('chave, valor')
     for (const r of regras ?? []) { if (r.chave === 'r1') C.S.r1 = r.valor; else C.R[r.chave] = r.valor }
-    ARENA._coord = { alunos, byClass, perf: perf.data }
+    // equipe (coordenação + professores) e alunos que saíram
+    const eq = perf.data.filter((x) => x.tipo === 'coordenacao' || x.tipo === 'professor')
+    fill(C.EQUIPE, [
+      { n: 'Coordenação (você)', e: ARENA.perfil.email || '', r: 'coord', _id: ARENA.perfil.id },
+      ...eq.filter((x) => x.id !== ARENA.perfil.id).map((x) => ({ n: x.nome, e: x.email || '', r: x.tipo === 'professor' ? 'prof' : 'coord', ...(x.tipo === 'professor' ? { s: C.PROFS.find((q) => q.id === x.id)?.s || 7 } : {}), _id: x.id })),
+    ])
+    Object.keys(C.SAIU).forEach((k) => delete C.SAIU[k])
+    alunos.filter((a) => a.saiu).forEach((a) => { C.SAIU[a.matricula] = true })
+    ARENA._coord = { alunos, byClass, turmas: turm.data, perf: perf.data, byMat: Object.fromEntries(alunos.map((a) => [a.matricula, a])) }
     ARENA._snap = ARENA.tirarFoto()
     Object.assign(C.PLAB, { semana: 'Últimos 7 dias', mes: 'Últimos 30 dias', bimestre: 'Bimestre atual' })
     window.__real = true
@@ -326,6 +335,10 @@ const ARENA = {
       corr: Object.fromEntries(C.CORR.map((c) => [c.id, !!c.pausado])),
       prp: Object.fromEntries(C.PRP.map((q) => [q.id, JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])])),
       regras: JSON.stringify({ r1: C.S.r1, ...C.R }),
+      cad: Object.fromEntries(C.aidx().map((a) => [a.mat, serTur(a).join('|')])),
+      saiu: JSON.stringify(C.SAIU),
+      senha: JSON.stringify(C.SENHA),
+      equipe: JSON.stringify(C.EQUIPE.map((p) => [p._id || '', p.n, p.e, p.r, p.s || 0])),
     }
   },
 
@@ -385,6 +398,77 @@ const ARENA = {
         const r = await supabase.from('propostas').insert(row).select('id').single()
         if (r.error) ok(r); else { q.id = r.data.id; prev.prp[q.id] = assin }
       } else ok(await supabase.from('propostas').update(row).eq('id', q.id))
+    }
+
+    // alunos: novos, mudança de turma, saída, nova senha
+    const K = ARENA._coord
+    const ano = new Date().getFullYear()
+    const turmaId = async (sr, nome) => {
+      let t = K.turmas.find((x) => String(x.serie) === String(sr) && x.nome === nome)
+      if (!t) {
+        const r = await supabase.from('turmas').insert({ ano, serie: String(sr), nome }).select().single()
+        if (r.error) { ok(r); return null }
+        t = r.data; K.turmas.push(t)
+      }
+      return t.id
+    }
+    const senhaDe = (mat) => C.SENHA[mat] || C.senhaDe(mat)
+    for (const a0 of C.aidx()) {
+      const [sr, tn] = serTur(a0)
+      const a = { ...a0, s: sr, t: tn }
+      const noBanco = K.byMat[a.mat]
+      const chave = `${sr}|${tn}`
+      if (!noBanco) {
+        const tid = await turmaId(a.s, a.t)
+        if (!tid) continue
+        const r = await supabase.from('alunos').insert({ matricula: a.mat, nome: a.nome, turma_id: tid }).select('*, turmas(serie, nome)').single()
+        if (r.error) { ok(r); continue }
+        const novo = { ...r.data, s: a.s, t: a.t }
+        K.byMat[a.mat] = novo; K.alunos.push(novo); (K.byClass[chave] ??= []).push(novo)
+        const f = await supabase.functions.invoke('criar-usuario', { body: { tipo: 'aluno', matricula: a.mat, nome: a.nome, senha: senhaDe(a.mat) } })
+        if (f.error || f.data?.erro) falhas.push('Acesso do aluno ' + a.nome + ': ' + (f.data?.erro || f.error.message))
+      } else if (prev.cad[a.mat] !== undefined && prev.cad[a.mat] !== chave) {
+        const tid = await turmaId(a.s, a.t)
+        if (tid) {
+          ok(await supabase.from('alunos').update({ turma_id: tid }).eq('id', noBanco.id))
+          const velha = `${noBanco.s}|${noBanco.t}`
+          K.byClass[velha] = (K.byClass[velha] || []).filter((x) => x.id !== noBanco.id)
+          noBanco.s = a.s; noBanco.t = a.t; noBanco.turma_id = tid; (K.byClass[chave] ??= []).push(noBanco)
+        }
+      }
+    }
+    const saiuAgora = JSON.parse(JSON.stringify(C.SAIU)), saiuAntes = JSON.parse(prev.saiu)
+    for (const mat of new Set([...Object.keys(saiuAgora), ...Object.keys(saiuAntes)])) {
+      if (!!saiuAgora[mat] !== !!saiuAntes[mat] && K.byMat[mat]) { ok(await supabase.from('alunos').update({ saiu: !!saiuAgora[mat] }).eq('id', K.byMat[mat].id)); K.byMat[mat].saiu = !!saiuAgora[mat] }
+    }
+    const sAgora = JSON.parse(JSON.stringify(C.SENHA)), sAntes = JSON.parse(prev.senha)
+    for (const mat of Object.keys(sAgora)) {
+      if (sAgora[mat] !== sAntes[mat] && K.byMat[mat]?.perfil_id) {
+        const f = await supabase.functions.invoke('criar-usuario', { body: { acao: 'senha', matricula: mat, senha: sAgora[mat] } })
+        if (f.error || f.data?.erro) falhas.push('Senha de ' + mat + ': ' + (f.data?.erro || f.error.message))
+      }
+    }
+
+    // equipe: nova pessoa, papel e série
+    const eqAgora = JSON.stringify(C.EQUIPE.map((p) => [p._id || '', p.n, p.e, p.r, p.s || 0]))
+    if (eqAgora !== prev.equipe) {
+      for (const p of C.EQUIPE) {
+        const antigo = JSON.parse(prev.equipe).find((x) => x[0] === p._id)
+        if (!p._id) {
+          if (!p.e) { falhas.push('Informe o e-mail de ' + p.n); continue }
+          const senha = Math.random().toString(36).slice(2, 10)
+          const tid = p.r === 'prof' ? K.turmas.filter((x) => Number(x.serie) === p.s).map((x) => x.id) : []
+          const f = await supabase.functions.invoke('criar-usuario', { body: { tipo: p.r === 'prof' ? 'professor' : 'coordenacao', email: p.e, nome: p.n.replace(/^Prof\.\s*/, ''), senha, turma_ids: tid } })
+          if (f.error || f.data?.erro) falhas.push(p.n + ': ' + (f.data?.erro || f.error.message))
+          else { p._id = f.data.id; window.alert(`Acesso criado para ${p.n}\nE-mail: ${p.e}\nSenha inicial: ${senha}\nAnote e passe à pessoa (ela pode ser trocada depois).`) }
+        } else if (antigo && antigo[3] !== p.r) {
+          ok(await supabase.from('perfis').update({ tipo: p.r === 'prof' ? 'professor' : 'coordenacao' }).eq('id', p._id))
+        } else if (antigo && p.r === 'prof' && antigo[4] !== (p.s || 0)) {
+          ok(await supabase.from('professor_turmas').delete().eq('perfil_id', p._id))
+          const ids = K.turmas.filter((x) => Number(x.serie) === p.s).map((x) => ({ perfil_id: p._id, turma_id: x.id }))
+          if (ids.length) ok(await supabase.from('professor_turmas').insert(ids))
+        }
+      }
     }
 
     // regras
