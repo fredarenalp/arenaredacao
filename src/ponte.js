@@ -100,6 +100,11 @@ const ARENA = {
           if (c.diag != null) a.diag = c.diag
           a.nCorr = c.extras?.nCorr || 0
           if (c.n1 != null || c.anulacao) a.salvo = true
+          if (r.etapa === 'aguardando_liberacao') {
+            a.fila = 'pend'
+            if (c.extras?.duvida) a.duvida = { tipo: 'prof', txt: c.extras.duvida.pergunta, crit: c.extras.duvida.crit, linha: c.extras.duvida.linha, st: 'pend' }
+            if (c.extras?.ia) a.ia = { txt: c.extras.ia.txt }
+          }
         }
         a.marks = (r.marcacoes ?? []).map((m) => m.dados)
         alunos.push(a)
@@ -109,13 +114,13 @@ const ARENA = {
     const { data: minhas } = await supabase.from('redacoes').select('versao, etapa, corretor_id, correcoes(atualizada_em, n1, anulacao)').eq('corretor_id', ARENA.perfil.id).limit(5000)
     ARENA.definirFinanceiro((minhas ?? []).flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao }] : [] }))
     window.__corretor.setMes(mesAtual())
-    const { data: rets } = await supabase.from('retornos').select('id, resultado, antes, depois, visto, redacao_id, redacoes(foto_path, alunos(nome), pacotes(numero), correcoes(comentario), marcacoes(dados))').eq('corretor_id', ARENA.perfil.id).eq('entendido', false).order('criado_em', { ascending: false })
+    const { data: rets } = await supabase.from('retornos').select('id, resultado, antes, depois, resposta, visto, redacao_id, redacoes(foto_path, alunos(nome), pacotes(numero), correcoes(comentario, extras), marcacoes(dados))').eq('corretor_id', ARENA.perfil.id).eq('entendido', false).order('criado_em', { ascending: false })
     const itens = []
     for (const r of rets ?? []) {
       const rd = r.redacoes
       const c = Array.isArray(rd?.correcoes) ? rd.correcoes[0] : rd?.correcoes
       const foto = rd?.foto_path ? (await supabase.storage.from('redacoes').createSignedUrl(rd.foto_path, 3600)).data?.signedUrl ?? null : null
-      itens.push({ id: r.id, aluno: rd?.alunos?.nome ?? '', pac: rd?.pacotes?.numero ?? '', res: r.resultado, antes: r.antes, depois: r.depois, visto: r.visto, marks: (rd?.marcacoes ?? []).map((m) => m.dados), obs: c?.comentario ?? '', foto, seed: r.redacao_id })
+      itens.push({ id: r.id, aluno: rd?.alunos?.nome ?? '', pac: rd?.pacotes?.numero ?? '', res: r.resultado, antes: r.antes, depois: r.depois, resp: r.resposta, pergunta: c?.extras?.duvida?.pergunta ?? '', visto: r.visto, marks: (rd?.marcacoes ?? []).map((m) => m.dados), obs: c?.comentario ?? '', foto, seed: r.redacao_id })
     }
     window.__store.retornos = itens
     window.__real = true
@@ -141,7 +146,7 @@ const ARENA = {
     const soma = a.anul ? 0 : a.niv.reduce((x, y) => x + y, 0)
     // retida: anulada, nota 0 ou 10, suspeita de IA ou dúvida pendente -> o professor/coordenação decide
     const retida = !!a.anul || soma === 0 || soma === 20 || !!a.ia || !!(a.duvida && a.duvida.st === 'pend')
-    row.extras = { nCorr: a.nCorr || 0, retida }
+    row.extras = { nCorr: a.nCorr || 0, retida, ...(a.duvida && a.duvida.st === 'pend' ? { duvida: { pergunta: a.duvida.txt, crit: a.duvida.crit ?? '', linha: a.duvida.linha ?? '' } } : {}), ...(a.ia ? { ia: { txt: a.ia.txt } } : {}) }
     row.liberada = !retida
     const r1 = await supabase.from('correcoes').upsert(row)
     if (r1.error) return false
@@ -186,7 +191,7 @@ const ARENA = {
       for (const p of doBim) {
         const v = (n) => { const c = lib(reds.find((r) => r.proposta_id === p.id && r.versao === n)); return c && c.nota != null ? Number(c.nota) : 0 }
         const anul = lib(reds.find((r) => r.proposta_id === p.id && r.versao === 1))?.anulacao
-        BIMS[b].ess.push({ n: p.numero, g: p.genero, tema: p.titulo, ...(anul ? { z: { tipo: 'gen', mot: anul, data: '', por: 'Professor' } } : {}) })
+        BIMS[b].ess.push({ n: p.numero, g: p.genero, tema: p.titulo, ...(anul ? { z: { tipo: anul === 'ia' ? 'ia' : 'gen', mot: anul, data: '', por: 'Professor' } } : {}) })
         BIMS[b].notas.push([v(1), v(2)])
       }
     }
@@ -226,7 +231,7 @@ const ARENA = {
         const dd = (c.liberada_em ?? r.enviada_em).slice(0, 10)
         return {
           ...base, g, t: rot, s: `Entregue em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)} · corrigida`, st: 'ok',
-          l: `Corrigida · nota ${novaNota(c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: [c.n1, c.n2, c.n3, c.n4, c.n5],
+          l: `Corrigida · nota ${novaNota(c.anulacao ? 0 : c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: c.anulacao ? [0, 0, 0, 0, 0] : [c.n1, c.n2, c.n3, c.n4, c.n5],
           circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario),
         }
       }
@@ -392,8 +397,9 @@ const ARENA = {
       const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes
       const a = alunos.find((x) => x.id === r.aluno_id)
       const niv = c && c.n1 != null ? [c.n1, c.n2, c.n3, c.n4, c.n5] : [0, 0, 0, 0, 0]
-      const retidaTipo = c?.extras?.retida && !c?.anulacao && c.nota != null && Number(c.nota) !== 0 && Number(c.nota) !== 10 ? 'ia' : ''
-      return { id: r.id, pac: pacDe[r.pacote_id] ?? 0, idx: i, aluno: a?.nome ?? '', c: r.corretor_id, nota: c?.nota != null ? Number(c.nota) : 0, niv, st: 'pend', mot: c?.anulacao ? `Redação anulada: ${c.anulacao}` : '', tipo: retidaTipo, marks: marcasRet.filter((m) => m.redacao_id === r.id).map((m) => m.dados), obs: c?.comentario ?? '', foto: fotosRet[r.id] ?? null, seed: r.id, _rid: r.id }
+      const ex = c?.extras || {}
+      const retidaTipo = ex.duvida ? 'duvida' : ex.ia ? 'ia' : ''
+      return { id: r.id, pac: pacDe[r.pacote_id] ?? 0, idx: i, aluno: a?.nome ?? '', c: r.corretor_id, nota: c?.nota != null ? Number(c.nota) : 0, niv, st: 'pend', mot: c?.anulacao ? `Redação anulada: ${c.anulacao}` : ex.ia ? 'Suspeita de IA' : '', tipo: retidaTipo, anot: ex.ia?.txt || '', pergunta: ex.duvida?.pergunta || '', crit: ex.duvida?.crit ?? '', linha: ex.duvida?.linha ?? '', marks: marcasRet.filter((m) => m.redacao_id === r.id).map((m) => m.dados), obs: c?.comentario ?? '', foto: fotosRet[r.id] ?? null, seed: r.id, _rid: r.id }
     }))
     fill(C.AVISOS, avis.data.map((x) => ({
       id: x.id, aluno: x.alunos?.nome ?? '', turma: x.alunos?.turmas ? `${x.alunos.turmas.serie}º ano ${x.alunos.turmas.nome}` : '',
@@ -473,6 +479,14 @@ const ARENA = {
       if (x._pid && (prev.pacs[x.id] ?? '') !== (x.c || '')) ok(await supabase.from('pacotes').update({ corretor_id: x.c || null }).eq('id', x._pid))
     }
 
+    // fila de liberação (retidas): zerar por IA
+    for (const f of C.FILA) {
+      if (prev.fila[f.id] === 'pend' && f.st === 'zer' && f._rid) {
+        ok(await supabase.from('correcoes').update({ n1: null, n2: null, n3: null, n4: null, n5: null, anulacao: 'ia', liberada: true }).eq('redacao_id', f._rid))
+        ok(await supabase.from('redacoes').update({ etapa: 'corrigida' }).eq('id', f._rid))
+        if (f.c) ok(await supabase.from('retornos').insert({ corretor_id: f.c, redacao_id: f._rid, resultado: 'ia', antes: f.niv, depois: null }))
+      }
+    }
     // fila de liberação (retidas): quando o professor/coordenação libera ou modifica
     for (const f of C.FILA) {
       if (prev.fila[f.id] === 'pend' && f.st === 'lib' && f._rid) {
@@ -485,7 +499,7 @@ const ARENA = {
           if (f.marks.length) ok(await supabase.from('marcacoes').insert(f.marks.map((m) => ({ redacao_id: f._rid, tipo: m.t === 'c' ? 'c' : 'o', categoria: m.cat ?? null, linha: m.line ?? null, dados: m }))))
         }
         ok(await supabase.from('redacoes').update({ etapa: 'corrigida' }).eq('id', f._rid))
-        if (f.c) ok(await supabase.from('retornos').insert({ corretor_id: f.c, redacao_id: f._rid, resultado: f.res === 'modificada' ? 'modificada' : 'aprovada', antes: f.niv, depois: f.novo || null }))
+        if (f.c) ok(await supabase.from('retornos').insert({ corretor_id: f.c, redacao_id: f._rid, resultado: f.tipo === 'duvida' ? 'duvida' : f.res === 'modificada' ? 'modificada' : 'aprovada', antes: f.niv, depois: f.novo || null, resposta: f.resp || null }))
       }
     }
 
