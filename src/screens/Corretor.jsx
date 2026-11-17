@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { CRITERIOS, calcularNota, formatarNota } from '../domain/grade.js'
 import { rotuloEtapa } from '../domain/etapas.js'
+import { sugerirNiveis, comentarioAuto } from '../domain/assistente.js'
 import { CATEGORIAS } from '../domain/categorias.js'
 import FotoMarcada from '../components/FotoMarcada.jsx'
 
@@ -47,6 +48,11 @@ function Correcao({ redacao, perfil, aoSalvar }) {
           ))}
         </div>
       ))}
+      <button onClick={() => {
+        const sug = sugerirNiveis(marcas)
+        setNiveis(niveis.map((v, i) => (sug[i] ?? v)))
+        if (!coment) setComent(comentarioAuto(marcas))
+      }}>Sugerir níveis e comentário</button>
       <textarea placeholder="Comentário ao aluno" value={coment} onChange={(e) => setComent(e.target.value)} />
       <p>Nota: <b>{formatarNota(nota)}</b></p>
       <button disabled={nota == null} onClick={salvar}>Salvar correção</button>
