@@ -10,3 +10,8 @@ Sistema de correção de redações (grade "Gêneros": 5 critérios, níveis 0�
 npm install && npm run dev
 npm run lint && npm test && npm run build
 ```
+
+## Primeiro acesso (coordenação)
+1. No painel do Supabase → Authentication → Users → *Add user* (e-mail + senha).
+2. No SQL Editor: `insert into perfis(id,tipo,nome) values ('<uuid do usuário>','coordenacao','Seu nome');`
+3. Entre no app; os demais perfis são cadastrados da mesma forma.
