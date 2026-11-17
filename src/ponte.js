@@ -305,9 +305,101 @@ const ARENA = {
     })))
     fill(C.LOG, even.data.filter((e) => e.texto).map((e) => ({ t: dh(e.em), bim: bimAtual, q: nomeDe[e.autor] || 'Coordenação', k: e.tipo || 'outro', x: e.texto })))
     C.resetAidx()
+    // regras gravadas
+    const { data: regras } = await supabase.from('regras').select('chave, valor')
+    for (const r of regras ?? []) { if (r.chave === 'r1') C.S.r1 = r.valor; else C.R[r.chave] = r.valor }
+    ARENA._coord = { alunos, byClass, perf: perf.data }
+    ARENA._snap = ARENA.tirarFoto()
     Object.assign(C.PLAB, { semana: 'Últimos 7 dias', mes: 'Últimos 30 dias', bimestre: 'Bimestre atual' })
     window.__real = true
     window.__coordNomes = nomeDe
+  },
+
+  // ===== Sincronização: o que a coordenação muda na tela vai para o banco =====
+  tirarFoto() {
+    const C = window.__coord
+    return {
+      log: new Set(C.LOG),
+      avisos: Object.fromEntries(C.AVISOS.map((a) => [a.id, `${a.st}|${a.dest || ''}`])),
+      pacs: Object.fromEntries(C.PACS.map((x) => [x.id, x.c || ''])),
+      fila: Object.fromEntries(C.FILA.map((f) => [f.id, f.st])),
+      corr: Object.fromEntries(C.CORR.map((c) => [c.id, !!c.pausado])),
+      prp: Object.fromEntries(C.PRP.map((q) => [q.id, JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])])),
+      regras: JSON.stringify({ r1: C.S.r1, ...C.R }),
+    }
+  },
+
+  _syncTimer: null,
+  sincronizarCoord() {
+    clearTimeout(ARENA._syncTimer)
+    ARENA._syncTimer = setTimeout(() => ARENA._sincronizar().catch((e) => console.error('sync', e)), 400)
+  },
+
+  async _sincronizar() {
+    if (!ARENA._snap || !ARENA.perfil) return
+    const C = window.__coord
+    const prev = ARENA._snap
+    const eu = ARENA.perfil.id
+    const ymd = (dm, ano = new Date().getFullYear()) => { const m = /(\d{2})\/(\d{2})/.exec(dm || ''); return m ? `${ano}-${m[2]}-${m[1]}` : null }
+    const falhas = []
+    const ok = (r) => { if (r && r.error) falhas.push(r.error.message) }
+
+    // histórico
+    const novos = C.LOG.filter((x) => !prev.log.has(x))
+    for (const x of novos.reverse()) ok(await supabase.from('eventos').insert({ autor: eu, acao: 'log', texto: x.x, tipo: x.k }))
+
+    // avisos (aceitar / recusar / corretor destino)
+    for (const a of C.AVISOS) {
+      const antes = prev.avisos[a.id]
+      const agora = `${a.st}|${a.dest || ''}`
+      if (antes === undefined || antes === agora || typeof a.id !== 'number') continue
+      const st = a.st === 'lib' ? 'aceito' : a.st === 'rec' ? 'recusado' : 'pend'
+      ok(await supabase.from('avisos').update({ status: st, destino: a.dest || null, decidido_por: st === 'pend' ? null : eu, decidido_em: st === 'pend' ? null : new Date().toISOString() }).eq('id', a.id))
+    }
+
+    // pacotes: atribuição de corretor
+    for (const x of C.PACS) {
+      if (x._pid && (prev.pacs[x.id] ?? '') !== (x.c || '')) ok(await supabase.from('pacotes').update({ corretor_id: x.c || null }).eq('id', x._pid))
+    }
+
+    // fila de liberação (retidas): quando o professor/coordenação libera ou modifica
+    for (const f of C.FILA) {
+      if (prev.fila[f.id] === 'pend' && f.st === 'lib' && f._rid) {
+        const upd = { liberada: true }
+        if (f.novo) Object.assign(upd, { n1: f.novo[0], n2: f.novo[1], n3: f.novo[2], n4: f.novo[3], n5: f.novo[4] })
+        ok(await supabase.from('correcoes').update(upd).eq('redacao_id', f._rid))
+        ok(await supabase.from('redacoes').update({ etapa: 'corrigida' }).eq('id', f._rid))
+      }
+    }
+
+    // corretores pausados / ativos
+    for (const c of C.CORR) if (prev.corr[c.id] !== undefined && prev.corr[c.id] !== !!c.pausado) ok(await supabase.from('perfis').update({ ativo: !c.pausado }).eq('id', c.id))
+
+    // propostas: criar / alterar
+    for (const q of C.PRP) {
+      const assin = JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])
+      if (prev.prp[q.id] === assin) continue
+      const ano = new Date().getFullYear()
+      const row = { ano, bimestre: q.bim, numero: q.n, genero: q.g, titulo: q.t, series: q.ser, prazo: ymd(q.p1), prazo2: ymd(q.p2), status: q.st, sem_reescrita: !!q.semRe }
+      if (prev.prp[q.id] === undefined) {
+        const r = await supabase.from('propostas').insert(row).select('id').single()
+        if (r.error) ok(r); else { q.id = r.data.id; prev.prp[q.id] = assin }
+      } else ok(await supabase.from('propostas').update(row).eq('id', q.id))
+    }
+
+    // regras
+    const reg = JSON.stringify({ r1: C.S.r1, ...C.R })
+    if (reg !== prev.regras) {
+      const nova = JSON.parse(reg), velha = JSON.parse(prev.regras)
+      for (const k of Object.keys(nova)) if (JSON.stringify(nova[k]) !== JSON.stringify(velha[k])) ok(await supabase.from('regras').upsert({ chave: k, valor: nova[k], atualizada_por: eu, atualizada_em: new Date().toISOString() }))
+    }
+
+    if (falhas.length) {
+      console.error('Falhas ao gravar', falhas)
+      const t = document.getElementById('toast')
+      if (t) { t.textContent = 'Não foi possível gravar tudo no servidor. Recarregue a página e confira.'; t.classList.add('on') }
+    }
+    ARENA._snap = ARENA.tirarFoto()
   },
 
   async sair() {
