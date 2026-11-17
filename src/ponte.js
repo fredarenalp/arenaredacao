@@ -77,7 +77,7 @@ const ARENA = {
   async carregarCorretor() {
     const { data: pacs, error } = await supabase
       .from('pacotes')
-      .select('*, propostas(titulo, genero), redacoes(id, obs, foto_path, etapa, alunos(nome, matricula, turmas(serie, nome)), correcoes(n1,n2,n3,n4,n5,comentario,anulacao,diag,extras), marcacoes(dados))')
+      .select('*, propostas(titulo, genero), redacoes(id, aluno_id, obs, foto_path, etapa, alunos(nome, matricula, turmas(serie, nome)), correcoes(n1,n2,n3,n4,n5,comentario,anulacao,diag,extras), marcacoes(dados))')
       .eq('corretor_id', ARENA.perfil.id)
       .order('numero')
     if (error) throw error
@@ -92,7 +92,14 @@ const ARENA = {
           foto = u?.signedUrl ?? null
         }
         const a = { n: r.alunos.nome, t: r.alunos.turmas ? `${r.alunos.turmas.serie}º${r.alunos.turmas.nome}` : '', m: r.alunos.matricula, foto, _rid: r.id, reesc: p.reescrita }
+        let v1 = null
+        if (p.reescrita && p.proposta_id) {
+          v1 = (await supabase.from('redacoes').select('foto_path, correcoes(n1,n2,n3,n4,n5), marcacoes(dados)').eq('aluno_id', r.aluno_id).eq('proposta_id', p.proposta_id).eq('versao', 1).maybeSingle()).data
+        }
+        const c1 = v1 ? (Array.isArray(v1.correcoes) ? v1.correcoes[0] : v1.correcoes) : null
+        const prev = c1 && c1.n1 != null ? [c1.n1, c1.n2, c1.n3, c1.n4, c1.n5] : null
         if (c && c.n1 != null) a.niv = [c.n1, c.n2, c.n3, c.n4, c.n5]
+        else if (prev) a.niv = prev.slice() // a reescrita começa com os níveis da 1ª versão
         if (c?.anulacao) a.anul = c.anulacao
         window.__corretor.iniA(a)
         if (c) {
@@ -107,6 +114,11 @@ const ARENA = {
           }
         }
         a.marks = (r.marcacoes ?? []).map((m) => m.dados)
+        if (v1) {
+          if (prev) a.prev = prev
+          a.origMarks = (v1.marcacoes ?? []).map((m) => m.dados)
+          if (v1.foto_path) a.origFoto = (await supabase.storage.from('redacoes').createSignedUrl(v1.foto_path, 3600)).data?.signedUrl ?? null
+        }
         alunos.push(a)
       }
       novos.push({ n: p.numero, _pid: p.id, serie: p.serie, prop: p.rotulo, entrega: fmtData(p.entrega), prazo: fmtData(p.prazo), alunos, reesc: p.reescrita, atr: p.atrasadas })
@@ -168,6 +180,7 @@ const ARENA = {
     ARENA.aluno = al
     const { data: props } = await supabase.from('propostas').select('*').order('bimestre').order('id')
     const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao), marcacoes(dados)').eq('aluno_id', al.id)
+    const { data: prazosInd } = await supabase.from('prazos_individuais').select('proposta_id, ate, vale_nota').eq('aluno_id', al.id)
     window.__real = true
     const turma = al.turmas ? `${al.turmas.serie}º ano ${al.turmas.nome}` : ''
     document.getElementById('alNm').textContent = `${al.nome} · ${turma}`.replace(/ · $/, '')
@@ -213,6 +226,8 @@ const ARENA = {
             if (!c1) return { ...base, g, t: rot, s: `Libera depois da correção da Proposta ${num}`, st: 'bl', l: 'Ainda não liberada', kind: 'block' }
             return { ...base, g, t: rot, s: 'Aberta para envio', st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação' }
           }
+          const ind = (prazosInd ?? []).find((x) => x.proposta_id === p.id && x.ate >= hoje)
+          if (ind) return { ...base, g, t: rot, s: `Envio liberado até ${ind.ate.slice(8, 10)}/${ind.ate.slice(5, 7)}${ind.vale_nota ? '' : ' · não vale nota'}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação' }
           const atrasada = p.prazo && p.prazo < hoje
           return atrasada
             ? { ...base, g, t: rot, s: `Prazo encerrado em ${prazo}`, st: 'at', l: 'Atrasada · ainda dá para enviar', kind: 'late', cta: 'Enviar com atraso' }
@@ -428,7 +443,7 @@ const ARENA = {
     ])
     Object.keys(C.SAIU).forEach((k) => delete C.SAIU[k])
     alunos.filter((a) => a.saiu).forEach((a) => { C.SAIU[a.matricula] = true })
-    ARENA._coord = { alunos, byClass, turmas: turm.data, perf: perf.data, byMat: Object.fromEntries(alunos.map((a) => [a.matricula, a])) }
+    ARENA._coord = { alunos, byClass, props: prop.data, turmas: turm.data, perf: perf.data, byMat: Object.fromEntries(alunos.map((a) => [a.matricula, a])) }
     ARENA._snap = ARENA.tirarFoto()
     Object.assign(C.PLAB, { semana: 'Últimos 7 dias', mes: 'Últimos 30 dias', bimestre: 'Bimestre atual' })
     window.__real = true
@@ -447,6 +462,8 @@ const ARENA = {
       prp: Object.fromEntries(C.PRP.map((q) => [q.id, JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])])),
       regras: JSON.stringify({ r1: C.S.r1, ...C.R }),
       bimc: JSON.stringify(C.BIMC.map((b) => b.st)),
+      ext: JSON.stringify(C.EXT),
+      comem: JSON.stringify(C.COMEM),
       cad: Object.fromEntries(C.aidx().map((a) => [a.mat, serTur(a).join('|')])),
       saiu: JSON.stringify(C.SAIU),
       senha: JSON.stringify(C.SENHA),
@@ -594,6 +611,30 @@ const ARENA = {
           const ids = K.turmas.filter((x) => Number(x.serie) === p.s).map((x) => ({ perfil_id: p._id, turma_id: x.id }))
           if (ids.length) ok(await supabase.from('professor_turmas').insert(ids))
         }
+      }
+    }
+
+    // prazo individual liberado a um aluno (Prorrogar → Só um aluno / comunicado extraordinário) e registro de comunicados
+    {
+      const K2 = ARENA._coord
+      const ymdAno = (dm) => { const m = /(\d{2})\/(\d{2})/.exec(dm || ''); return m ? `${new Date().getFullYear()}-${m[2]}-${m[1]}` : null }
+      const alunoDeChave = (key) => { const m = /^(\d)([A-I])(\d+)$/.exec(key); return m ? (K2.byClass[`${m[1]}|${m[2]}`] || [])[+m[3]] : null }
+      const extAgora = C.EXT, extAntes = JSON.parse(prev.ext)
+      for (const key of Object.keys(extAgora)) {
+        if (JSON.stringify(extAgora[key]) === JSON.stringify(extAntes[key])) continue
+        const al = alunoDeChave(key)
+        if (!al) continue
+        for (const sl of extAgora[key].slots || []) {
+          const pr = K2.props.find((x) => x.bimestre === (C.BIMC.filter((b) => b.st === 'and').pop() || C.BIMC.filter((b) => b.st === 'enc').pop() || { n: 1 }).n && x.numero === sl.p)
+          const ate = ymdAno(extAgora[key].prazo)
+          if (pr && ate) ok(await supabase.from('prazos_individuais').upsert({ aluno_id: al.id, proposta_id: pr.id, ate, vale_nota: extAgora[key].vale !== false, motivo: null, criado_por: eu }, { onConflict: 'aluno_id,proposta_id' }))
+        }
+      }
+      const cmAgora = C.COMEM, cmAntes = JSON.parse(prev.comem)
+      for (const key of Object.keys(cmAgora)) {
+        if (JSON.stringify(cmAgora[key]) === JSON.stringify(cmAntes[key])) continue
+        const al = alunoDeChave(key)
+        if (al) ok(await supabase.from('comunicados').insert({ aluno_id: al.id, texto: `Comunicado extraordinário emitido em ${cmAgora[key].dt}: ${cmAgora[key].n} redações não entregues.`, criado_por: eu }))
       }
     }
 
