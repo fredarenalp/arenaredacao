@@ -18,3 +18,17 @@ export function tendencia(linhas) {
   const d = com[com.length - 1].media - com[com.length - 2].media
   return d > 0.25 ? 'em alta' : d < -0.25 ? 'em queda' : 'estável'
 }
+
+// Média de nível (0–4) de cada critério em todas as correções liberadas.
+export function mediaCriterios(correcoes) {
+  return [1, 2, 3, 4, 5].map((n) => {
+    const v = correcoes.map((c) => c['n' + n]).filter((x) => x != null)
+    return { n, media: v.length ? v.reduce((s, x) => s + x, 0) / v.length : null }
+  })
+}
+
+// Média geral de notas (ignora bimestres sem nota).
+export function mediaGeral(linhas) {
+  const v = linhas.filter((l) => l.media != null).map((l) => l.media)
+  return v.length ? v.reduce((s, x) => s + x, 0) / v.length : null
+}

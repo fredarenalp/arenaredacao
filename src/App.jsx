@@ -9,6 +9,9 @@ import Coordenacao from './screens/Coordenacao.jsx'
 
 const TELAS = { aluno: Aluno, corretor: Corretor, professor: Professor, coordenacao: Coordenacao }
 
+const ROTULO = { aluno: 'Aluno', corretor: 'Corretor(a)', professor: 'Professor(a)', coordenacao: 'Coordenação' }
+const iniciais = (n) => n.split(' ').filter(Boolean).slice(0, 2).map((x) => x[0].toUpperCase()).join('')
+
 function Shell() {
   const { sessao, perfil, sair } = useAuth()
   if (!supabase) return <p>Configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.</p>
@@ -18,7 +21,15 @@ function Shell() {
   const Tela = TELAS[perfil.tipo]
   return (
     <>
-      <header><b>Arena Redação</b><span>{perfil.nome} · {perfil.tipo}</span><button onClick={sair}>Sair</button></header>
+      <header className="ph">
+        <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="Arena" style={{ filter: 'brightness(0) invert(1)' }} />
+        <b>Arena Redação</b>
+        <div className="quem">
+          <span className="av">{iniciais(perfil.nome)}</span>
+          <span>{perfil.nome} · {ROTULO[perfil.tipo]}</span>
+          <button onClick={sair}>Sair</button>
+        </div>
+      </header>
       <main><Tela perfil={perfil} /></main>
     </>
   )

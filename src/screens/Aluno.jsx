@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase.js'
 import { rotuloEtapa } from '../domain/etapas.js'
 import Verso from '../components/Verso.jsx'
 import FotoMarcada from '../components/FotoMarcada.jsx'
-import { boletim, tendencia } from '../domain/boletim.js'
+import { boletim, mediaCriterios, mediaGeral } from '../domain/boletim.js'
 import { CRITERIOS, formatarNota } from '../domain/grade.js'
 
 export default function Aluno({ perfil }) {
@@ -12,6 +12,7 @@ export default function Aluno({ perfil }) {
   const [redacoes, setRedacoes] = useState([])
   const [correcoes, setCorrecoes] = useState({})
   const [msg, setMsg] = useState('')
+  const [aba, setAba] = useState('redacoes')
   const [avisos, setAvisos] = useState([])
   const [vista, setVista] = useState(null) // { url, marcas }
 
@@ -46,15 +47,53 @@ export default function Aluno({ perfil }) {
   const linhasBol = boletim(redacoes.filter((r) => correcoes[r.id]?.liberada).map((r) => ({
     bimestre: propostas.find((p) => p.id === r.proposta_id)?.bimestre, nota: correcoes[r.id].nota })))
 
+  const liberadas = redacoes.map((r) => correcoes[r.id]).filter((c) => c?.liberada)
+  const crits = mediaCriterios(liberadas)
+  const geral = mediaGeral(linhasBol)
+
   if (!aluno) return <p>Seu cadastro de aluno ainda não foi vinculado. Fale com a coordenação.</p>
   return (
     <section>
-      <h2>Olá, {aluno.nome}</h2>
-      <div className="card"><b>Boletim</b> <small>({tendencia(linhasBol)})</small>
-        <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
-          {linhasBol.map((l) => <div key={l.bimestre}>{l.bimestre}º bim.<br /><b>{formatarNota(l.media)}</b></div>)}
-        </div>
+      <div className="tabs" role="tablist">
+        {[['redacoes', 'Minhas redações'], ['boletim', 'Boletim'], ['criterios', 'Conhecer critérios']].map(([k, t]) => (
+          <button key={k} className={aba === k ? 'on' : ''} onClick={() => setAba(k)}>{t}</button>
+        ))}
       </div>
+      {aba === 'boletim' && (
+        <div>
+          <h2>Boletim</h2>
+          <p className="lead">Redação · média por bimestre</p>
+          <div className="card destaque"><span className="lb">Média dos bimestres com nota</span><span className="num">{formatarNota(geral)}</span><small>de 10,0</small></div>
+          <div className="grid4">
+            {linhasBol.map((l) => (
+              <div key={l.bimestre} className={'card bim' + (l.media == null ? ' vazio' : '')}>
+                <div className="lb">{l.bimestre}º bimestre</div>
+                <div className="num">{l.media == null ? '–' : formatarNota(l.media)}</div>
+                <small>{l.qtd ? `${l.qtd} redação(ões) corrigida(s)` : 'sem nota ainda'}</small>
+              </div>
+            ))}
+          </div>
+          <h3 style={{ margin: '20px 0 8px' }}>Seus critérios ao longo do ano</h3>
+          <p className="lead">Média do nível de cada critério (de 0 a 4) em todas as suas redações corrigidas.</p>
+          <div className="grid5">
+            {CRITERIOS.map((k, i) => (
+              <div key={k.n} className="card crit-card" style={{ '--c': k.cor }}>
+                <div className="lb">{k.nome}</div>
+                <div><span className="num">{crits[i].media == null ? '–' : crits[i].media.toFixed(1).replace('.', ',')}</span> <small>de 4</small></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {aba === 'criterios' && (
+        <div>
+          <h2>Conhecer critérios</h2>
+          <p className="lead">Cada redação é avaliada em cinco critérios, com níveis de 0 a 4. A nota é a soma dos níveis × 0,5 (máximo 10).</p>
+          {CRITERIOS.map((k) => <div key={k.n} className="card crit-card" style={{ '--c': k.cor }}><b>{k.romano} · {k.nome}</b></div>)}
+        </div>
+      )}
+      {aba === 'redacoes' && <>
+      <h2>Olá, {aluno.nome}</h2>
       {avisos.map((a) => <div key={a.id} className="card aviso-extra"><b>Comunicado da coordenação</b><p>{a.texto}</p></div>)}
       {msg && <p className="aviso">{msg}</p>}
       {vista && <div className="card folha"><button onClick={() => setVista(null)}>Fechar</button> <button onClick={() => window.print()}>Imprimir folha</button><FotoMarcada url={vista.url} marcacoes={vista.marcas} /><div className="verso-quebra"><Verso correcao={vista.correcao} marcas={vista.marcas} /></div></div>}
@@ -81,6 +120,7 @@ export default function Aluno({ perfil }) {
           </article>
         )
       })}
+      </>}
     </section>
   )
 }

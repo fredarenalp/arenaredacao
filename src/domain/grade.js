@@ -1,10 +1,10 @@
 // Grade de correção "Gêneros": 5 critérios (I–V), níveis 0–4, nota = soma × 0,5 (0 a 10).
 export const CRITERIOS = [
-  { n: 1, nome: 'Adequação ao gênero', cor: '#3c7678' },
-  { n: 2, nome: 'Domínio da norma e da língua', cor: '#1a4888' },
-  { n: 3, nome: 'Coesão e coerência', cor: '#6a3a8a' },
-  { n: 4, nome: 'Seleção e organização de informações', cor: '#b07a10' },
-  { n: 5, nome: 'Elementos do gênero', cor: '#2f855a' },
+  { n: 1, nome: 'Estética', cor: '#3c7678', romano: 'I' },
+  { n: 2, nome: 'Linguagem', cor: '#1a4888', romano: 'II' },
+  { n: 3, nome: 'Progressão', cor: '#6a3a8a', romano: 'III' },
+  { n: 4, nome: 'Proposta', cor: '#b07a10', romano: 'IV' },
+  { n: 5, nome: 'Abordagem', cor: '#2f855a', romano: 'V' },
 ]
 
 export const NIVEL_MIN = 0
