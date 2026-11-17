@@ -163,11 +163,28 @@ const ARENA = {
     PROPS.length = 0
     ESSAYS.length = 0
     const novaNota = (n) => String(Number(n).toFixed(1)).replace('.', ',')
-    for (const [i, p] of props.entries()) {
-      const num = i + 1
+    const bimAtual = props.length ? Math.max(...props.map((x) => x.bimestre)) : 1
+    const lib = (r) => (r && r.correcoes && (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes)?.liberada ? (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes) : null)
+
+    // bimestres anteriores: histórico (boletim)
+    const BIMS = window.__aluno.BIMS
+    for (const k of Object.keys(BIMS)) delete BIMS[k]
+    for (let b = 1; b < bimAtual; b++) {
+      const doBim = props.filter((x) => x.bimestre === b).sort((x, y) => x.numero - y.numero)
+      BIMS[b] = { ess: [], notas: [] }
+      for (const p of doBim) {
+        const v = (n) => { const c = lib(reds.find((r) => r.proposta_id === p.id && r.versao === n)); return c && c.nota != null ? Number(c.nota) : 0 }
+        const anul = lib(reds.find((r) => r.proposta_id === p.id && r.versao === 1))?.anulacao
+        BIMS[b].ess.push({ n: p.numero, g: p.genero, tema: p.titulo, ...(anul ? { z: { tipo: 'gen', mot: anul, data: '', por: 'Professor' } } : {}) })
+        BIMS[b].notas.push([v(1), v(2)])
+      }
+    }
+
+    // bimestre atual: cartões
+    for (const p of props.filter((x) => x.bimestre === bimAtual).sort((x, y) => x.numero - y.numero)) {
+      const num = p.numero
       const orig = reds.find((r) => r.proposta_id === p.id && r.versao === 1)
       const re = reds.find((r) => r.proposta_id === p.id && r.versao === 2)
-      const lib = (r) => (r && r.correcoes && (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes)?.liberada ? (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes) : null)
       const item = async (r, versao) => {
         const base = { _pid: p.id, _v: versao }
         const rot = versao === 1 ? `Proposta ${num} · ${p.genero}` : `2ª versão (reescrita) · Proposta ${num}`
@@ -175,6 +192,7 @@ const ARENA = {
         const prazo = p.prazo ? `${p.prazo.slice(8, 10)}/${p.prazo.slice(5, 7)}` : ''
         if (!r) {
           if (versao === 2) {
+            if (p.sem_reescrita) return { ...base, g, t: rot, s: 'Esta proposta não tem reescrita', st: 'bl', l: 'Sem reescrita', kind: 'norew' }
             const c1 = lib(orig)
             if (!c1) return { ...base, g, t: rot, s: `Libera depois da correção da Proposta ${num}`, st: 'bl', l: 'Ainda não liberada', kind: 'block' }
             return { ...base, g, t: rot, s: 'Aberta para envio', st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação' }
@@ -208,7 +226,7 @@ const ARENA = {
       ESSAYS.push({ n: num, g: p.genero, tema: p.titulo, o: io, r: ir })
     }
     window.__aluno.recalc()
-    if (props.length) window.__aluno.setBim(props[props.length - 1].bimestre)
+    window.__aluno.setBim(bimAtual)
   },
 
   // Aviso do aluno à coordenação (envio em atraso ou ausência)
