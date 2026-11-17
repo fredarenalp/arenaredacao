@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { formatarNota } from '../domain/grade.js'
+import ImportarAlunos from './ImportarAlunos.jsx'
 import Corretor from './Corretor.jsx'
 
 function Comunicados({ perfil }) {
@@ -54,6 +55,7 @@ export default function Coordenacao({ perfil }) {
           <button onClick={() => liberar(r)}>Liberar ao aluno</button>
         </article>
       ))}
+      <ImportarAlunos />
       <Comunicados perfil={perfil} />
       <h2>Auditoria recente</h2>
       <ul>{eventos.map((e) => <li key={e.id}>{new Date(e.em).toLocaleString('pt-BR')} — {e.acao} (redação {e.redacao_id})</li>)}</ul>
