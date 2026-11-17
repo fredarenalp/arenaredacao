@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { rotuloEtapa } from '../domain/etapas.js'
 import FotoMarcada from '../components/FotoMarcada.jsx'
+import { boletim, tendencia } from '../domain/boletim.js'
 import { CRITERIOS, formatarNota } from '../domain/grade.js'
 
 export default function Aluno({ perfil }) {
@@ -38,10 +39,18 @@ export default function Aluno({ perfil }) {
     carregar()
   }
 
+  const linhasBol = boletim(redacoes.filter((r) => correcoes[r.id]?.liberada).map((r) => ({
+    bimestre: propostas.find((p) => p.id === r.proposta_id)?.bimestre, nota: correcoes[r.id].nota })))
+
   if (!aluno) return <p>Seu cadastro de aluno ainda não foi vinculado. Fale com a coordenação.</p>
   return (
     <section>
       <h2>Olá, {aluno.nome}</h2>
+      <div className="card"><b>Boletim</b> <small>({tendencia(linhasBol)})</small>
+        <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
+          {linhasBol.map((l) => <div key={l.bimestre}>{l.bimestre}º bim.<br /><b>{formatarNota(l.media)}</b></div>)}
+        </div>
+      </div>
       {msg && <p className="aviso">{msg}</p>}
       {vista && <div className="card"><button onClick={() => setVista(null)}>Fechar</button><FotoMarcada url={vista.url} marcacoes={vista.marcas} /></div>}
       {propostas.map((p) => {
