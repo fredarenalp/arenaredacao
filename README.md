@@ -39,7 +39,7 @@ Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PR
 - [ ] Ganchos (calibração): a tela existe, mas **não** grava no banco (fica vazia a cada recarga); comparação professor × corretor depende disso
 - [ ] Entregas → "Ver redação" ainda mostra a ilustração de exemplo em vez da foto real do aluno
 - [ ] Relatórios impressos (PDF) com dados reais de ponta a ponta; contestação do aluno; notificações por e-mail
-- [ ] Criação de pacotes pela coordenação (hoje os pacotes entram por SQL ou importação futura)
+- [x] Pacotes: criados automaticamente (turma + proposta + versão, prazo vencido) quando a coordenação abre o sistema; distribuição gravada
 
 ### Testes
 - `node e2e/smoke.cjs` (com `npx vite preview --port 4173` rodando): entra com os 4 perfis e abre todas as telas.
