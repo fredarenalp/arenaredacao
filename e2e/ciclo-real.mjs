@@ -11,7 +11,7 @@ const entrar = async (email) => {
 }
 const ok = (cond, msg) => { console.log((cond ? 'ok   ' : 'FALHA'), msg); if (!cond) process.exitCode = 1 }
 
-const aluno = await entrar('aluno@arena.com')
+const aluno = await entrar('20260187@aluno.arena.com')
 const corretor = await entrar('corretor@arena.com')
 const coord = await entrar('teste@arena.com')
 
@@ -30,28 +30,28 @@ const { data: url } = await corretor.storage.from('redacoes').createSignedUrl(pa
 ok(!!url?.signedUrl, 'corretor acessa a foto')
 
 await corretor.from('marcacoes').insert({ redacao_id: red.id, tipo: 'o', categoria: 'ort', dados: { cx: 0.3, cy: 0.4 } })
-const { error: eC } = await corretor.from('correcoes').upsert({ redacao_id: red.id, n1: 4, n2: 3, n3: 3, n4: 2, n5: 4, comentario: 'Ciclo de teste.' })
+const { error: eC } = await corretor.from('correcoes').upsert({ redacao_id: red.id, n1: 4, n2: 3, n3: 3, n4: 2, n5: 4, comentario: 'Ciclo de teste.', extras: { retida: false } })
 ok(!eC, 'corretor salva a correção')
-await corretor.from('redacoes').update({ etapa: 'aguardando_liberacao' }).eq('id', red.id)
-
-const { data: antes } = await aluno.from('correcoes').select('*').eq('redacao_id', red.id)
-ok(antes.length === 0, 'aluno NÃO vê a correção antes da liberação')
-const { data: marcAntes } = await aluno.from('marcacoes').select('*').eq('redacao_id', red.id)
-ok(marcAntes.length === 0, 'aluno NÃO vê as marcações antes da liberação')
-const lib = await corretor.from('correcoes').update({ liberada: true }).eq('redacao_id', red.id)
-const { data: ainda } = await aluno.from('correcoes').select('liberada').eq('redacao_id', red.id)
-ok(ainda.length === 0, 'corretor não consegue liberar' + (lib.error ? '' : ' (sem efeito)'))
-
-await coord.from('correcoes').update({ liberada: true }).eq('redacao_id', red.id)
-await coord.from('redacoes').update({ etapa: 'corrigida' }).eq('id', red.id)
+const { error: eL } = await corretor.from('correcoes').update({ liberada: true }).eq('redacao_id', red.id)
+ok(!eL, 'corretor libera correção comum (nota 8)')
 const { data: dep } = await aluno.from('correcoes').select('*').eq('redacao_id', red.id).single()
 ok(dep?.nota === 8, `aluno vê a nota após liberar (nota ${dep?.nota})`)
 const { data: marcDep } = await aluno.from('marcacoes').select('*').eq('redacao_id', red.id)
 ok(marcDep.length === 1, 'aluno vê as marcações após liberar')
 
+// nota 10 é retida: o corretor NÃO libera; coordenação libera
+await corretor.from('correcoes').update({ n1: 4, n2: 4, n3: 4, n4: 4, n5: 4, liberada: false }).eq('redacao_id', red.id)
+const { error: eRet } = await corretor.from('correcoes').update({ liberada: true }).eq('redacao_id', red.id)
+ok(!!eRet, 'corretor NÃO libera nota 10 (retida)')
+const { data: ret } = await aluno.from('correcoes').select('liberada').eq('redacao_id', red.id)
+ok(ret.length === 0, 'aluno não vê a nota retida')
+await coord.from('correcoes').update({ liberada: true }).eq('redacao_id', red.id)
+const { data: ret2 } = await aluno.from('correcoes').select('nota').eq('redacao_id', red.id)
+ok(ret2[0]?.nota === 10, 'coordenação libera a nota retida')
+
 await coord.from('correcoes').update({ n1: 3 }).eq('redacao_id', red.id)
 const { data: ev } = await coord.from('eventos').select('*').eq('redacao_id', red.id).eq('acao', 'nota_alterada')
-ok(ev.length === 1, 'alteração de nota gerou auditoria')
+ok(ev.length >= 1, 'alteração de nota gerou auditoria')
 
 // limpeza
 await coord.from('redacoes').delete().eq('id', red.id)

@@ -81,8 +81,13 @@ const ARENA = {
       redacao_id: a._rid,
       n1: a.anul ? null : a.niv[0], n2: a.anul ? null : a.niv[1], n3: a.anul ? null : a.niv[2],
       n4: a.anul ? null : a.niv[3], n5: a.anul ? null : a.niv[4],
-      comentario: a.obs ?? '', anulacao: a.anul || null, diag: a.diag ?? null, extras: { nCorr: a.nCorr || 0 },
+      comentario: a.obs ?? '', anulacao: a.anul || null, diag: a.diag ?? null,
     }
+    const soma = a.anul ? 0 : a.niv.reduce((x, y) => x + y, 0)
+    // retida: anulada, nota 0 ou 10, suspeita de IA ou dúvida pendente -> o professor/coordenação decide
+    const retida = !!a.anul || soma === 0 || soma === 20 || !!a.ia || !!(a.duvida && a.duvida.st === 'pend')
+    row.extras = { nCorr: a.nCorr || 0, retida }
+    row.liberada = !retida
     const r1 = await supabase.from('correcoes').upsert(row)
     if (r1.error) return false
     await supabase.from('marcacoes').delete().eq('redacao_id', a._rid)
@@ -91,7 +96,7 @@ const ARENA = {
       const r2 = await supabase.from('marcacoes').insert(marcas)
       if (r2.error) return false
     }
-    await supabase.from('redacoes').update({ etapa: 'aguardando_liberacao', corretor_id: ARENA.perfil.id }).eq('id', a._rid)
+    await supabase.from('redacoes').update({ etapa: retida ? 'aguardando_liberacao' : 'corrigida', corretor_id: ARENA.perfil.id }).eq('id', a._rid)
     return true
   },
 
