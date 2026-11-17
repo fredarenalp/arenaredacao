@@ -300,6 +300,8 @@ const ARENA = {
 
   // ===== Coordenação / Professor =====
   async carregarCoord() {
+    // agrupa em pacotes as redações já vencidas e ainda sem pacote (só a coordenação executa)
+    if (ARENA.perfil.tipo === 'coordenacao') await supabase.rpc('gerar_pacotes')
     const q = (t, sel = '*') => supabase.from(t).select(sel).limit(5000)
     const desde = new Date(Date.now() - 70 * 86400000).toISOString()
     const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess] = await Promise.all([
