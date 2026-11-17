@@ -47,21 +47,39 @@ export default function Coordenacao({ perfil }) {
     await supabase.from('eventos').insert({ redacao_id: r.id, autor: perfil.id, acao: 'liberada' })
     carregar()
   }
+  const [aba, setAba] = useState('liberacao')
+  const ABAS = [['liberacao', `Liberação (${fila.length})`], ['corrigir', 'Corrigir'], ['comunicados', 'Comunicados'], ['cadastros', 'Cadastros'], ['auditoria', 'Auditoria']]
   return (
     <section>
-      <h2>Aguardando liberação ({fila.length})</h2>
-      {fila.map((r) => (
-        <article key={r.id} className="card row">
-          <b>{r.alunos?.nome}</b> — {r.propostas?.titulo} · nota {formatarNota(Number(r.correcoes?.nota))}
-          <button onClick={() => liberar(r)}>Liberar ao aluno</button>
-        </article>
-      ))}
-      <NovoUsuario />
-      <ImportarAlunos />
-      <Comunicados perfil={perfil} />
-      <h2>Auditoria recente</h2>
-      <ul>{eventos.map((e) => <li key={e.id}>{new Date(e.em).toLocaleString('pt-BR')} — {e.acao} (redação {e.redacao_id})</li>)}</ul>
-      <Corretor perfil={perfil} />
+      <div className="tabs" role="tablist">
+        {ABAS.map(([k, t]) => <button key={k} className={aba === k ? 'on' : ''} onClick={() => setAba(k)}>{t}</button>)}
+      </div>
+      {aba === 'liberacao' && (
+        <div>
+          <h2>Aguardando liberação</h2>
+          <p className="lead">Correções prontas. O aluno só vê a nota depois que você liberar.</p>
+          {fila.map((r) => (
+            <article key={r.id} className="card row" style={{ cursor: 'default' }}>
+              <b>{r.alunos?.nome}</b> <span>{r.propostas?.titulo}</span>
+              <span className="pill" style={{ marginLeft: 'auto' }}>nota {formatarNota(Number(r.correcoes?.nota))}</span>
+              <button className="pri" onClick={() => liberar(r)}>Liberar ao aluno</button>
+            </article>
+          ))}
+          {!fila.length && <div className="card"><small>Nada aguardando liberação.</small></div>}
+        </div>
+      )}
+      {aba === 'corrigir' && <Corretor perfil={perfil} />}
+      {aba === 'comunicados' && <Comunicados perfil={perfil} />}
+      {aba === 'cadastros' && <><NovoUsuario /><ImportarAlunos /></>}
+      {aba === 'auditoria' && (
+        <div>
+          <h2>Auditoria recente</h2>
+          <div className="card">
+            {eventos.map((e) => <div key={e.id} className="crs"><span>{e.acao.replace('_', ' ')} · redação {e.redacao_id}</span><small>{new Date(e.em).toLocaleString('pt-BR')}</small></div>)}
+            {!eventos.length && <small>Sem registros ainda.</small>}
+          </div>
+        </div>
+      )}
     </section>
   )
 }
