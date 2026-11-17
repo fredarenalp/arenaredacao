@@ -22,3 +22,5 @@ button.sel{background:var(--c2);color:#fff}
   .folha{border:0;margin:0}
   body{background:#fff}
 }
+.crs{display:flex;justify-content:space-between;padding:4px 0}
+@media print{.verso-quebra{break-before:page}}

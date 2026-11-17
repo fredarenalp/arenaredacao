@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { rotuloEtapa } from '../domain/etapas.js'
+import Verso from '../components/Verso.jsx'
 import FotoMarcada from '../components/FotoMarcada.jsx'
 import { boletim, tendencia } from '../domain/boletim.js'
 import { CRITERIOS, formatarNota } from '../domain/grade.js'
@@ -56,7 +57,7 @@ export default function Aluno({ perfil }) {
       </div>
       {avisos.map((a) => <div key={a.id} className="card aviso-extra"><b>Comunicado da coordenação</b><p>{a.texto}</p></div>)}
       {msg && <p className="aviso">{msg}</p>}
-      {vista && <div className="card folha"><button onClick={() => setVista(null)}>Fechar</button> <button onClick={() => window.print()}>Imprimir folha</button><FotoMarcada url={vista.url} marcacoes={vista.marcas} /></div>}
+      {vista && <div className="card folha"><button onClick={() => setVista(null)}>Fechar</button> <button onClick={() => window.print()}>Imprimir folha</button><FotoMarcada url={vista.url} marcacoes={vista.marcas} /><div className="verso-quebra"><Verso correcao={vista.correcao} marcas={vista.marcas} /></div></div>}
       {propostas.map((p) => {
         const r = redacoes.find((x) => x.proposta_id === p.id)
         const c = r && correcoes[r.id]
@@ -72,7 +73,7 @@ export default function Aluno({ perfil }) {
                 <button onClick={async () => {
                   const { data: u } = await supabase.storage.from('redacoes').createSignedUrl(r.foto_path, 600)
                   const { data: m } = await supabase.from('marcacoes').select('*').eq('redacao_id', r.id)
-                  setVista({ url: u?.signedUrl, marcas: m ?? [] })
+                  setVista({ url: u?.signedUrl, marcas: m ?? [], correcao: c })
                 }}>Ver correção na redação</button>
                 {c.comentario && <p className="coment">{c.comentario}</p>}
               </div>
