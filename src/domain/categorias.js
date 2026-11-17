@@ -1,6 +1,6 @@
 // Categorias de marcação por critério (numeral = critério ao qual pertencem).
 export const CATEGORIAS = [
-  { id: 'gen', nome: 'Adequação ao gênero', crit: 1 },
+  { id: 'gen', nome: 'Estética (apresentação)', crit: 1 },
   { id: 'ort', nome: 'Ortografia', crit: 2 },
   { id: 'pont', nome: 'Pontuação', crit: 2 },
   { id: 'conc', nome: 'Concordância', crit: 2 },
