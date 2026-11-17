@@ -7,6 +7,11 @@ const emailAluno = (matricula) => `${String(matricula).trim().toLowerCase()}@alu
 const serTur = (a) => [a.s ?? Number(/(\d)º/.exec(a.turma || '')?.[1]), a.t ?? String(a.turma || '').trim().slice(-1)]
 const fmtData = (d) => (d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '')
 
+const NOMES_MES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
+const mesDe = (iso) => String(iso).slice(0, 7)
+const mesAtual = () => new Date().toISOString().slice(0, 7)
+const rotuloMes = (k) => { const [a, m] = k.split('-'); return `${NOMES_MES[+m - 1][0].toUpperCase()}${NOMES_MES[+m - 1].slice(1)}/${a}${k === mesAtual() ? ' (em andamento)' : ''}` }
+
 const ARENA = {
   supabase,
   perfil: null,
@@ -32,6 +37,28 @@ const ARENA = {
     } catch {
       return 'sys'
     }
+  },
+
+  // ===== Financeiro (valor por redação corrigida; gancho pela metade) =====
+  definirFinanceiro(dados) {
+    // dados: [{ corretor_id, versao, em, feita }]
+    ARENA._fin = dados
+    window.__finDB = (cid, mes) => {
+      const C = window.__coord
+      const r1 = C ? C.S.r1 : 6.33
+      const meus = ARENA._fin.filter((x) => x.corretor_id === cid && x.feita && mesDe(x.em) === mes)
+      const q1 = meus.filter((x) => x.versao === 1).length, q2 = meus.filter((x) => x.versao === 2).length
+      const rg = Math.round(r1 * 50 + 1e-9) / 100
+      const meses = {}
+      meses[mesAtual()] = rotuloMes(mesAtual())
+      for (const x of ARENA._fin) if (x.corretor_id === cid) meses[mesDe(x.em)] = rotuloMes(mesDe(x.em))
+      const ordenado = Object.fromEntries(Object.entries(meses).sort((a, b) => (a[0] < b[0] ? 1 : -1)))
+      return { q1, q2, ng: 0, r1, rg, avg: null, prazo: null, v1: q1 * r1, v2: q2 * r1, vg: 0, tot: (q1 + q2) * r1, meses: ordenado, parcial: mes === mesAtual() }
+    }
+  },
+
+  async retornoMarca(id, patch) {
+    await supabase.from('retornos').update(patch).eq('id', id)
   },
 
   // ===== Corretor: pacotes reais no lugar dos pacotes de exemplo =====
@@ -68,6 +95,18 @@ const ARENA = {
       }
       novos.push({ n: p.numero, _pid: p.id, serie: p.serie, prop: p.rotulo, entrega: fmtData(p.entrega), prazo: fmtData(p.prazo), alunos, reesc: p.reescrita, atr: p.atrasadas })
     }
+    const { data: minhas } = await supabase.from('redacoes').select('versao, etapa, corretor_id, correcoes(atualizada_em, n1, anulacao)').eq('corretor_id', ARENA.perfil.id).limit(5000)
+    ARENA.definirFinanceiro((minhas ?? []).flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao }] : [] }))
+    window.__corretor.setMes(mesAtual())
+    const { data: rets } = await supabase.from('retornos').select('id, resultado, antes, depois, visto, redacao_id, redacoes(foto_path, alunos(nome), pacotes(numero), correcoes(comentario), marcacoes(dados))').eq('corretor_id', ARENA.perfil.id).eq('entendido', false).order('criado_em', { ascending: false })
+    const itens = []
+    for (const r of rets ?? []) {
+      const rd = r.redacoes
+      const c = Array.isArray(rd?.correcoes) ? rd.correcoes[0] : rd?.correcoes
+      const foto = rd?.foto_path ? (await supabase.storage.from('redacoes').createSignedUrl(rd.foto_path, 3600)).data?.signedUrl ?? null : null
+      itens.push({ id: r.id, aluno: rd?.alunos?.nome ?? '', pac: rd?.pacotes?.numero ?? '', res: r.resultado, antes: r.antes, depois: r.depois, visto: r.visto, marks: (rd?.marcacoes ?? []).map((m) => m.dados), obs: c?.comentario ?? '', foto, seed: r.redacao_id })
+    }
+    window.__store.retornos = itens
     window.__real = true
     const pn = ARENA.perfil.nome
     const ini = pn.split(' ').filter(Boolean).slice(0, 2).map((x) => x[0].toUpperCase()).join('')
@@ -204,7 +243,7 @@ const ARENA = {
     const desde = new Date(Date.now() - 70 * 86400000).toISOString()
     const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess] = await Promise.all([
       q('perfis'), q('turmas'), q('alunos', '*, turmas(serie, nome)'), q('propostas'), q('pacotes'),
-      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario)'),
+      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario,atualizada_em)'),
       q('avisos', '*, alunos(nome, turmas(serie, nome)), propostas(numero, genero)'),
       supabase.from('eventos').select('*').order('em', { ascending: false }).limit(300),
       q('professor_turmas'),
@@ -335,6 +374,7 @@ const ARENA = {
     })))
     fill(C.LOG, even.data.filter((e) => e.texto).map((e) => ({ t: dh(e.em), bim: bimAtual, q: nomeDe[e.autor] || 'Coordenação', k: e.tipo || 'outro', x: e.texto })))
     C.resetAidx()
+    ARENA.definirFinanceiro(reds.data.flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && r.corretor_id ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao }] : [] }))
     // regras gravadas
     const { data: regras } = await supabase.from('regras').select('chave, valor')
     for (const r of regras ?? []) { if (r.chave === 'r1') C.S.r1 = r.valor; else C.R[r.chave] = r.valor }
@@ -409,8 +449,14 @@ const ARENA = {
       if (prev.fila[f.id] === 'pend' && f.st === 'lib' && f._rid) {
         const upd = { liberada: true }
         if (f.novo) Object.assign(upd, { n1: f.novo[0], n2: f.novo[1], n3: f.novo[2], n4: f.novo[3], n5: f.novo[4] })
+        if (f.novo) upd.comentario = f.obs ?? ''
         ok(await supabase.from('correcoes').update(upd).eq('redacao_id', f._rid))
+        if (f.novo && f.marks) {
+          ok(await supabase.from('marcacoes').delete().eq('redacao_id', f._rid))
+          if (f.marks.length) ok(await supabase.from('marcacoes').insert(f.marks.map((m) => ({ redacao_id: f._rid, tipo: m.t === 'c' ? 'c' : 'o', categoria: m.cat ?? null, linha: m.line ?? null, dados: m }))))
+        }
         ok(await supabase.from('redacoes').update({ etapa: 'corrigida' }).eq('id', f._rid))
+        if (f.c) ok(await supabase.from('retornos').insert({ corretor_id: f.c, redacao_id: f._rid, resultado: f.res === 'modificada' ? 'modificada' : 'aprovada', antes: f.niv, depois: f.novo || null }))
       }
     }
 

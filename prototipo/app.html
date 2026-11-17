@@ -1984,7 +1984,7 @@ var PACS=[
  {n:18,serie:'8º ano A',prop:'2ª versão (reescrita) · Proposta 1 · Crônica',entrega:'14/11',prazo:'18/11',alunos:REESC,reesc:true},
  {n:20,serie:'Pasta de teste',prop:'Proposta Teste · Gênero Teste · 1ª versão',entrega:'09/11',prazo:'16/11',alunos:REAIS}
 ],pacIdx=0;
-window.__corretor={PACS:PACS,iniA:iniA};
+window.__corretor={PACS:PACS,iniA:iniA,setMes:function(m){ganhoMes=m}};
 var ATRAS=[{n:'Rafaela Duarte',t:'8ºA',m:'20260410',atr:true},{n:'Gustavo Pires',t:'7ºB',m:'20260411',atr:true}];ATRAS.forEach(iniA);
 var CONC=[{n:'Aline Costa',t:'9ºC',m:'20250601',niv:[3,3,4,3,3]},{n:'Bernardo Reis',t:'9ºC',m:'20250602',niv:[2,3,3,3,3]},{n:'Clara Nunes',t:'9ºC',m:'20250603',niv:[4,3,4,4,3]},{n:'Diego Faria',t:'9ºC',m:'20250604',niv:[3,2,3,3,2]}];CONC.forEach(iniA);
 var i=0,zoom=60,rot=0,cur;
@@ -2147,24 +2147,24 @@ function retornoGancho(a,go){
 window.__corr.addAtrasada=function(o){var P=PACS.filter(function(x){return x.atr})[0];if(!P)return;var a={n:o.n,t:o.t,m:o.m,atr:true,semNota:!!o.semNota};iniA(a);P.alunos.push(a)};
 var ganhoMes='2026-11';
 function rsB(v){return 'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+,)/g,'.')}
-function renderGanho(){if(window.__real){if($('phGanho'))$('phGanho').innerHTML='';return}var el=$('phGanho'),F=window.__fin&&window.__fin('marina',ganhoMes);if(!el||!F)return;
- var parcial=ganhoMes==='2026-11',n1=F.q1,n2=F.q2;
+function renderGanho(){var el=$('phGanho'),F=window.__fin&&window.__fin((window.__real&&window.ARENA&&window.ARENA.perfil)?window.ARENA.perfil.id:'marina',ganhoMes);if(!el||!F)return;
+ var parcial=F.parcial!=null?F.parcial:ganhoMes==='2026-11',n1=F.q1,n2=F.q2;
  el.innerHTML='<div class="gh"><div class="ghh"><div><div class="ghk">Quanto você recebe</div><div class="ghv">'+rsB(F.tot)+'</div><div class="ghs">'+(parcial?'Valor parcial: o mês ainda está em andamento.':'Mês fechado.')+'</div></div><label class="ghm">Período<select id="ghMes">'+Object.keys(F.meses).map(function(k){return '<option value="'+k+'"'+(k===ganhoMes?' selected':'')+'>'+F.meses[k]+'</option>'}).join('')+'</select></label></div>'+
  '<table class="ght"><tbody><tr><td>1ª versão</td><td class="n">'+n1+' × '+rsB(F.r1)+'</td><td class="n"><b>'+rsB(F.v1)+'</b></td></tr><tr><td>Reescritas</td><td class="n">'+n2+' × '+rsB(F.r1)+'</td><td class="n"><b>'+rsB(F.v2)+'</b></td></tr><tr><td>Ganchos <small>(pagos pela metade)</small></td><td class="n">'+F.ng+' × '+rsB(F.rg)+'</td><td class="n"><b>'+rsB(F.vg)+'</b></td></tr></tbody></table>'+
- '<div class="ghf"><span><b>'+(n1+n2)+'</b> redações corrigidas</span><span>Tempo médio <b>'+Math.floor(F.avg/60)+':'+('0'+Math.round(F.avg%60)).slice(-2)+'</b> por redação</span><span><b>'+F.prazo+'%</b> devolvidas no prazo</span></div></div>';
+ '<div class="ghf"><span><b>'+(n1+n2)+'</b> redações corrigidas</span>'+(F.avg!=null?'<span>Tempo médio <b>'+Math.floor(F.avg/60)+':'+('0'+Math.round(F.avg%60)).slice(-2)+'</b> por redação</span>':'')+(F.prazo!=null?'<span><b>'+F.prazo+'%</b> devolvidas no prazo</span>':'')+'</div></div>';
  var sel=$('ghMes');if(sel)sel.onchange=function(){ganhoMes=sel.value;renderGanho()}}
 var phTab='ab';
 function pacConc(P){var n=P.alunos.length;return !P.atr&&n>0&&P.alunos.filter(feito).length===n}
 var RTALL=false;function esc2(x){return String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')}
-function renderRetornos(){if(window.__real){if($('phRet'))$('phRet').innerHTML='';return}var el=$('phRet'),R=(window.__store&&window.__store.retornos)||[];if(!el)return;if(!R.length){el.innerHTML='';return}
+function renderRetornos(){var el=$('phRet'),R=(window.__store&&window.__store.retornos)||[];if(!el)return;if(!R.length){el.innerHTML='';return}
  var A=window.__arena,tot=function(a){return a.reduce(function(x,y){return x+y},0)/2},V=RTALL?R:R.slice(0,3),lg=function(t){if(window.__store&&window.__store.logCorr)window.__store.logCorr('Marina Souza',t,'nota')};
  el.innerHTML='<div class="rt"><div class="rth">Retorno do professor <i>'+R.length+'</i></div>'+V.map(function(r){var d='';
   if(r.res==='modificada'){d=r.depois.map(function(v,j){return v!==r.antes[j]?A.COMPS[j].nome+' '+r.antes[j]+' → '+v:''}).filter(Boolean).join(' · ')}
   var tx=r.res==='aprovada'?'<b>Aprovada pelo professor.</b> Vale a sua nota ('+A.fmt(tot(r.antes))+').':r.res==='modificada'?'<b>Recorrigida pelo professor:</b> sua nota '+A.fmt(tot(r.antes))+' → <b>'+A.fmt(tot(r.depois))+'</b>. <span class="sm">'+d+'</span>':'<b>Zerada pelo professor</b> por uso de inteligência artificial.';
   if(r.res==='duvida')tx='<b>Resposta à sua dúvida:</b> “'+esc2(r.resp)+'” '+(r.depois?'<span class="sm">'+(r.antes?'O professor ajustou a nota: '+A.fmt(tot(r.antes))+' → <b>'+A.fmt(tot(r.depois))+'</b>':'O professor definiu a nota: <b>'+A.fmt(tot(r.depois))+'</b>')+'</span>':'<span class="sm">Vale a sua nota'+(r.antes?' ('+A.fmt(tot(r.antes))+')':'')+'.</span>');
   return '<div class="rti"><div><b>'+r.aluno+'</b> <span class="sm">Pacote '+r.pac+'</span>'+(r.visto?' <span class="rtv">redação vista</span>':'')+'<div>'+tx+'</div></div><span class="rta">'+(r.res==='aprovada'?'':'<button type="button" class="rtbtn" data-rv="'+r.id+'">Ver redação</button>')+'<button type="button" class="link" data-rt="'+r.id+'"'+(r.visto||r.res==='aprovada'?'':' disabled title="Veja a redação primeiro"')+'>Entendi</button></span></div>'}).join('')+(R.length>3?'<div class="rtm"><button type="button" class="link" data-rall="1">'+(RTALL?'Mostrar menos':'Ver todos ('+R.length+')')+'</button></div>':'')+'</div>';
- var fim=function(id){var r=window.__store.retornos.filter(function(x){return String(x.id)===String(id)})[0];window.__store.retornos=window.__store.retornos.filter(function(x){return String(x.id)!==String(id)});if(r)lg('Marcou “Entendi” no retorno do professor sobre '+r.aluno+' (pacote '+r.pac+')');renderRetornos()};
- el.querySelectorAll('[data-rv]').forEach(function(b){b.onclick=function(){var r=window.__store.retornos.filter(function(x){return String(x.id)===b.dataset.rv})[0];if(!r)return;if(!r.visto){r.visto=true;lg('Viu a redação de '+r.aluno+' no retorno do professor (pacote '+r.pac+')')}
+ var fim=function(id){var r=window.__store.retornos.filter(function(x){return String(x.id)===String(id)})[0];window.__store.retornos=window.__store.retornos.filter(function(x){return String(x.id)!==String(id)});if(r){lg('Marcou “Entendi” no retorno do professor sobre '+r.aluno+' (pacote '+r.pac+')');if(window.__real&&window.ARENA)window.ARENA.retornoMarca(r.id,{entendido:true})}renderRetornos()};
+ el.querySelectorAll('[data-rv]').forEach(function(b){b.onclick=function(){var r=window.__store.retornos.filter(function(x){return String(x.id)===b.dataset.rv})[0];if(!r)return;if(!r.visto){r.visto=true;if(window.__real&&window.ARENA)window.ARENA.retornoMarca(r.id,{visto:true});lg('Viu a redação de '+r.aluno+' no retorno do professor (pacote '+r.pac+')')}
   verCorrProf({aluno:r.aluno,seed:r.seed,foto:r.foto,marks:r.marks,obs:r.obs,orig:r.orig,niv:r.depois||r.antes,corNiv:r.depois?r.antes:null,titulo:r.res==='aprovada'?'Aprovada pelo professor':r.res==='duvida'?'Resposta à sua dúvida':r.res==='modificada'?'Correção do professor':'Zerada pelo professor',voltar:'← Voltar aos retornos',onClose:renderRetornos,onOk:function(){fim(r.id)}})}});
  el.querySelectorAll('[data-rt]').forEach(function(b){b.onclick=function(){if(b.disabled)return;fim(b.dataset.rt)}});
  var ra=el.querySelector('[data-rall]');if(ra)ra.onclick=function(){RTALL=!RTALL;renderRetornos()}}
@@ -4327,7 +4327,7 @@ function relMedias(){var s=profS(),t=S.x.mt,tur=t==='todas'?TURMAS:[t],logo=($('
 $('coMain').addEventListener('click',function(e){var t=e.target.closest('[data-x-rel]');if(t){relEntregas(t.dataset.xRel);return}if(e.target.closest('[data-x-med]'))relMedias()});
 $('coMain').addEventListener('change',function(e){var t=e.target;if(t.id==='xmS'){S.x.ms=+t.value;render()}else if(t.id==='xmT'){S.x.mt=t.value;render()}});
 
-window.__fin=function(cid,mes){var ci=CORR.map(function(c){return c.id}).indexOf(cid);if(ci<0)return null;var old=S.mes;S.mes=mes;var x=perf(CORR[ci],ci);S.mes=old;var ng=nGanchos(cid);return {q1:x.q1,q2:x.q2,ng:ng,r1:S.r1,rg:halfR(),avg:x.avg,prazo:x.prazo,v1:x.q1*S.r1,v2:x.q2*S.r1,vg:ng*halfR(),tot:x.q*S.r1+ng*halfR(),meses:MESES}};
+window.__fin=function(cid,mes){if(window.__finDB)return window.__finDB(cid,mes);var ci=CORR.map(function(c){return c.id}).indexOf(cid);if(ci<0)return null;var old=S.mes;S.mes=mes;var x=perf(CORR[ci],ci);S.mes=old;var ng=nGanchos(cid);return {q1:x.q1,q2:x.q2,ng:ng,r1:S.r1,rg:halfR(),avg:x.avg,prazo:x.prazo,v1:x.q1*S.r1,v2:x.q2*S.r1,vg:ng*halfR(),tot:x.q*S.r1+ng*halfR(),meses:MESES}};
 var PROFS=[{id:'marta',n:'Prof. Marta Cunha',s:7},{id:'helena',n:'Prof. Helena Duarte',s:8},{id:'sergio',n:'Prof. Sérgio Lima',s:9}];S.pid='helena';
 function profO(){return PROFS.filter(function(p){return p.id===S.pid})[0]}
 function profS(){return profO().s}
