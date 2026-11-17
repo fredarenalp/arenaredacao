@@ -12,6 +12,17 @@ const mesDe = (iso) => String(iso).slice(0, 7)
 const mesAtual = () => new Date().toISOString().slice(0, 7)
 const rotuloMes = (k) => { const [a, m] = k.split('-'); return `${NOMES_MES[+m - 1][0].toUpperCase()}${NOMES_MES[+m - 1].slice(1)}/${a}${k === mesAtual() ? ' (em andamento)' : ''}` }
 
+// Separa o comentário gravado pelo corretor ("Comp. I – Estética (nível 4): texto") em um texto por critério.
+const ROMANOS = ['I', 'II', 'III', 'IV', 'V']
+const parseObs = (txt) => {
+  const out = [null, null, null, null, null]
+  for (const m of String(txt || '').matchAll(/Comp\.\s*(IV|V|I{1,3})\s*[–-][^(\n]*\(nível\s*\d\):\s*([\s\S]*?)(?=\nComp\.|$)/g)) {
+    const i = ROMANOS.indexOf(m[1])
+    if (i >= 0) out[i] = m[2].trim()
+  }
+  return out
+}
+
 const ARENA = {
   supabase,
   perfil: null,
@@ -216,7 +227,7 @@ const ARENA = {
         return {
           ...base, g, t: rot, s: `Entregue em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)} · corrigida`, st: 'ok',
           l: `Corrigida · nota ${novaNota(c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: [c.n1, c.n2, c.n3, c.n4, c.n5],
-          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`,
+          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario),
         }
       }
       const io = PROPS.length

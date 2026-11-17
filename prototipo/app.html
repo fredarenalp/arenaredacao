@@ -3635,7 +3635,7 @@ function verCorrecao(k){
  }
  var dvLing=Object.keys(por).length?'<div class="crt">'+Object.keys(por).map(function(c){return '<i>'+catN[c]+' '+por[c]+'</i>'}).join('')+'</div><div class="crl"><b>Linhas:</b> '+Object.keys(linhas).map(Number).sort(function(a,b){return a-b}).map(function(l){return (l<10?"0":"")+l+(linhas[l]>1?" ("+linhas[l]+")":"")}).join(" · ")+'</div>':'';
   var dvEst=Object.keys(est).length?'<div class="crt">'+Object.keys(est).map(function(c){return '<i class="ras">'+catN[c]+' '+est[c]+'</i>'}).join('')+'</div>':'';
-  var comps=A.COMPS.map(function(c,j){var n=NIV[j],tx=A.compoe(j,n,null,aluno).join(' ');return '<div class="crc'+(n<ESPERADO?' abx':'')+'"><div class="crh"><b>'+c.id+' · '+c.nome+'</b><span>'+(n<ESPERADO?'<em class="abt">Abaixo do esperado</em> ':'')+A.NIVEIS[n]+' · '+A.fmt(n*.5)+' pt</span></div><p>'+tx+'</p>'+(j===0&&detEst?'<p class="crd">'+detEst+'</p>':'')+(j===1&&detLing?'<p class="crd">'+detLing+(porLin.ss?' '+A.SS_TXT:'')+'</p>':'')+(j===0?dvEst:j===1?dvLing:'')+'</div>'}).join('');
+  var comps=A.COMPS.map(function(c,j){var n=NIV[j],tx=(P.obsCrit&&P.obsCrit[j])?P.obsCrit[j]:A.compoe(j,n,null,aluno).join(' ');return '<div class="crc'+(n<ESPERADO?' abx':'')+'"><div class="crh"><b>'+c.id+' · '+c.nome+'</b><span>'+(n<ESPERADO?'<em class="abt">Abaixo do esperado</em> ':'')+A.NIVEIS[n]+' · '+A.fmt(n*.5)+' pt</span></div><p>'+tx+'</p>'+(j===0&&detEst?'<p class="crd">'+detEst+'</p>':'')+(j===1&&detLing?'<p class="crd">'+detLing+(porLin.ss?' '+A.SS_TXT:'')+'</p>':'')+(j===0?dvEst:j===1?dvLing:'')+'</div>'}).join('');
 
  // ----- correção em forma de texto: "o que ficou muito bom" / "o que vale melhorar" -----
  var nome='Lucas',esc=function(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')};
