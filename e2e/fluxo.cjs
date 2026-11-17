@@ -34,7 +34,7 @@ async function rodar(tipo, esperado) {
   await p.goto('http://localhost:4173')
   await p.fill('input[type=email]', 'a@a.com')
   await p.fill('input[type=password]', 'x')
-  await p.click('button')
+  await p.click('button.pri')
   await p.waitForSelector('main', { timeout: 10000 })
   const ultimo = esperado[esperado.length - 1]
   await p.waitForFunction((t) => document.querySelector('main')?.textContent.includes(t), ultimo, { timeout: 5000 }).catch(() => {})
