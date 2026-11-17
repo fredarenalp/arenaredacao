@@ -68,6 +68,13 @@ const ARENA = {
     }
   },
 
+  // Foto real da redação de um aluno (para a coordenação e o professor)
+  async fotoDoAluno(alunoId, numero, versao) {
+    const path = window.__coordDB?.fotoPath(alunoId, numero, versao)
+    if (!path) return null
+    return (await supabase.storage.from('redacoes').createSignedUrl(path, 3600)).data?.signedUrl ?? null
+  },
+
   // Desempenho do corretor no mês selecionado (tela "Desempenho")
   perfDe(c) {
     const mes = window.__coord.S.mes
@@ -306,7 +313,7 @@ const ARENA = {
     const desde = new Date(Date.now() - 70 * 86400000).toISOString()
     const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess] = await Promise.all([
       q('perfis'), q('turmas'), q('alunos', '*, turmas(serie, nome)'), q('propostas'), q('pacotes'),
-      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario,atualizada_em)'),
+      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, foto_path, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario,atualizada_em)'),
       q('avisos', '*, alunos(nome, turmas(serie, nome)), propostas(numero, genero)'),
       supabase.from('eventos').select('*').order('em', { ascending: false }).limit(300),
       q('professor_turmas'),
@@ -388,6 +395,7 @@ const ARENA = {
           return { nome: a.nome, k, s, t, n, soma, med: qt ? soma / qt : 0 }
         }).sort((x, y) => (x.nome < y.nome ? -1 : 1))
       },
+      fotoPath: (aid, num, ver) => { const P = propByNum[num]; const r = P ? redOf(aid, P.id, ver) : null; return r?.foto_path ?? null },
       GN: () => { const g = ['']; for (const x of prop.data.filter((q) => q.bimestre === bimAtual)) g[x.numero] = x.genero; return g },
       mat: (s, t, k) => (byClass[`${s}|${t}`] || [])[k]?.matricula ?? '',
       PR: (s) => prop.data.filter((x) => x.bimestre === bimAtual && x.series.includes(s)).map((x) => x.numero).sort((a, b) => a - b),
@@ -448,12 +456,15 @@ const ARENA = {
     Object.assign(C.MESES, Object.fromEntries([...new Set([mesAtual(), ...ARENA._fin.map((x) => mesDe(x.em))])].sort().reverse().map((m) => [m, rotuloMes(m)])))
     for (const k of Object.keys(C.MESES)) if (!ARENA._fin.some((x) => mesDe(x.em) === k) && k !== mesAtual()) delete C.MESES[k]
     C.S.mes = mesAtual()
-    C.GS.length = 0
     for (const k of Object.keys(C.CORLV)) delete C.CORLV[k]
     // regras gravadas
     const { data: regras } = await supabase.from('regras').select('chave, valor')
     let bims = null
     for (const r of regras ?? []) { if (r.chave === 'r1') C.S.r1 = r.valor; else if (r.chave === 'bimestres') bims = r.valor; else C.R[r.chave] = r.valor }
+    const ganchos = (regras ?? []).find((r) => r.chave === 'ganchos')?.valor ?? []
+    C.GS.length = 0
+    ganchos.forEach((g) => C.GS.push(g))
+    C.setGsId(ganchos.reduce((m, g) => Math.max(m, g.id || 0), 0))
     const DESC = { enc: 'encerrado', and: 'em andamento', fut: 'ainda não começou' }
     fill(C.BIMC, [1, 2, 3, 4].map((n) => { const st = bims ? bims[n - 1] : n < bimAtual ? 'enc' : n === bimAtual ? 'and' : 'fut'; return { n, st, d: DESC[st] } }))
     // equipe (coordenação + professores) e alunos que saíram
@@ -483,6 +494,7 @@ const ARENA = {
       prp: Object.fromEntries(C.PRP.map((q) => [q.id, JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])])),
       regras: JSON.stringify({ r1: C.S.r1, ...C.R }),
       bimc: JSON.stringify(C.BIMC.map((b) => b.st)),
+      gs: JSON.stringify(C.GS.map((g) => ({ ...g, fotoUrl: undefined }))),
       ext: JSON.stringify(C.EXT),
       comem: JSON.stringify(C.COMEM),
       cad: Object.fromEntries(C.aidx().map((a) => [a.mat, serTur(a).join('|')])),
@@ -658,6 +670,10 @@ const ARENA = {
         if (al) ok(await supabase.from('comunicados').insert({ aluno_id: al.id, texto: `Comunicado extraordinário emitido em ${cmAgora[key].dt}: ${cmAgora[key].n} redações não entregues.`, criado_por: eu }))
       }
     }
+
+    // ganchos (calibração): guardados como uma lista única nas regras
+    const gsAgora = JSON.stringify(C.GS.map((g) => ({ ...g, fotoUrl: undefined })))
+    if (gsAgora !== prev.gs) ok(await supabase.from('regras').upsert({ chave: 'ganchos', valor: JSON.parse(gsAgora), atualizada_por: eu, atualizada_em: new Date().toISOString() }))
 
     // bimestres (encerrar / abrir)
     const bimc = JSON.stringify(C.BIMC.map((b) => b.st))
