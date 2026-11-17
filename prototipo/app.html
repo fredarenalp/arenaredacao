@@ -1627,7 +1627,7 @@ function erro(){
  var e=$('iPwd');e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');$('pwd').focus();
 }
 function sys(){setLoad(false);alertas('<div class="alert sys">'+ic('wifi')+'<span>Não foi possível conectar ao sistema agora. Não é problema da sua senha — verifique sua conexão e tente novamente.</span></div>');}
-function ok(){setLoad(false);if(cur==='corretor'){alertas('');window.ARENA.carregarCorretor().then(function(){window.abrePortal()},function(){sys()});return;}if(cur==='aluno'){alertas('');window.ARENA.carregarAluno().then(function(){window.abreAluno()},function(){sys()});return;}if(cur==='coord'||cur==='prof'){alertas('');window.__entraRole(cur);return;}}
+function ok(){setLoad(false);if(cur==='corretor'){alertas('');window.ARENA.carregarCorretor().then(function(){window.abrePortal()},function(){sys()});return;}if(cur==='aluno'){alertas('');window.ARENA.carregarAluno().then(function(){window.abreAluno()},function(){sys()});return;}if(cur==='coord'||cur==='prof'){alertas('');window.ARENA.carregarCoord(cur).then(function(){window.__entraRole(cur)},function(e){console.error(e);sys()});return;}}
 
 document.addEventListener('click',function(e){
  var b=e.target.closest('.p');
@@ -3802,7 +3802,7 @@ function calib(cid,gen){var D=samples(cid,gen);if(D.length<2)return {tag:'wait',
  return {tag:tag,igual:igual,n:D.length,rep:rep,mx:mx}}
 function nGanchos(cid){return Object.keys(CORLV[cid]||{}).length+PACS.filter(function(p){return p.c===cid&&p.gan.cor}).length}
 function halfR(){return Math.round(S.r1*50+1e-9)/100}
-function nAl(s,t){return 20+((s*7+t.charCodeAt(0)*3)%7)}
+function nAl(s,t){if(window.__coordDB)return window.__coordDB.nAl(s,t);return 20+((s*7+t.charCodeAt(0)*3)%7)}
 function esc(x){return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function brl(v){return 'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+,)/g,'.')}
 function mmss(sec){sec=Math.round(sec);return Math.floor(sec/60)+':'+('0'+sec%60).slice(-2)}
@@ -3811,20 +3811,20 @@ function toast(t){var e=$('coToast');e.textContent=t;e.className='toast show';cl
 var BASE={acesso:{semana:[58,96],mes:[78,99],bimestre:[88,100]},envio:{semana:[38,90],mes:[62,96],bimestre:[80,99]},atraso:{semana:[3,30],mes:[2,22],bimestre:[1,14]}};
 var MLAB={acesso:'Acessaram o sistema',envio:'Enviaram redação',atraso:'Com proposta em atraso'};
 var PLAB={semana:'Esta semana (03–09/11)',mes:'Últimos 30 dias',bimestre:'Bimestre atual'};
-function cellData(s,t){var n=nAl(s,t),r=rnd(s*131+t.charCodeAt(0)*17+(S.metric==='acesso'?1:S.metric==='envio'?2:3)*977+(S.per==='semana'?1:S.per==='mes'?2:3)*31),b=BASE[S.metric][S.per];
+function cellData(s,t){if(window.__coordDB)return window.__coordDB.cell(s,t,S.metric,S.per);var n=nAl(s,t),r=rnd(s*131+t.charCodeAt(0)*17+(S.metric==='acesso'?1:S.metric==='envio'?2:3)*977+(S.per==='semana'?1:S.per==='mes'?2:3)*31),b=BASE[S.metric][S.per];
  var p=b[0]+(b[1]-b[0])*Math.pow(r(),S.metric==='atraso'?1.8:.6);p=Math.max(0,Math.min(100,Math.round(p)));return {n:n,p:p,q:Math.round(n*p/100)}}
 function good(p){return S.metric==='atraso'?1-p/36:p/100}
 function tone(p){var g=good(p);return g>=.88?['#cfe8e8','#1f4f51']:g>=.72?['#e6f3f3','#2f5f61']:g>=.55?['#faefd0','#7a5000']:['#fae8e5','#8a1a0a']}
-function trend(s){var r=rnd(s*53+(S.per==='semana'?7:S.per==='mes'?9:11)),d=Math.round((r()-.4)*10);return d}
+function trend(s){if(window.__coordDB)return window.__coordDB.trend(s,S.metric,S.per);var r=rnd(s*53+(S.per==='semana'?7:S.per==='mes'?9:11)),d=Math.round((r()-.4)*10);return d}
 function renderAcessos(){
  var cells={},tot={n:0,q:0},ser={};
  SERIES.forEach(function(s){ser[s]={n:0,q:0};TURMAS.forEach(function(t){var c=cellData(s,t);cells[s+t]=c;ser[s].n+=c.n;ser[s].q+=c.q;tot.n+=c.n;tot.q+=c.q})});
- var kp=SERIES.map(function(s){var p=Math.round(ser[s].q/ser[s].n*100),d=trend(s);return '<div class="kpi"><small>'+s+'º ano</small><b>'+p+'%</b><span>'+ser[s].q+' de '+ser[s].n+' alunos · <span class="'+(d>=0===(S.metric!=='atraso')?'up':'dn')+'">'+(d>=0?'▲ ':'▼ ')+Math.abs(d)+' pp</span></span></div>'}).join('');
- var tp=Math.round(tot.q/tot.n*100);
+ var kp=SERIES.map(function(s){var p=(ser[s].n?Math.round(ser[s].q/ser[s].n*100):0),d=trend(s);return '<div class="kpi"><small>'+s+'º ano</small><b>'+p+'%</b><span>'+ser[s].q+' de '+ser[s].n+' alunos · <span class="'+(d>=0===(S.metric!=='atraso')?'up':'dn')+'">'+(d>=0?'▲ ':'▼ ')+Math.abs(d)+' pp</span></span></div>'}).join('');
+ var tp=(tot.n?Math.round(tot.q/tot.n*100):0);
  kp+='<div class="kpi sum"><small>Todas as séries</small><b>'+tp+'%</b><span>'+tot.q+' de '+tot.n+' alunos</span></div>';
  var head='<tr><th>Turma</th>'+SERIES.map(function(s){return '<th class="c">'+s+'º ano</th>'}).join('')+'</tr>';
  var rows=TURMAS.map(function(t){return '<tr><td class="t">Turma '+t+'</td>'+SERIES.map(function(s){var c=cells[s+t],k=tone(c.p);return '<td class="c"><span class="cell" style="background:'+k[0]+';color:'+k[1]+'" title="'+s+'º ano '+t+': '+c.q+' de '+c.n+' alunos">'+c.p+'%<small>'+c.q+'/'+c.n+'</small></span></td>'}).join('')+'</tr>'}).join('');
- var foot='<tfoot><tr><td>Série</td>'+SERIES.map(function(s){return '<td class="c">'+Math.round(ser[s].q/ser[s].n*100)+'%</td>'}).join('')+'</tr></tfoot>';
+ var foot='<tfoot><tr><td>Série</td>'+SERIES.map(function(s){return '<td class="c">'+(ser[s].n?Math.round(ser[s].q/ser[s].n*100):0)+'%</td>'}).join('')+'</tr></tfoot>';
  var all=[];SERIES.forEach(function(s){TURMAS.forEach(function(t){all.push({s:s,t:t,c:cells[s+t]})})});
  all.sort(function(a,b){return S.metric==='atraso'?b.c.p-a.c.p:a.c.p-b.c.p});
  var low=all.slice(0,6).map(function(x){return '<li><b>'+x.s+'º ano '+x.t+'</b><span>'+x.c.p+'%</span></li>'}).join('');
@@ -3888,8 +3888,8 @@ var CATA={desorganizacao:['Desorganização','#e35d00'],entregou_depois:['2º ho
 var CATK=Object.keys(CATA);
 var STL={ent:['Entregue','g'],atr:['Atrasado','a'],nao:['Não entregue','r']};
 S.ent={serie:'todas',turma:'todas',prop:2,st:'todos',alerta:'nao_entregou'};
-function matDe(s,t,k,nm){return nm==='Lucas Prado'?'20260187':'2026'+s+('0'+(t.charCodeAt(0)-64)).slice(-2)+('00'+(k+1)).slice(-3)}
-function alunosTurma(s,t,prop){var n=nAl(s,t),o=[];for(var k=0;k<n;k++){var h=s*1000+t.charCodeAt(0)*31+k*7+prop*13,r=rnd(h)(),nm=N1[(k*5+s+t.charCodeAt(0))%24]+' '+N2[(k*7+s*3+t.charCodeAt(0))%30];if(s===8&&t==='A'&&k===3)nm='Lucas Prado';
+function matDe(s,t,k,nm){if(window.__coordDB)return window.__coordDB.mat(s,t,k);return nm==='Lucas Prado'?'20260187':'2026'+s+('0'+(t.charCodeAt(0)-64)).slice(-2)+('00'+(k+1)).slice(-3)}
+function alunosTurma(s,t,prop){if(window.__coordDB)return window.__coordDB.alunosTurma(s,t,prop);var n=nAl(s,t),o=[];for(var k=0;k<n;k++){var h=s*1000+t.charCodeAt(0)*31+k*7+prop*13,r=rnd(h)(),nm=N1[(k*5+s+t.charCodeAt(0))%24]+' '+N2[(k*7+s*3+t.charCodeAt(0))%30];if(s===8&&t==='A'&&k===3)nm='Lucas Prado';
   var st=(s===8&&t==='A'&&k===3&&(prop===3||prop===13))?'nao':(r<.80?'ent':r<.88?'atr':r<.93?'ent':'nao'),cat=st==='atr'?CATK[Math.floor(rnd(h+5)()*CATK.length)]:null;
   var dia=3+Math.floor(rnd(h+9)()*6),hora=7+Math.floor(rnd(h+11)()*12),min=Math.floor(rnd(h+13)()*60);
   // contadores do bimestre para os alertas
@@ -3897,7 +3897,7 @@ function alunosTurma(s,t,prop){var n=nAl(s,t),o=[];for(var k=0;k<n;k++){var h=s*
 /* ---- Comunicado Extraordinário (importado do Fluxo) ---- */
 var EXT={};
 function isNaoSlot(s,t,k,pp){if(s===8&&t==='A'&&k===3&&(pp===3||pp===13))return true;return rnd(s*1000+t.charCodeAt(0)*31+k*7+pp*13)()>=.93}
-function slotsNao(s,t,k){var o=[];PR(s).forEach(function(p){[1,2].forEach(function(v){if(v===2&&semReDe(p))return;if(isNaoSlot(s,t,k,p+(v===2?10:0)))o.push({p:p,v:v})})});return o}
+function slotsNao(s,t,k){if(window.__coordDB)return window.__coordDB.slotsNao(s,t,k);var o=[];PR(s).forEach(function(p){[1,2].forEach(function(v){if(v===2&&semReDe(p))return;if(isNaoSlot(s,t,k,p+(v===2?10:0)))o.push({p:p,v:v})})});return o}
 function semReDe(n){return PRP.some(function(q){return q.bim===3&&q.n===n&&q.semRe})}
 function extKey(a){return a.s+a.t+a.k}
 var COMEM={}; // registro de comunicados emitidos: aluno -> {dt: data, n: não entregues na data}
@@ -4004,8 +4004,8 @@ function renderCorretores(){
 /* ===== Coordenação ampliada: propostas, avisos, distribuição, pessoas, regras, histórico ===== */
 S.x={np:null,prr:null,psub:'alunos',qa:'',ac:{n:'',e:''},ae:{n:'',e:'',r:'leit'},hk:'todos',avf:'pend',chk:{}};
 var R=window.__regras=window.__regras||{};R.corte=6;R.devolve=5;R.reesc=7;R.alerta=2;R.meta=35;R.pol='turma';R.janela=3;R.uteis='uteis';R.email=true;R.mail='coordenacao@colegioarena.exemplo';R.hora='07:30';
-var HOJE=new Date(2026,10,11);
-function agora(){return '11/11 · '+('0'+new Date().getHours()).slice(-2)+':'+('0'+new Date().getMinutes()).slice(-2)}
+var HOJE=new Date();HOJE.setHours(0,0,0,0);
+function agora(){var d=new Date();return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' · '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
 var LOG=[
  {t:'10/11 · 09:15',bim:3,q:'Prof. Helena Duarte',k:'nota',x:'Liberou a redação de Lucas Rocha (8º ano F), nota 10,0'},
  {t:'08/11 · 14:03',bim:3,q:'Coordenação',k:'dist',x:'Atribuiu o pacote 24 a Carlos Mendes'},
@@ -4301,8 +4301,8 @@ function relEntregas(tipo){var E=S.ent,A=todosAlunos(),prop=['','Proposta 1 · C
  corpo+=Object.keys(g).length?Object.keys(g).map(function(k){return '<div class="pr-h2">'+k+' <small>'+g[k].length+(g[k].length===1?' aluno':' alunos')+'</small></div><table class="pr-tab rlt"><thead><tr><th>Aluno</th>'+(tipo==='nao'?'<th>Situação</th><th>Não entregues no bimestre</th>':'<th>Motivo do atraso</th><th>Enviado em</th><th>Atrasos no bimestre</th>')+'</tr></thead><tbody>'+g[k].map(function(a){return '<tr><td>'+esc(a.nome)+'</td>'+(tipo==='nao'?'<td>Não apresentou</td><td class="n">'+a.nao+'</td>':'<td>'+CATA[a.cat][0]+'</td><td>'+a.env+'</td><td class="n">'+a.atr+'</td>')+'</tr>'}).join('')+'</tbody></table>'}).join(''):'<p>Nenhum aluno neste filtro.</p>';
  imprimeRel(titulo,sub,corpo);reg('Imprimiu o relatório de '+(tipo==='nao'?'não entregues':'atrasadas')+' ('+prop.split(' · ')[0]+', '+escopoTxt()+')','outro')}
 /* ---- médias do bimestre (professor) ---- */
-function NP(s){return s===7?3:4}
-function PR(s){var a=[],i;for(i=1;i<=NP(s);i++)a.push(i);return a}
+function NP(s){if(window.__coordDB)return window.__coordDB.PR(s).length;return s===7?3:4}
+function PR(s){if(window.__coordDB)return window.__coordDB.PR(s);var a=[],i;for(i=1;i<=NP(s);i++)a.push(i);return a}
 function calcTxt(s){var n=2*NP(s);return 'soma das '+n+' notas ('+NP(s)+' propostas, 1ª versão e reescrita) ÷ '+n}
 function medTurma(s,t){var np=NP(s),P=PR(s).map(function(p){return alunosTurma(s,t,p)});
  return P[0].map(function(a,k){var n=[];P.forEach(function(Q,i){var x=Q[k],r=rnd(x.seed+7)(),r2=rnd(x.seed+9)(),v1=x.st==='nao'?0:Math.min(10,Math.max(4,Math.round((5.5+r*4.5)*2)/2)),v2=(v1===0)?0:Math.min(10,Math.max(0,Math.round((v1+(r2*2.2-.4))*2)/2));n.push(v1,semReDe(PR(s)[i])?null:v2)});
@@ -4786,6 +4786,7 @@ $('coMain').addEventListener('change',function(e){var t=e.target;
  if(t.dataset&&t.dataset.pac){var x=PACS.filter(function(p){return String(p.id)===t.dataset.pac})[0];var nm=CORR.filter(function(c){return c.id===t.value})[0];x.c=t.value||null;(function(m){if(m)DT[m[1]+m[2]]=x.c})(/(\d)º ano ([A-I])/.exec(x.turma));reg(t.value?'Atribuiu o pacote '+x.id+' ('+x.turma+') a '+nm.n:'Tirou o corretor do pacote '+x.id,'dist');toast(t.value?'Pacote '+x.id+' atribuído a '+nm.n:'Pacote '+x.id+' sem corretor');render();return}
  if(t.dataset&&t.dataset.gp){var q=t.dataset.gp.split(':');gOf(q[0]).prof[+q[1]]=+t.value;render();return}
  if(t.id==='coR1'){var v=parseFloat(String(t.value).replace(',','.'));if(!(v>=0))v=S.r1;S.r1=v;render()}});
+window.__coord={PLAB:PLAB,CORR:CORR,PRP:PRP,PACS:PACS,AVISOS:AVISOS,LOG:LOG,FILA:FILA,PROFS:PROFS,BIMC:BIMC,S:S,R:R,render:function(){render()},reg:function(x,k){reg(x,k)},pac:pac,genero:genero,resetAidx:function(){CAD=null;AIDX=null}};
 window.__entraRole=entra;
 document.querySelector('.cobar').addEventListener('click',function(e){var b=e.target.closest('[data-top]');if(!b)return;S.top=b.dataset.top;render()});
 function entra(role){S.role=role;S.top=role==='prof'?'pgeral':'acessos';S.pf={pac:null,idx:null,niv:[null,null,null,null,null]};$('roleMdl').classList.add('hide');$('coLogo').src=document.querySelector('#al .ph img').src;render();document.body.classList.add('in-coord');window.scrollTo(0,0);$('co').scrollTop=0}

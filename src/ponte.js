@@ -23,6 +23,10 @@ const ARENA = {
         return 'erro'
       }
       ARENA.perfil = perfil
+      if (perfil.tipo === 'aluno') {
+        const { data: al } = await supabase.from('alunos').select('id').eq('perfil_id', perfil.id).maybeSingle()
+        supabase.from('acessos').insert({ perfil_id: perfil.id, aluno_id: al?.id ?? null }).then(() => {})
+      }
       return 'ok'
     } catch {
       return 'sys'
@@ -184,6 +188,126 @@ const ARENA = {
     } catch {
       return false
     }
+  },
+
+  // ===== Coordenação / Professor =====
+  async carregarCoord() {
+    const q = (t, sel = '*') => supabase.from(t).select(sel).limit(5000)
+    const desde = new Date(Date.now() - 70 * 86400000).toISOString()
+    const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess] = await Promise.all([
+      q('perfis'), q('turmas'), q('alunos', '*, turmas(serie, nome)'), q('propostas'), q('pacotes'),
+      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras)'),
+      q('avisos', '*, alunos(nome, turmas(serie, nome)), propostas(numero, genero)'),
+      supabase.from('eventos').select('*').order('em', { ascending: false }).limit(300),
+      q('professor_turmas'),
+      supabase.from('acessos').select('aluno_id, em').gte('em', desde).not('aluno_id', 'is', null).limit(20000),
+    ])
+    for (const r of [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess]) if (r.error) throw r.error
+    const dm = (d) => (d ? `${String(d).slice(8, 10)}/${String(d).slice(5, 7)}` : null)
+    const dh = (t) => { const d = new Date(t); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` }
+    const C = window.__coord
+    const nomeDe = Object.fromEntries(perf.data.map((x) => [x.id, x.nome]))
+
+    // --- índices
+    const alunos = alun.data.map((a) => ({ ...a, s: Number(a.turmas?.serie), t: a.turmas?.nome }))
+    const byClass = {}
+    for (const a of alunos) (byClass[`${a.s}|${a.t}`] ??= []).push(a)
+    Object.values(byClass).forEach((l) => l.sort((x, y) => x.nome.localeCompare(y.nome, 'pt-BR')))
+    const propByNum = Object.fromEntries(prop.data.map((x) => [x.numero, x]))
+    const redOf = (aid, pid, v) => reds.data.find((r) => r.aluno_id === aid && r.proposta_id === pid && r.versao === v)
+    const bimAtual = prop.data.length ? Math.max(...prop.data.map((x) => x.bimestre)) : 1
+    const hoje = new Date().toISOString().slice(0, 10)
+    const MOT = { 'Saúde': 'saude', Viagem: 'viagem', 'Problema técnico': 'outro', 'Esqueci ou perdi o prazo': 'desorganizacao', 'Outro motivo': 'outro' }
+
+    const rowDe = (a, k, prop2) => {
+      const n = prop2 > 10 ? prop2 - 10 : prop2
+      const ver = prop2 > 10 ? 2 : 1
+      const P = propByNum[n]
+      const r = P ? redOf(a.id, P.id, ver) : null
+      const st = r ? (r.fora_do_prazo ? 'atr' : 'ent') : 'nao'
+      const av = P ? avis.data.find((x) => x.aluno_id === a.id && x.proposta_id === P.id && x.tipo === 'atraso') : null
+      const meus = reds.data.filter((x) => x.aluno_id === a.id)
+      const nao = prop.data.filter((x) => x.bimestre === bimAtual && x.series.includes(a.s) && x.prazo && x.prazo < hoje && !redOf(a.id, x.id, 1)).length
+      return {
+        nome: a.nome, s: a.s, t: a.t, k, st, cat: st === 'atr' ? (MOT[av?.motivo] || 'nao_informou') : null,
+        env: r ? dh(r.enviada_em) : '—', nao, atr: meus.filter((x) => x.fora_do_prazo).length,
+        baixa: meus.filter((x) => { const c = Array.isArray(x.correcoes) ? x.correcoes[0] : x.correcoes; return c && c.liberada && c.nota != null && c.nota < 5 }).length,
+        sem1: !meus.some((x) => x.versao === 1), semR: !meus.some((x) => x.versao === 2), seed: a.id,
+      }
+    }
+    const DIAS = { semana: 7, mes: 30, bimestre: 60 }
+    const cellReal = (s, t, metric, per, off) => {
+      const lista = byClass[`${s}|${t}`] || []
+      const d = DIAS[per] || 7
+      const fim = Date.now() - off * d * 86400000
+      const ini = fim - d * 86400000
+      const em = (x) => { const v = new Date(x).getTime(); return v >= ini && v < fim }
+      let q = 0
+      for (const a of lista) {
+        if (metric === 'acesso') q += acess.data.some((x) => x.aluno_id === a.id && em(x.em)) ? 1 : 0
+        else if (metric === 'envio') q += reds.data.some((x) => x.aluno_id === a.id && em(x.enviada_em)) ? 1 : 0
+        else q += reds.data.some((x) => x.aluno_id === a.id && x.fora_do_prazo && em(x.enviada_em)) || prop.data.some((x) => x.series.includes(s) && x.prazo && x.prazo < hoje && new Date(x.prazo).getTime() >= ini && new Date(x.prazo).getTime() < fim && !redOf(a.id, x.id, 1)) ? 1 : 0
+      }
+      return { n: lista.length, q, p: lista.length ? Math.round((q / lista.length) * 100) : 0 }
+    }
+    window.__coordDB = {
+      nAl: (s, t) => (byClass[`${s}|${t}`] || []).length,
+      alunosTurma: (s, t, prop2) => (byClass[`${s}|${t}`] || []).map((a, k) => rowDe(a, k, prop2)),
+      slotsNao: (s, t, k) => {
+        const a = (byClass[`${s}|${t}`] || [])[k]
+        if (!a) return []
+        return prop.data.filter((x) => x.bimestre === bimAtual && x.series.includes(s) && x.prazo && x.prazo < hoje && !redOf(a.id, x.id, 1)).map((x) => ({ p: x.numero, v: 1 }))
+      },
+      // percentual de alunos da turma por métrica e período (janela atual) e tendência vs. janela anterior
+      cell: (s, t, metric, per) => cellReal(s, t, metric, per, 0),
+      trend: (s, metric, per) => {
+        const q = (off) => { let n = 0, c = 0; for (const key of Object.keys(byClass)) { if (key.startsWith(s + '|')) { const r = cellReal(s, key.split('|')[1], metric, per, off); n += r.n; c += r.q } } return n ? Math.round((c / n) * 100) : 0 }
+        return q(0) - q(1)
+      },
+      mat: (s, t, k) => (byClass[`${s}|${t}`] || [])[k]?.matricula ?? '',
+      PR: (s) => prop.data.filter((x) => x.bimestre === bimAtual && x.series.includes(s)).map((x) => x.numero).sort((a, b) => a - b),
+    }
+
+    // --- listas globais do protótipo (conteúdo trocado no lugar)
+    const fill = (arr, items) => { arr.length = 0; items.forEach((x) => arr.push(x)) }
+    fill(C.CORR, perf.data.filter((x) => x.tipo === 'corretor').map((x) => ({ id: x.id, n: x.nome, pausado: !x.ativo })))
+    fill(C.PROFS, perf.data.filter((x) => x.tipo === 'professor').map((x) => {
+      const tid = ptur.data.find((y) => y.perfil_id === x.id)?.turma_id
+      const serie = Number(turm.data.find((y) => y.id === tid)?.serie) || 7
+      return { id: x.id, n: `Prof. ${x.nome}`, s: serie }
+    }))
+    if (C.PROFS.length) C.S.pid = C.PROFS[0].id
+    fill(C.PRP, prop.data.map((x) => ({
+      id: x.id, bim: x.bimestre, n: x.numero, g: x.genero, t: x.titulo, ser: x.series, p1: dm(x.prazo), p2: dm(x.prazo2),
+      ...(x.sem_reescrita ? { semRe: true } : {}), st: x.status,
+    })))
+    fill(C.BIMC, [1, 2, 3, 4].map((n) => ({ n, st: n < bimAtual ? 'enc' : n === bimAtual ? 'and' : 'fut', d: n < bimAtual ? 'encerrado' : n === bimAtual ? 'em andamento' : 'ainda não começou' })))
+    const nPac = Object.fromEntries(pacs.data.map((x) => [x.id, reds.data.filter((r) => r.pacote_id === x.id)]))
+    fill(C.PACS, pacs.data.map((x) => {
+      const rs = nPac[x.id]
+      const feitas = rs.filter((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && (c.n1 != null || c.anulacao) }).length
+      const o = { id: x.numero, turma: x.serie, prop: x.rotulo, ver: x.reescrita ? '2ª' : '1ª', n: rs.length, prazo: dm(x.prazo) || '', c: x.corretor_id, ok: feitas, _pid: x.id }
+      o.g = C.genero(x.rotulo); o.sg = x.reescrita; o.gan = { aluno: null, prof: null, cor: null }
+      return o
+    }))
+    const pacDe = Object.fromEntries(pacs.data.map((x) => [x.id, x.numero]))
+    fill(C.FILA, reds.data.filter((r) => r.etapa === 'aguardando_liberacao').map((r, i) => {
+      const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes
+      const a = alunos.find((x) => x.id === r.aluno_id)
+      const niv = c && c.n1 != null ? [c.n1, c.n2, c.n3, c.n4, c.n5] : [0, 0, 0, 0, 0]
+      return { id: r.id, pac: pacDe[r.pacote_id] ?? 0, idx: i, aluno: a?.nome ?? '', c: r.corretor_id, nota: c?.nota != null ? Number(c.nota) : 0, niv, st: 'pend', mot: c?.anulacao ? `Redação anulada: ${c.anulacao}` : '', _rid: r.id }
+    }))
+    fill(C.AVISOS, avis.data.map((x) => ({
+      id: x.id, aluno: x.alunos?.nome ?? '', turma: x.alunos?.turmas ? `${x.alunos.turmas.serie}º ano ${x.alunos.turmas.nome}` : '',
+      prop: x.propostas ? `Proposta ${x.propostas.numero} · ${x.propostas.genero}` : '', tipo: x.tipo === 'ausencia' ? 'Não vai entregar' : x.motivo, txt: x.texto || '',
+      quando: dh(x.criado_em), st: x.status === 'pend' ? 'pend' : x.status === 'aceito' ? 'lib' : 'rec',
+      ...(x.status !== 'pend' ? { res: dh(x.decidido_em || x.criado_em) } : {}),
+    })))
+    fill(C.LOG, even.data.filter((e) => e.texto).map((e) => ({ t: dh(e.em), bim: bimAtual, q: nomeDe[e.autor] || 'Coordenação', k: e.tipo || 'outro', x: e.texto })))
+    C.resetAidx()
+    Object.assign(C.PLAB, { semana: 'Últimos 7 dias', mes: 'Últimos 30 dias', bimestre: 'Bimestre atual' })
+    window.__real = true
+    window.__coordNomes = nomeDe
   },
 
   async sair() {
