@@ -68,6 +68,27 @@ const ARENA = {
     }
   },
 
+  // Prepara os dados reais das correções de uma turma (proposta e versão) para a impressão dos relatórios
+  async prepararCorrecoes(s, t, num, ver) {
+    const K = ARENA._coord
+    const P = K.props.find((x) => x.bimestre === K.bimAtual && x.numero === num)
+    window.__corrCache = {}
+    if (!P) return
+    const lista = K.byClass[`${s}|${t}`] || []
+    if (!lista.length) return
+    const { data } = await supabase.from('redacoes').select('id, aluno_id, foto_path, corretor_id, correcoes(n1,n2,n3,n4,n5,comentario,anulacao), marcacoes(dados)').eq('proposta_id', P.id).eq('versao', ver).in('aluno_id', lista.map((a) => a.id))
+    for (const r of data ?? []) {
+      const k = lista.findIndex((a) => a.id === r.aluno_id)
+      const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes
+      if (k < 0 || !c) continue
+      const fotoUrl = r.foto_path ? (await supabase.storage.from('redacoes').createSignedUrl(r.foto_path, 3600)).data?.signedUrl ?? null : null
+      window.__corrCache[`${s}${t}|${k}|${num}|${ver}`] = {
+        niv: c.n1 != null ? [c.n1, c.n2, c.n3, c.n4, c.n5] : [0, 0, 0, 0, 0], obsCrit: parseObs(c.comentario),
+        marks: (r.marcacoes ?? []).map((m) => m.dados), fotoUrl, corretor: K.perf.find((x) => x.id === r.corretor_id)?.nome ?? null,
+      }
+    }
+  },
+
   // Foto real da redação de um aluno (para a coordenação e o professor)
   async fotoDoAluno(alunoId, numero, versao) {
     const path = window.__coordDB?.fotoPath(alunoId, numero, versao)
@@ -498,7 +519,7 @@ const ARENA = {
     ])
     Object.keys(C.SAIU).forEach((k) => delete C.SAIU[k])
     alunos.filter((a) => a.saiu).forEach((a) => { C.SAIU[a.matricula] = true })
-    ARENA._coord = { alunos, byClass, props: prop.data, turmas: turm.data, perf: perf.data, byMat: Object.fromEntries(alunos.map((a) => [a.matricula, a])) }
+    ARENA._coord = { bimAtual, alunos, byClass, props: prop.data, turmas: turm.data, perf: perf.data, byMat: Object.fromEntries(alunos.map((a) => [a.matricula, a])) }
     ARENA._snap = ARENA.tirarFoto()
     Object.assign(C.PLAB, { semana: 'Últimos 7 dias', mes: 'Últimos 30 dias', bimestre: 'Bimestre atual' })
     window.__real = true

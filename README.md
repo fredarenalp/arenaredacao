@@ -36,9 +36,11 @@ Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PR
 - [x] Aluno: propostas, envio de foto, avisos de atraso/ausência, prazo individual, correção liberada (texto do corretor, marcações, foto), boletim com bimestres e critérios
 - [x] Coordenação: acessos, entregas, turmas, demandas (aceitar/recusar), corretores (pacotes, distribuição, desempenho), propostas e bimestres, pessoas (alunos com acesso por matrícula, equipe, senhas), regras, histórico, comunicados
 - [x] Professor: visão geral, fila de liberação (foto e marcações reais; aprovar/modificar/zerar/responder dúvida), médias
-- [ ] Ganchos (calibração): a tela existe, mas **não** grava no banco (fica vazia a cada recarga); comparação professor × corretor depende disso
-- [ ] Entregas → "Ver redação" ainda mostra a ilustração de exemplo em vez da foto real do aluno
-- [ ] Relatórios impressos (PDF) com dados reais de ponta a ponta; contestação do aluno; notificações por e-mail
+- [~] Ganchos (calibração): definição e nota do professor gravam (nas `regras`); falta o gancho aparecer com a foto real dentro do pacote do corretor e a comparação professor × corretor (precisa de SQL, em `supabase/pendente.sql`)
+- [x] Entregas → "Ver redação" mostra a foto real do aluno
+- [x] Relatórios impressos das correções (turma e aluno) com níveis, comentários, marcações, foto e corretor reais
+- [~] Contestação do aluno: código pronto, depende da tabela `contestacoes` (em `supabase/pendente.sql`)
+- [ ] Notificações por e-mail
 - [x] Pacotes: criados automaticamente (turma + proposta + versão, prazo vencido) quando a coordenação abre o sistema; distribuição gravada
 
 ### Testes
@@ -63,3 +65,7 @@ Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PR
 - [ ] Aluno: boletim (aviso provisório), texto do corretor palavra por palavra, contestação
 - [ ] Ganchos (calibração), 2ª versão (reescrita/diagnóstico), dúvidas e suspeita de IA do corretor → professor
 - [ ] Comunicado extraordinário (impressão e registro), relatórios com dados reais
+
+## SQL
+Tudo que já foi aplicado ao banco está em `supabase/migrations/`. O que ainda **não** foi aplicado fica em
+`supabase/pendente.sql`. Ao final do trabalho será gerado um script único e completo: `supabase/schema-completo.sql`.
