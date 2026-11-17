@@ -95,6 +95,92 @@ const ARENA = {
     return true
   },
 
+  // ===== Aluno =====
+  async carregarAluno() {
+    const uid = ARENA.perfil.id
+    const { data: al, error: e0 } = await supabase.from('alunos').select('id, nome, matricula, turmas(serie, nome)').eq('perfil_id', uid).maybeSingle()
+    if (e0 || !al) throw e0 || new Error('Cadastro de aluno não vinculado')
+    ARENA.aluno = al
+    const { data: props } = await supabase.from('propostas').select('*').order('bimestre').order('id')
+    const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao), marcacoes(dados)').eq('aluno_id', al.id)
+    window.__real = true
+    const turma = al.turmas ? `${al.turmas.serie}º ano ${al.turmas.nome}` : ''
+    document.getElementById('alNm').textContent = `${al.nome} · ${turma}`.replace(/ · $/, '')
+    document.getElementById('alAv').textContent = al.nome.split(' ').filter(Boolean).slice(0, 2).map((x) => x[0].toUpperCase()).join('')
+
+    const hoje = new Date().toISOString().slice(0, 10)
+    const PROPS = window.__aluno.PROPS
+    const ESSAYS = window.__aluno.ESSAYS
+    PROPS.length = 0
+    ESSAYS.length = 0
+    const novaNota = (n) => String(Number(n).toFixed(1)).replace('.', ',')
+    for (const [i, p] of props.entries()) {
+      const num = i + 1
+      const orig = reds.find((r) => r.proposta_id === p.id && r.versao === 1)
+      const re = reds.find((r) => r.proposta_id === p.id && r.versao === 2)
+      const lib = (r) => (r && r.correcoes && (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes)?.liberada ? (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes) : null)
+      const item = async (r, versao) => {
+        const base = { _pid: p.id, _v: versao }
+        const rot = versao === 1 ? `Proposta ${num} · ${p.genero}` : `2ª versão (reescrita) · Proposta ${num}`
+        const g = versao === 1 ? 'o' : 'r'
+        const prazo = p.prazo ? `${p.prazo.slice(8, 10)}/${p.prazo.slice(5, 7)}` : ''
+        if (!r) {
+          if (versao === 2) {
+            const c1 = lib(orig)
+            if (!c1) return { ...base, g, t: rot, s: `Libera depois da correção da Proposta ${num}`, st: 'bl', l: 'Ainda não liberada', kind: 'block' }
+            return { ...base, g, t: rot, s: 'Aberta para envio', st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação' }
+          }
+          const atrasada = p.prazo && p.prazo < hoje
+          return atrasada
+            ? { ...base, g, t: rot, s: `Prazo encerrado em ${prazo}`, st: 'at', l: 'Atrasada · ainda dá para enviar', kind: 'late', cta: 'Enviar com atraso' }
+            : { ...base, g, t: rot, s: `Tema: ${p.titulo}${prazo ? ' · prazo ' + prazo : ''}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação' }
+        }
+        const c = lib(r)
+        if (!c) {
+          const etapa = r.etapa === 'aguardando_liberacao' ? 'ret' : 'corr'
+          return { ...base, g, t: rot, s: `Enviada em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)}`, st: 'ok', l: etapa === 'ret' ? 'Aguardando liberação' : 'Enviada · aguardando correção', etapa }
+        }
+        let fotoUrl = null
+        if (r.foto_path) fotoUrl = (await supabase.storage.from('redacoes').createSignedUrl(r.foto_path, 3600)).data?.signedUrl ?? null
+        const marks = (r.marcacoes ?? []).map((m) => m.dados)
+        const circ = marks.filter((m) => m.t === 'o' && m.line).map((m) => ({ l: m.line, x: Math.round(m.cx), c: m.cat, ...(m.pal ? { w: m.pal } : {}) }))
+        const cmts = marks.filter((m) => m.t === 'c').map((m) => ({ l: m.line, x: Math.round(m.x ?? 176), j: m.j ?? m.crit ?? 1, t: m.txt ?? '' }))
+        const dd = (c.liberada_em ?? r.enviada_em).slice(0, 10)
+        return {
+          ...base, g, t: rot, s: `Entregue em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)} · corrigida`, st: 'ok',
+          l: `Corrigida · nota ${novaNota(c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: [c.n1, c.n2, c.n3, c.n4, c.n5],
+          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`,
+        }
+      }
+      const io = PROPS.length
+      PROPS.push(await item(orig, 1))
+      const ir = PROPS.length
+      PROPS.push(await item(re, 2))
+      ESSAYS.push({ n: num, g: p.genero, tema: p.titulo, o: io, r: ir })
+    }
+    window.__aluno.recalc()
+    if (props.length) window.__aluno.setBim(props[props.length - 1].bimestre)
+  },
+
+  // Envia a foto da redação (data URL escolhida no celular/computador) e cria o registro.
+  async enviarRedacao(P, dataUrl, atraso) {
+    try {
+      if (!ARENA.aluno || !dataUrl) return false
+      const blob = await (await fetch(dataUrl)).blob()
+      const ext = blob.type === 'image/png' ? 'png' : blob.type === 'image/svg+xml' ? 'svg' : 'jpg'
+      const path = `${ARENA.aluno.id}/${P._pid}-v${P._v}-${Date.now()}.${ext}`
+      const up = await supabase.storage.from('redacoes').upload(path, blob, { contentType: blob.type || 'image/jpeg' })
+      if (up.error) return false
+      const { error } = await supabase.from('redacoes').insert({
+        aluno_id: ARENA.aluno.id, proposta_id: P._pid, versao: P._v, foto_path: path, fora_do_prazo: !!atraso,
+        obs: atraso ? `Atraso: ${atraso.mot}${atraso.txt ? ' — ' + atraso.txt : ''}` : null,
+      })
+      return !error
+    } catch {
+      return false
+    }
+  },
+
   async sair() {
     ARENA.perfil = null
     try { await supabase.auth.signOut() } catch { /* sem conexão: a sessão local expira sozinha */ }
