@@ -32,6 +32,28 @@ Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PR
 
 ## Estado da ligação protótipo ↔ banco
 - [x] Login real: corretor (e-mail), aluno (matrícula), coordenação e professor (Área restrita)
+- [x] Corretor: pacotes, fotos, correção gravada (níveis, comentário, marcações, anulação, tempo gasto); liberação automática das correções comuns; 2ª versão com a 1ª para comparar; dúvidas e suspeita de IA retidas; financeiro; retorno do professor
+- [x] Aluno: propostas, envio de foto, avisos de atraso/ausência, prazo individual, correção liberada (texto do corretor, marcações, foto), boletim com bimestres e critérios
+- [x] Coordenação: acessos, entregas, turmas, demandas (aceitar/recusar), corretores (pacotes, distribuição, desempenho), propostas e bimestres, pessoas (alunos com acesso por matrícula, equipe, senhas), regras, histórico, comunicados
+- [x] Professor: visão geral, fila de liberação (foto e marcações reais; aprovar/modificar/zerar/responder dúvida), médias
+- [ ] Ganchos (calibração): a tela existe, mas **não** grava no banco (fica vazia a cada recarga); comparação professor × corretor depende disso
+- [ ] Entregas → "Ver redação" ainda mostra a ilustração de exemplo em vez da foto real do aluno
+- [ ] Relatórios impressos (PDF) com dados reais de ponta a ponta; contestação do aluno; notificações por e-mail
+- [ ] Criação de pacotes pela coordenação (hoje os pacotes entram por SQL ou importação futura)
+
+### Testes
+- `node e2e/smoke.cjs` (com `npx vite preview --port 4173` rodando): entra com os 4 perfis e abre todas as telas.
+- `node e2e/ciclo-real.mjs`: ciclo aluno → corretor → coordenação no banco real (limpa o que cria).
+- `node e2e/pessoas-real.mjs <matrícula>`: coordenação redefine a senha de um aluno e ele entra.
+
+## Publicação (Vercel)
+Importe o repositório na Vercel (framework Other, comando `npm run build`, saída `dist`) e defina as variáveis
+`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (valores em `.env.example`; a chave é pública, a proteção é a RLS).
+
+Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PROXY=1 node e2e/ciclo-real.mjs`.
+
+## Estado da ligação protótipo ↔ banco
+- [x] Login real: corretor (e-mail), aluno (matrícula), coordenação e professor (Área restrita)
 - [x] Corretor: pacotes, fotos, correção gravada (níveis, comentário, marcações, anulação); liberação automática das correções comuns
 - [x] Aluno: propostas, envio de foto, avisos de atraso/ausência, correção liberada com a foto
 - [x] Coordenação (leitura): acessos, entregas, turmas, demandas, corretores, propostas, pessoas, regras, histórico

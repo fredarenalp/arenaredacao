@@ -68,6 +68,18 @@ const ARENA = {
     }
   },
 
+  // Desempenho do corretor no mês selecionado (tela "Desempenho")
+  perfDe(c) {
+    const mes = window.__coord.S.mes
+    const meus = ARENA._fin.filter((x) => x.corretor_id === c.id && x.feita && mesDe(x.em) === mes)
+    const q1 = meus.filter((x) => x.versao === 1).length, q2 = meus.filter((x) => x.versao === 2).length
+    const comTempo = meus.filter((x) => x.seg > 0)
+    const avg = comTempo.length ? comTempo.reduce((a, x) => a + x.seg, 0) / comTempo.length : 0
+    const medidos = meus.filter((x) => x.noPrazo != null)
+    const prazo = medidos.length ? Math.round((medidos.filter((x) => x.noPrazo).length / medidos.length) * 100) : 0
+    return { c, q1, q2, q: q1 + q2, avg, tot: comTempo.reduce((a, x) => a + x.seg, 0), prazo }
+  },
+
   async retornoMarca(id, patch) {
     await supabase.from('retornos').update(patch).eq('id', id)
   },
@@ -158,7 +170,7 @@ const ARENA = {
     const soma = a.anul ? 0 : a.niv.reduce((x, y) => x + y, 0)
     // retida: anulada, nota 0 ou 10, suspeita de IA ou dúvida pendente -> o professor/coordenação decide
     const retida = !!a.anul || soma === 0 || soma === 20 || !!a.ia || !!(a.duvida && a.duvida.st === 'pend')
-    row.extras = { nCorr: a.nCorr || 0, retida, ...(a.duvida && a.duvida.st === 'pend' ? { duvida: { pergunta: a.duvida.txt, crit: a.duvida.crit ?? '', linha: a.duvida.linha ?? '' } } : {}), ...(a.ia ? { ia: { txt: a.ia.txt } } : {}) }
+    row.extras = { nCorr: a.nCorr || 0, retida, segundos: a._seg || 0, ...(a.duvida && a.duvida.st === 'pend' ? { duvida: { pergunta: a.duvida.txt, crit: a.duvida.crit ?? '', linha: a.duvida.linha ?? '' } } : {}), ...(a.ia ? { ia: { txt: a.ia.txt } } : {}) }
     row.liberada = !retida
     const r1 = await supabase.from('correcoes').upsert(row)
     if (r1.error) return false
@@ -428,7 +440,14 @@ const ARENA = {
     C.GP.length = 0
     window.__coordDB.GN().forEach((g) => C.GP.push(g))
     C.resetAidx()
-    ARENA.definirFinanceiro(reds.data.flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && r.corretor_id ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao }] : [] }))
+    const prazoPac = Object.fromEntries(pacs.data.map((x) => [x.id, x.prazo]))
+    ARENA.definirFinanceiro(reds.data.flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && r.corretor_id ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao, seg: c.extras?.segundos || 0, noPrazo: prazoPac[r.pacote_id] ? c.atualizada_em.slice(0, 10) <= prazoPac[r.pacote_id] : null }] : [] }))
+    window.__perfDB = (c) => ARENA.perfDe(c)
+    Object.assign(C.MESES, Object.fromEntries([...new Set([mesAtual(), ...ARENA._fin.map((x) => mesDe(x.em))])].sort().reverse().map((m) => [m, rotuloMes(m)])))
+    for (const k of Object.keys(C.MESES)) if (!ARENA._fin.some((x) => mesDe(x.em) === k) && k !== mesAtual()) delete C.MESES[k]
+    C.S.mes = mesAtual()
+    C.GS.length = 0
+    for (const k of Object.keys(C.CORLV)) delete C.CORLV[k]
     // regras gravadas
     const { data: regras } = await supabase.from('regras').select('chave, valor')
     let bims = null

@@ -2056,7 +2056,7 @@ function atualiza0(){
  $('obs').disabled=false;sinEstado();
 }
 function abre(k,foco){
- document.body.classList.remove('pk-list');i=Math.max(0,Math.min(ALUNOS.length-1,k));
+ document.body.classList.remove('pk-list');i=Math.max(0,Math.min(ALUNOS.length-1,k));if(ALUNOS[i])ALUNOS[i]._t0=Date.now();
  var a=ALUNOS[i];
  upMode=false;$('up').classList.add('hide');$('mk').setAttribute('viewBox','0 0 210 297');$('img').src=a.foto||foto(i+1+pacIdx*7);zoom=innerWidth<=640?105:60;rot=a.foto?0:(i%3-1)*.8;view();linhaAtual=null;cmtAtual=null;catAtual=null;selC=null;$('catp').classList.add('hide');$('lc').classList.add('hide');drawMarks();
  verOrig=false;$('origBtn').classList.toggle('hide',!a.reesc);$('origBtn').classList.remove('on');$('origBtn').firstChild.textContent='Ver 1ª versão';$('foto').textContent='Foto 1 de 1';$('pg').classList.remove('orig');
@@ -2083,6 +2083,7 @@ function salvar(){
  a.salvo=true;a.lastPick=Object.assign(a.lastPick||{},a._pick||{});a.nCorr=(a.nCorr||0)+1; // lembra as frases mostradas, para não repetir na próxima correção
  a.obs=$('obs').value;
  toast('Correção salva · '+a.n.split(' ')[0]);
+ if(a._t0){a._seg=(a._seg||0)+Math.min(1800,Math.round((Date.now()-a._t0)/1000));a._t0=null}
  if(window.ARENA&&a._rid)window.ARENA.salvarCorrecao(a).then(function(ok){if(!ok)toast('Não foi possível gravar a correção no servidor. Tente salvar de novo.',1)});
  var go=goNext;
  var tn=total(a);
@@ -3855,18 +3856,18 @@ function renderPacotes(){
 }
 /* ---------- Corretores · Desempenho ---------- */
 var MESES={'2026-11':'Novembro/2026 (em andamento)','2026-10':'Outubro/2026','2026-09':'Setembro/2026'};
-function perf(c,ci){var r=rnd(ci*211+(S.mes==='2026-11'?3:S.mes==='2026-10'?5:7)),f=S.mes==='2026-11'?.45:1;
+function perf(c,ci){if(window.__perfDB)return window.__perfDB(c,ci);var r=rnd(ci*211+(S.mes==='2026-11'?3:S.mes==='2026-10'?5:7)),f=S.mes==='2026-11'?.45:1;
  var q1=Math.round((70+r()*90)*f),q2=Math.round((14+r()*34)*f),avg=330+r()*210;if(c.id==='carlos')avg=158+r()*20;
  return {c:c,q1:q1,q2:q2,q:q1+q2,avg:avg,tot:(q1+q2)*avg,prazo:Math.round(82+r()*18)}}
 function renderDesempenho(){
  var P=CORR.map(perf),tq=0,tt=0,tv=0,tp=0;
  var rows=P.map(function(x){var ng=nGanchos(x.c.id),v=x.q*S.r1+ng*halfR();tq+=x.q;tt+=x.tot;tv+=v;tp+=x.prazo*x.q;
-  var w=x.avg<240?'<span class="warn" title="Tempo muito abaixo da média da equipe: vale revisar uma amostra">⚠ Revisar</span>':'';
+  var w=x.avg>0&&x.avg<240?'<span class="warn" title="Tempo muito abaixo da média da equipe: vale revisar uma amostra">⚠ Revisar</span>':'';
   return '<tr><td><b>'+x.c.n+'</b></td><td class="n">'+x.q1+'</td><td class="n">'+x.q2+'</td><td class="n"><b>'+x.q+'</b></td><td class="n" title="Redações gancho: pagas pela metade do valor">'+ng+'</td><td><div class="tbar"><span style="min-width:40px;font-variant-numeric:tabular-nums"><b>'+mmss(x.avg)+'</b></span><div class="bar"><i style="width:'+Math.round(Math.min(100,x.avg/600*100))+'%"></i></div>'+w+'</div></td><td class="n">'+(x.tot/3600).toFixed(1).replace('.',',')+' h</td><td class="n">'+x.prazo+'%</td><td class="n"><b>'+brl(v)+'</b></td></tr>'}).join('');
- var avgG=tt/tq,kp='<div class="kpis"><div class="kpi"><small>Redações corrigidas</small><b>'+tq+'</b><span>'+P.reduce(function(a,x){return a+x.q1},0)+' 1ª versão · '+P.reduce(function(a,x){return a+x.q2},0)+' reescritas</span></div>'+
+ var avgG=tq?tt/tq:0,kp='<div class="kpis"><div class="kpi"><small>Redações corrigidas</small><b>'+tq+'</b><span>'+P.reduce(function(a,x){return a+x.q1},0)+' 1ª versão · '+P.reduce(function(a,x){return a+x.q2},0)+' reescritas</span></div>'+
  '<div class="kpi"><small>Tempo médio por redação</small><b>'+mmss(avgG)+'</b><span>média da equipe</span></div>'+
  '<div class="kpi"><small>Tempo total corrigindo</small><b>'+Math.round(tt/3600)+' h</b><span>'+CORR.length+' corretores</span></div>'+
- '<div class="kpi"><small>Devolvidas no prazo</small><b>'+Math.round(tp/tq)+'%</b><span>das redações do período</span></div>'+
+ '<div class="kpi"><small>Devolvidas no prazo</small><b>'+(tq?Math.round(tp/tq):0)+'%</b><span>das redações do período</span></div>'+
  '<div class="kpi sum"><small>Total a pagar</small><b>'+brl(tv)+'</b><span>valores abaixo</span></div></div>';
  return '<div class="cotools"><select class="cosel" id="coMes" aria-label="Período">'+Object.keys(MESES).map(function(k){return '<option value="'+k+'"'+(S.mes===k?' selected':'')+'>'+MESES[k]+'</option>'}).join('')+'</select><span class="sp"></span>'+
  '<label class="rate">Valor por redação <input id="coR1" inputmode="decimal" value="'+S.r1.toFixed(2).replace('.',',')+'" aria-label="Valor por redação corrigida"></label>'+
@@ -4787,7 +4788,7 @@ $('coMain').addEventListener('change',function(e){var t=e.target;
  if(t.dataset&&t.dataset.pac){var x=PACS.filter(function(p){return String(p.id)===t.dataset.pac})[0];var nm=CORR.filter(function(c){return c.id===t.value})[0];x.c=t.value||null;(function(m){if(m)DT[m[1]+m[2]]=x.c})(/(\d)º ano ([A-I])/.exec(x.turma));reg(t.value?'Atribuiu o pacote '+x.id+' ('+x.turma+') a '+nm.n:'Tirou o corretor do pacote '+x.id,'dist');toast(t.value?'Pacote '+x.id+' atribuído a '+nm.n:'Pacote '+x.id+' sem corretor');render();return}
  if(t.dataset&&t.dataset.gp){var q=t.dataset.gp.split(':');gOf(q[0]).prof[+q[1]]=+t.value;render();return}
  if(t.id==='coR1'){var v=parseFloat(String(t.value).replace(',','.'));if(!(v>=0))v=S.r1;S.r1=v;render()}});
-window.__coord={EXT:EXT,COMEM:COMEM,GP:GP,EQUIPE:EQUIPE,SAIU:SAIU,SENHA:SENHA,aidx:function(){return aidx()},senhaDe:senhaDe,PLAB:PLAB,CORR:CORR,PRP:PRP,PACS:PACS,AVISOS:AVISOS,LOG:LOG,FILA:FILA,PROFS:PROFS,BIMC:BIMC,S:S,R:R,render:function(){render()},reg:function(x,k){reg(x,k)},pac:pac,genero:genero,resetAidx:function(){CAD=null;AIDX=null}};
+window.__coord={GS:GS,CORLV:CORLV,MESES:MESES,EXT:EXT,COMEM:COMEM,GP:GP,EQUIPE:EQUIPE,SAIU:SAIU,SENHA:SENHA,aidx:function(){return aidx()},senhaDe:senhaDe,PLAB:PLAB,CORR:CORR,PRP:PRP,PACS:PACS,AVISOS:AVISOS,LOG:LOG,FILA:FILA,PROFS:PROFS,BIMC:BIMC,S:S,R:R,render:function(){render()},reg:function(x,k){reg(x,k)},pac:pac,genero:genero,resetAidx:function(){CAD=null;AIDX=null}};
 window.__entraRole=entra;
 document.querySelector('.cobar').addEventListener('click',function(e){var b=e.target.closest('[data-top]');if(!b)return;S.top=b.dataset.top;render()});
 function entra(role){S.role=role;S.top=role==='prof'?'pgeral':'acessos';S.pf={pac:null,idx:null,niv:[null,null,null,null,null]};$('roleMdl').classList.add('hide');$('coLogo').src=document.querySelector('#al .ph img').src;render();document.body.classList.add('in-coord');window.scrollTo(0,0);$('co').scrollTop=0}
