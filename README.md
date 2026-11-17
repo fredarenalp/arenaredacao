@@ -22,3 +22,5 @@ npm run lint && npm test && npm run build
 ## Publicação (Vercel)
 Importe o repositório na Vercel (framework Vite, `npm run build`, saída `dist`) e defina as variáveis
 `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (valores em `.env.example`; a chave é pública, a proteção é a RLS).
+
+Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PROXY=1 node e2e/ciclo-real.mjs`.
