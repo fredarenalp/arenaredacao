@@ -18,3 +18,7 @@ npm run lint && npm test && npm run build
 
 ## Testes de tela
 `npm run build && npx vite preview --port 4173 &` e depois `node e2e/fluxo.cjs` (Supabase simulado; requer Playwright instalado globalmente).
+
+## Publicação (Vercel)
+Importe o repositório na Vercel (framework Vite, `npm run build`, saída `dist`) e defina as variáveis
+`VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (valores em `.env.example`; a chave é pública, a proteção é a RLS).
