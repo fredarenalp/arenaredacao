@@ -15,3 +15,6 @@ npm run lint && npm test && npm run build
 1. No painel do Supabase → Authentication → Users → *Add user* (e-mail + senha).
 2. No SQL Editor: `insert into perfis(id,tipo,nome) values ('<uuid do usuário>','coordenacao','Seu nome');`
 3. Entre no app; os demais perfis são cadastrados da mesma forma.
+
+## Testes de tela
+`npm run build && npx vite preview --port 4173 &` e depois `node e2e/fluxo.cjs` (Supabase simulado; requer Playwright instalado globalmente).
