@@ -359,6 +359,7 @@ const ARENA = {
           return { nome: a.nome, k, s, t, n, soma, med: qt ? soma / qt : 0 }
         }).sort((x, y) => (x.nome < y.nome ? -1 : 1))
       },
+      GN: () => { const g = ['']; for (const x of prop.data.filter((q) => q.bimestre === bimAtual)) g[x.numero] = x.genero; return g },
       mat: (s, t, k) => (byClass[`${s}|${t}`] || [])[k]?.matricula ?? '',
       PR: (s) => prop.data.filter((x) => x.bimestre === bimAtual && x.series.includes(s)).map((x) => x.numero).sort((a, b) => a - b),
     }
@@ -376,7 +377,7 @@ const ARENA = {
       id: x.id, bim: x.bimestre, n: x.numero, g: x.genero, t: x.titulo, ser: x.series, p1: dm(x.prazo), p2: dm(x.prazo2),
       ...(x.sem_reescrita ? { semRe: true } : {}), st: x.status,
     })))
-    fill(C.BIMC, [1, 2, 3, 4].map((n) => ({ n, st: n < bimAtual ? 'enc' : n === bimAtual ? 'and' : 'fut', d: n < bimAtual ? 'encerrado' : n === bimAtual ? 'em andamento' : 'ainda não começou' })))
+    // (os bimestres são preenchidos depois de ler as regras)
     const nPac = Object.fromEntries(pacs.data.map((x) => [x.id, reds.data.filter((r) => r.pacote_id === x.id)]))
     fill(C.PACS, pacs.data.map((x) => {
       const rs = nPac[x.id]
@@ -408,11 +409,17 @@ const ARENA = {
       ...(x.status !== 'pend' ? { res: dh(x.decidido_em || x.criado_em) } : {}),
     })))
     fill(C.LOG, even.data.filter((e) => e.texto).map((e) => ({ t: dh(e.em), bim: bimAtual, q: nomeDe[e.autor] || 'Coordenação', k: e.tipo || 'outro', x: e.texto })))
+    { const nums = prop.data.filter((q) => q.bimestre === bimAtual).map((q) => q.numero).sort((a, b) => a - b); if (nums.length && !nums.includes(C.S.ent.prop)) C.S.ent.prop = nums[0] }
+    C.GP.length = 0
+    window.__coordDB.GN().forEach((g) => C.GP.push(g))
     C.resetAidx()
     ARENA.definirFinanceiro(reds.data.flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && r.corretor_id ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao }] : [] }))
     // regras gravadas
     const { data: regras } = await supabase.from('regras').select('chave, valor')
-    for (const r of regras ?? []) { if (r.chave === 'r1') C.S.r1 = r.valor; else C.R[r.chave] = r.valor }
+    let bims = null
+    for (const r of regras ?? []) { if (r.chave === 'r1') C.S.r1 = r.valor; else if (r.chave === 'bimestres') bims = r.valor; else C.R[r.chave] = r.valor }
+    const DESC = { enc: 'encerrado', and: 'em andamento', fut: 'ainda não começou' }
+    fill(C.BIMC, [1, 2, 3, 4].map((n) => { const st = bims ? bims[n - 1] : n < bimAtual ? 'enc' : n === bimAtual ? 'and' : 'fut'; return { n, st, d: DESC[st] } }))
     // equipe (coordenação + professores) e alunos que saíram
     const eq = perf.data.filter((x) => x.tipo === 'coordenacao' || x.tipo === 'professor')
     fill(C.EQUIPE, [
@@ -439,6 +446,7 @@ const ARENA = {
       corr: Object.fromEntries(C.CORR.map((c) => [c.id, !!c.pausado])),
       prp: Object.fromEntries(C.PRP.map((q) => [q.id, JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])])),
       regras: JSON.stringify({ r1: C.S.r1, ...C.R }),
+      bimc: JSON.stringify(C.BIMC.map((b) => b.st)),
       cad: Object.fromEntries(C.aidx().map((a) => [a.mat, serTur(a).join('|')])),
       saiu: JSON.stringify(C.SAIU),
       senha: JSON.stringify(C.SENHA),
@@ -588,6 +596,10 @@ const ARENA = {
         }
       }
     }
+
+    // bimestres (encerrar / abrir)
+    const bimc = JSON.stringify(C.BIMC.map((b) => b.st))
+    if (bimc !== prev.bimc) ok(await supabase.from('regras').upsert({ chave: 'bimestres', valor: JSON.parse(bimc), atualizada_por: eu, atualizada_em: new Date().toISOString() }))
 
     // regras
     const reg = JSON.stringify({ r1: C.S.r1, ...C.R })
