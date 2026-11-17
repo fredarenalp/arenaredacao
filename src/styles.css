@@ -1,0 +1,2 @@
+:root{--c1:#3c7678;--c2:#1a4888;--c3:#6a3a8a;--c4:#b07a10;--c5:#2f855a;--bg:#f6f4ef;--ink:#1f2328}
+body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--ink)}
