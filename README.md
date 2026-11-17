@@ -29,3 +29,12 @@ Importe o repositório na Vercel (framework Other, comando `npm run build`, saí
 `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` (valores em `.env.example`; a chave é pública, a proteção é a RLS).
 
 Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PROXY=1 node e2e/ciclo-real.mjs`.
+
+## Estado da ligação protótipo ↔ banco
+- [x] Login real (corretor por e-mail, aluno por matrícula, coordenação/professor pela "Área restrita")
+- [x] Corretor: pacotes, redações, fotos (URL assinada) e correção salva no banco (níveis, comentário, marcações, anulação)
+- [ ] Corretor: financeiro ("Quanto você recebe") e "Retorno do professor" — ocultos até serem ligados (eram números de exemplo)
+- [ ] Corretor: fila do professor (dúvidas, suspeita de IA, notas 0/10), ganchos, 2ª versão
+- [ ] Aluno: lista de propostas/redações, envio de foto, correção liberada, boletim
+- [ ] Coordenação: acessos, liberação, pacotes, avisos/comunicados, relatórios
+- [ ] Professor: visão geral, fila, revisão
