@@ -39,8 +39,7 @@ Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PR
 - [~] Ganchos (calibração): definição e nota do professor gravam (nas `regras`); falta o gancho aparecer com a foto real dentro do pacote do corretor e a comparação professor × corretor (precisa de SQL, em `supabase/pendente.sql`)
 - [x] Entregas → "Ver redação" mostra a foto real do aluno
 - [x] Relatórios impressos das correções (turma e aluno) com níveis, comentários, marcações, foto e corretor reais
-- [~] Contestação do aluno: código pronto, depende da tabela `contestacoes` (em `supabase/pendente.sql`)
-- [ ] Notificações por e-mail
+- Fora do escopo (decisão do dono): contestação do aluno e notificações por e-mail
 - [x] Pacotes: criados automaticamente (turma + proposta + versão, prazo vencido) quando a coordenação abre o sistema; distribuição gravada
 
 ### Testes
