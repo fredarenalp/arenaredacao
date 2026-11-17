@@ -199,6 +199,7 @@ const ARENA = {
     ARENA.aluno = al
     const { data: props } = await supabase.from('propostas').select('*').order('bimestre').order('id')
     const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao), marcacoes(dados)').eq('aluno_id', al.id)
+    const { data: contests } = await supabase.from('contestacoes').select('*').eq('aluno_id', al.id)
     const { data: prazosInd } = await supabase.from('prazos_individuais').select('proposta_id, ate, vale_nota').eq('aluno_id', al.id)
     window.__real = true
     const turma = al.turmas ? `${al.turmas.serie}º ano ${al.turmas.nome}` : ''
@@ -266,7 +267,7 @@ const ARENA = {
         return {
           ...base, g, t: rot, s: `Entregue em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)} · corrigida`, st: 'ok',
           l: `Corrigida · nota ${novaNota(c.anulacao ? 0 : c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: c.anulacao ? [0, 0, 0, 0, 0] : [c.n1, c.n2, c.n3, c.n4, c.n5],
-          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario),
+          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario), _rid: r.id,
         }
       }
       const io = PROPS.length
@@ -275,8 +276,22 @@ const ARENA = {
       PROPS.push(await item(re, 2))
       ESSAYS.push({ n: num, g: p.genero, tema: p.titulo, o: io, r: ir })
     }
+    // contestações já enviadas / decididas
+    for (const p of PROPS) {
+      const ct = (contests ?? []).find((x) => x._rid === undefined && x.redacao_id === p._rid)
+      if (!ct) continue
+      p.cont = { crits: ct.criterios }
+      if (ct.status === 'recorrigida' && ct.novo) p.niv = ct.novo
+    }
     window.__aluno.recalc()
     window.__aluno.setBim(bimAtual)
+  },
+
+  // Contestação de uma correção pelo aluno
+  async contestar(P, criterios, orig) {
+    if (!ARENA.aluno || !P._rid) return false
+    const { error } = await supabase.from('contestacoes').insert({ aluno_id: ARENA.aluno.id, redacao_id: P._rid, criterios, orig })
+    return !error
   },
 
   // Aviso do aluno à coordenação (envio em atraso ou ausência)
@@ -447,6 +462,14 @@ const ARENA = {
     })))
     fill(C.LOG, even.data.filter((e) => e.texto).map((e) => ({ t: dh(e.em), bim: bimAtual, q: nomeDe[e.autor] || 'Coordenação', k: e.tipo || 'outro', x: e.texto })))
     { const nums = prop.data.filter((q) => q.bimestre === bimAtual).map((q) => q.numero).sort((a, b) => a - b); if (nums.length && !nums.includes(C.S.ent.prop)) C.S.ent.prop = nums[0] }
+    {
+      const { data: cts } = await supabase.from('contestacoes').select('*, alunos(nome, turmas(serie, nome)), redacoes(propostas(numero, genero))')
+      window.__store.contest = (cts ?? []).map((x) => ({
+        id: x.id, aluno: x.alunos?.nome ?? '', turma: x.alunos?.turmas ? `${x.alunos.turmas.serie}º${x.alunos.turmas.nome}` : '',
+        prop: x.redacoes?.propostas ? `Proposta ${x.redacoes.propostas.numero} · ${x.redacoes.propostas.genero}` : '', k: 0,
+        crits: x.criterios, orig: x.orig, st: x.status === 'pendente' ? 'pend' : x.status === 'recorrigida' ? 'rec' : 'man', ...(x.novo ? { novo: x.novo } : {}), _rid: x.redacao_id,
+      }))
+    }
     C.GP.length = 0
     window.__coordDB.GN().forEach((g) => C.GP.push(g))
     C.resetAidx()
@@ -494,6 +517,7 @@ const ARENA = {
       prp: Object.fromEntries(C.PRP.map((q) => [q.id, JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])])),
       regras: JSON.stringify({ r1: C.S.r1, ...C.R }),
       bimc: JSON.stringify(C.BIMC.map((b) => b.st)),
+      cont: JSON.stringify((window.__store.contest || []).map((c) => [c.id, c.st, c.novo || null])),
       gs: JSON.stringify(C.GS.map((g) => ({ ...g, fotoUrl: undefined }))),
       ext: JSON.stringify(C.EXT),
       comem: JSON.stringify(C.COMEM),
@@ -668,6 +692,18 @@ const ARENA = {
         if (JSON.stringify(cmAgora[key]) === JSON.stringify(cmAntes[key])) continue
         const al = alunoDeChave(key)
         if (al) ok(await supabase.from('comunicados').insert({ aluno_id: al.id, texto: `Comunicado extraordinário emitido em ${cmAgora[key].dt}: ${cmAgora[key].n} redações não entregues.`, criado_por: eu }))
+      }
+    }
+
+    // contestações: professor mantém ou recorrige
+    {
+      const antes = JSON.parse(prev.cont)
+      for (const c of window.__store.contest || []) {
+        const a0 = antes.find((x) => x[0] === c.id)
+        if (!a0 || (a0[1] === c.st && JSON.stringify(a0[2]) === JSON.stringify(c.novo || null))) continue
+        const status = c.st === 'rec' ? 'recorrigida' : c.st === 'man' ? 'mantida' : 'pendente'
+        ok(await supabase.from('contestacoes').update({ status, novo: c.novo || null, decidido_por: eu, decidido_em: new Date().toISOString() }).eq('id', c.id))
+        if (c.st === 'rec' && c.novo) ok(await supabase.from('correcoes').update({ n1: c.novo[0], n2: c.novo[1], n3: c.novo[2], n4: c.novo[3], n5: c.novo[4] }).eq('redacao_id', c._rid))
       }
     }
 
