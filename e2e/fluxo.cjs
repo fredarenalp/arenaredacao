@@ -49,5 +49,5 @@ async function rodar(tipo, esperado) {
   await rodar('aluno', ['Ana Aluna', 'Boletim', 'Prazo prorrogado.', 'Bom texto.'])
   await rodar('corretor', ['Redações para corrigir (1)', 'Bia', 'fora do prazo'])
   await rodar('professor', ['Caio'])
-  await rodar('coordenacao', ['Aguardando liberação', 'Importar alunos', 'Comunicado extraordinário'])
+  await rodar('coordenacao', ['Aguardando liberação', 'Importar alunos', 'Novo usuário', 'Comunicado extraordinário'])
 })()

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase.js'
 import { formatarNota } from '../domain/grade.js'
+import NovoUsuario from './NovoUsuario.jsx'
 import ImportarAlunos from './ImportarAlunos.jsx'
 import Corretor from './Corretor.jsx'
 
@@ -55,6 +56,7 @@ export default function Coordenacao({ perfil }) {
           <button onClick={() => liberar(r)}>Liberar ao aluno</button>
         </article>
       ))}
+      <NovoUsuario />
       <ImportarAlunos />
       <Comunicados perfil={perfil} />
       <h2>Auditoria recente</h2>
