@@ -31,11 +31,13 @@ Importe o repositório na Vercel (framework Other, comando `npm run build`, saí
 Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PROXY=1 node e2e/ciclo-real.mjs`.
 
 ## Estado da ligação protótipo ↔ banco
-- [x] Login real (corretor por e-mail, aluno por matrícula, coordenação/professor pela "Área restrita")
-- [x] Corretor: pacotes, redações, fotos (URL assinada) e correção salva no banco (níveis, comentário, marcações, anulação)
-- [ ] Corretor: financeiro ("Quanto você recebe") e "Retorno do professor" — ocultos até serem ligados (eram números de exemplo)
-- [ ] Corretor: fila do professor (dúvidas, suspeita de IA, notas 0/10), ganchos, 2ª versão
-- [x] Aluno: lista de propostas/redações, envio de foto (upload real), correção liberada vista no visor do protótipo
-- [ ] Aluno: boletim (placeholder até ser ligado), textos por critério = os escritos pelo corretor (hoje o visor recompõe a partir dos níveis), contestação, ausência/atraso (avisos)
-- [ ] Coordenação: acessos, liberação, pacotes, avisos/comunicados, relatórios
-- [ ] Professor: visão geral, fila, revisão
+- [x] Login real: corretor (e-mail), aluno (matrícula), coordenação e professor (Área restrita)
+- [x] Corretor: pacotes, fotos, correção gravada (níveis, comentário, marcações, anulação); liberação automática das correções comuns
+- [x] Aluno: propostas, envio de foto, avisos de atraso/ausência, correção liberada com a foto
+- [x] Coordenação (leitura): acessos, entregas, turmas, demandas, corretores, propostas, pessoas, regras, histórico
+- [x] Coordenação (gravação por sincronização): aceitar/recusar demandas, atribuir pacotes, propostas, regras, histórico, cadastro de alunos/equipe/senhas
+- [x] Professor: visão geral, fila de liberação (foto e marcações reais), médias; aprovar grava no banco
+- [ ] Corretor: financeiro ("Quanto você recebe") e "Retorno do professor" (ocultos até serem ligados)
+- [ ] Aluno: boletim (aviso provisório), texto do corretor palavra por palavra, contestação
+- [ ] Ganchos (calibração), 2ª versão (reescrita/diagnóstico), dúvidas e suspeita de IA do corretor → professor
+- [ ] Comunicado extraordinário (impressão e registro), relatórios com dados reais

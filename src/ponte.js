@@ -172,6 +172,13 @@ const ARENA = {
     if (props.length) window.__aluno.setBim(props[props.length - 1].bimestre)
   },
 
+  // Aviso do aluno à coordenação (envio em atraso ou ausência)
+  async avisar(P, tipo, motivo, texto) {
+    if (!ARENA.aluno) return false
+    const { error } = await supabase.from('avisos').insert({ aluno_id: ARENA.aluno.id, proposta_id: P._pid ?? null, tipo, motivo, texto: texto || null })
+    return !error
+  },
+
   // Envia a foto da redação (data URL escolhida no celular/computador) e cria o registro.
   async enviarRedacao(P, dataUrl, atraso) {
     try {
@@ -197,7 +204,7 @@ const ARENA = {
     const desde = new Date(Date.now() - 70 * 86400000).toISOString()
     const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess] = await Promise.all([
       q('perfis'), q('turmas'), q('alunos', '*, turmas(serie, nome)'), q('propostas'), q('pacotes'),
-      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras)'),
+      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario)'),
       q('avisos', '*, alunos(nome, turmas(serie, nome)), propostas(numero, genero)'),
       supabase.from('eventos').select('*').order('em', { ascending: false }).limit(300),
       q('professor_turmas'),
@@ -265,6 +272,20 @@ const ARENA = {
         const q = (off) => { let n = 0, c = 0; for (const key of Object.keys(byClass)) { if (key.startsWith(s + '|')) { const r = cellReal(s, key.split('|')[1], metric, per, off); n += r.n; c += r.q } } return n ? Math.round((c / n) * 100) : 0 }
         return q(0) - q(1)
       },
+      medTurma: (s, t) => {
+        const nums = window.__coordDB.PR(s)
+        const lista = byClass[`${s}|${t}`] || []
+        return lista.map((a, k) => {
+          const n = []
+          for (const num of nums) {
+            const P = propByNum[num]
+            const nota = (v) => { const r = P ? redOf(a.id, P.id, v) : null; const c = r && (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes); return c && c.liberada && c.nota != null ? Number(c.nota) : 0 }
+            n.push(nota(1), P?.sem_reescrita ? null : nota(2))
+          }
+          const soma = n.reduce((x, y) => x + (y || 0), 0), qt = n.filter((y) => y != null).length
+          return { nome: a.nome, k, s, t, n, soma, med: qt ? soma / qt : 0 }
+        }).sort((x, y) => (x.nome < y.nome ? -1 : 1))
+      },
       mat: (s, t, k) => (byClass[`${s}|${t}`] || [])[k]?.matricula ?? '',
       PR: (s) => prop.data.filter((x) => x.bimestre === bimAtual && x.series.includes(s)).map((x) => x.numero).sort((a, b) => a - b),
     }
@@ -292,11 +313,19 @@ const ARENA = {
       return o
     }))
     const pacDe = Object.fromEntries(pacs.data.map((x) => [x.id, x.numero]))
-    fill(C.FILA, reds.data.filter((r) => r.etapa === 'aguardando_liberacao').map((r, i) => {
+    const retidas = reds.data.filter((r) => r.etapa === 'aguardando_liberacao')
+    const marcasRet = retidas.length ? (await supabase.from('marcacoes').select('redacao_id, dados').in('redacao_id', retidas.map((r) => r.id))).data ?? [] : []
+    const fotosRet = {}
+    for (const r of retidas) {
+      const { data: full } = await supabase.from('redacoes').select('foto_path').eq('id', r.id).single()
+      if (full?.foto_path) fotosRet[r.id] = (await supabase.storage.from('redacoes').createSignedUrl(full.foto_path, 3600)).data?.signedUrl ?? null
+    }
+    fill(C.FILA, retidas.map((r, i) => {
       const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes
       const a = alunos.find((x) => x.id === r.aluno_id)
       const niv = c && c.n1 != null ? [c.n1, c.n2, c.n3, c.n4, c.n5] : [0, 0, 0, 0, 0]
-      return { id: r.id, pac: pacDe[r.pacote_id] ?? 0, idx: i, aluno: a?.nome ?? '', c: r.corretor_id, nota: c?.nota != null ? Number(c.nota) : 0, niv, st: 'pend', mot: c?.anulacao ? `Redação anulada: ${c.anulacao}` : '', _rid: r.id }
+      const retidaTipo = c?.extras?.retida && !c?.anulacao && c.nota != null && Number(c.nota) !== 0 && Number(c.nota) !== 10 ? 'ia' : ''
+      return { id: r.id, pac: pacDe[r.pacote_id] ?? 0, idx: i, aluno: a?.nome ?? '', c: r.corretor_id, nota: c?.nota != null ? Number(c.nota) : 0, niv, st: 'pend', mot: c?.anulacao ? `Redação anulada: ${c.anulacao}` : '', tipo: retidaTipo, marks: marcasRet.filter((m) => m.redacao_id === r.id).map((m) => m.dados), obs: c?.comentario ?? '', foto: fotosRet[r.id] ?? null, seed: r.id, _rid: r.id }
     }))
     fill(C.AVISOS, avis.data.map((x) => ({
       id: x.id, aluno: x.alunos?.nome ?? '', turma: x.alunos?.turmas ? `${x.alunos.turmas.serie}º ano ${x.alunos.turmas.nome}` : '',
