@@ -16,3 +16,9 @@ button.sel{background:var(--c2);color:#fff}
 .crit span{flex:1}
 .erro{color:#b00020}.aviso{color:var(--c5)}
 @media(max-width:600px){.crit{flex-wrap:wrap}}
+.aviso-extra{border-left:4px solid var(--c4)}
+@media print{
+  header,button,select,.card:not(.folha){display:none!important}
+  .folha{border:0;margin:0}
+  body{background:#fff}
+}

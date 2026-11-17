@@ -11,6 +11,7 @@ export default function Aluno({ perfil }) {
   const [redacoes, setRedacoes] = useState([])
   const [correcoes, setCorrecoes] = useState({})
   const [msg, setMsg] = useState('')
+  const [avisos, setAvisos] = useState([])
   const [vista, setVista] = useState(null) // { url, marcas }
 
   const carregar = useCallback(async () => {
@@ -20,6 +21,8 @@ export default function Aluno({ perfil }) {
     setPropostas(p ?? [])
     const { data: r } = await supabase.from('redacoes').select('*').order('id')
     setRedacoes(r ?? [])
+    const { data: av } = await supabase.from('comunicados').select('*').order('criado_em', { ascending: false })
+    setAvisos(av ?? [])
     const { data: c } = await supabase.from('correcoes').select('*')
     setCorrecoes(Object.fromEntries((c ?? []).map((x) => [x.redacao_id, x])))
   }, [perfil.id])
@@ -51,8 +54,9 @@ export default function Aluno({ perfil }) {
           {linhasBol.map((l) => <div key={l.bimestre}>{l.bimestre}º bim.<br /><b>{formatarNota(l.media)}</b></div>)}
         </div>
       </div>
+      {avisos.map((a) => <div key={a.id} className="card aviso-extra"><b>Comunicado da coordenação</b><p>{a.texto}</p></div>)}
       {msg && <p className="aviso">{msg}</p>}
-      {vista && <div className="card"><button onClick={() => setVista(null)}>Fechar</button><FotoMarcada url={vista.url} marcacoes={vista.marcas} /></div>}
+      {vista && <div className="card folha"><button onClick={() => setVista(null)}>Fechar</button> <button onClick={() => window.print()}>Imprimir folha</button><FotoMarcada url={vista.url} marcacoes={vista.marcas} /></div>}
       {propostas.map((p) => {
         const r = redacoes.find((x) => x.proposta_id === p.id)
         const c = r && correcoes[r.id]
