@@ -3416,11 +3416,11 @@ function verZero(b,i){
  $('zVolta').onclick=lista;
 }
 function lista(){
- var chips=[1,2,3,4].map(function(b){var c=b<BATU?'ps':b===BATU?'at':'fu',sub=b<BATU?'Encerrado':b===BATU?'Em andamento':'Em '+BINI[b];return '<button type="button" class="bimc '+c+(b===BSEL?' sel':'')+'" data-bim="'+b+'" aria-pressed="'+(b===BSEL)+'"><b>'+b+'º</b>'+sub+'</button>'}).join('');
+ var chips=[1,2,3,4].map(function(b){var c=b<BATU?'ps':b===BATU?'at':'fu',sub=b<BATU?'Encerrado':b===BATU?'Em andamento':(BINI[b]?'Em '+BINI[b]:'Ainda não começou');return '<button type="button" class="bimc '+c+(b===BSEL?' sel':'')+'" data-bim="'+b+'" aria-pressed="'+(b===BSEL)+'"><b>'+b+'º</b>'+sub+'</button>'}).join('');
  var corpo;
  if(BSEL===BATU)corpo='<p class="lead">Cada proposta tem duas versões: a 1ª e a 2ª (reescrita).</p><div class="pcards">'+ESSAYS.map(cartao2).join('')+'</div>';
- else if(BSEL<BATU)corpo='<p class="lead">Encerrado em '+BFIM[BSEL]+'. Aqui você só consulta as correções.</p><div class="pcards">'+BIMS[BSEL].ess.map(function(E,i){return cartaoPas(E,BIMS[BSEL].notas[i],BSEL,i)}).join('')+'</div>';
- else corpo='<div class="bimvz"><div class="lk">🔒</div><b>Este bimestre ainda não começou</b><p>As propostas do '+BSEL+'º bimestre aparecem aqui a partir de '+BINI[BSEL]+'.</p></div>';
+ else if(BSEL<BATU)corpo='<p class="lead">Encerrado'+(BFIM[BSEL]?' em '+BFIM[BSEL]:'')+'. Aqui você só consulta as correções.</p><div class="pcards">'+BIMS[BSEL].ess.map(function(E,i){return cartaoPas(E,BIMS[BSEL].notas[i],BSEL,i)}).join('')+'</div>';
+ else corpo='<div class="bimvz"><div class="lk">🔒</div><b>Este bimestre ainda não começou</b><p>As propostas do '+BSEL+'º bimestre aparecem aqui'+(BINI[BSEL]?' a partir de '+BINI[BSEL]:' quando o bimestre começar')+'.</p></div>';
  var nov=BSEL===BATU?PROPS.map(function(q,k){return [q,k]}).filter(function(x){return x[0].kind==='corr'&&x[0].nova}):[],banner=nov.map(function(x){return '<div class="alnov" role="status"><div><b>Nova correção</b><span>'+x[0].t+' · '+x[0].l.replace('Corrigida · ','')+'</span></div><button type="button" class="pbtn" data-k="'+x[1]+'">Ver correção →</button></div>'}).join('');
  $('alMain').innerHTML=abasAl('lista')+'<div class="bimq" role="group" aria-label="Bimestre">'+chips+'</div>'+banner+'<h2>'+BSEL+'º bimestre</h2>'+corpo;
  document.querySelectorAll('[data-bim]').forEach(function(b){b.onclick=function(){BSEL=+b.dataset.bim;lista()}});

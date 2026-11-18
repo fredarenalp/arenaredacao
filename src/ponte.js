@@ -255,6 +255,16 @@ const ARENA = {
       }
     }
 
+    // datas de encerramento dos bimestres anteriores (último prazo cadastrado)
+    const BFIM = window.__aluno.BFIM
+    for (const k of Object.keys(BFIM)) delete BFIM[k]
+    for (let b = 1; b < bimAtual; b++) {
+      const datas = props.filter((x) => x.bimestre === b).flatMap((x) => [x.prazo, x.prazo2]).filter(Boolean).sort()
+      if (datas.length) { const d = datas[datas.length - 1]; BFIM[b] = `${d.slice(8, 10)}/${d.slice(5, 7)}` }
+    }
+    const BINI = window.__aluno.BINI
+    for (const k of Object.keys(BINI)) delete BINI[k]
+
     // bimestre atual: cartões
     for (const p of props.filter((x) => x.bimestre === bimAtual).sort((x, y) => x.numero - y.numero)) {
       const num = p.numero
