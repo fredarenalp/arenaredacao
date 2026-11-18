@@ -7,6 +7,8 @@ const emailAluno = (matricula) => `${String(matricula).trim().toLowerCase()}@alu
 const serTur = (a) => [a.s ?? Number(/(\d)º/.exec(a.turma || '')?.[1]), a.t ?? String(a.turma || '').trim().slice(-1)]
 const fmtData = (d) => (d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '')
 
+const ACESSO_TESTE = true
+const CONTAS_TESTE = { aluno: '20260187', corretor: 'corretor@arena.com', coord: 'teste@arena.com', prof: 'professor@arena.com' }
 const NOMES_MES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
 const mesDe = (iso) => String(iso).slice(0, 7)
 const mesAtual = () => new Date().toISOString().slice(0, 7)
@@ -30,7 +32,11 @@ const ARENA = {
   // Devolve 'ok' | 'erro' (credenciais/perfil inválidos) | 'sys' (falha de conexão/servidor).
   async entrar(login, { email, mat, senha }) {
     try {
-      const em = login === 'aluno' ? emailAluno(mat) : email.trim().toLowerCase()
+      // Acesso de teste simplificado: usuário "teste" + senha "teste" em qualquer perfil.
+      // Desative (ACESSO_TESTE = false) antes de usar com alunos reais.
+      const idDigitado = (login === 'aluno' ? mat : email).trim().toLowerCase()
+      const teste = ACESSO_TESTE && idDigitado === 'teste'
+      const em = login === 'aluno' ? emailAluno(teste ? CONTAS_TESTE.aluno : mat) : teste ? CONTAS_TESTE[login] : email.trim().toLowerCase()
       const { data, error } = await supabase.auth.signInWithPassword({ email: em, password: senha })
       if (error) return error.status && error.status < 500 ? 'erro' : 'sys'
       const { data: perfil, error: e2 } = await supabase.from('perfis').select('*').eq('id', data.user.id).maybeSingle()
