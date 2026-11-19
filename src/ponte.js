@@ -42,6 +42,25 @@ const parseObs = (txt) => {
   return out
 }
 
+// Foto de celular (4–15 MB) → JPEG de no máx. 3000 px no lado maior: cabe no limite de 12 MB do servidor,
+// sobe mais rápido no 4G e aplica a rotação EXIF. Se algo falhar, envia o original.
+async function comprimirFoto(blob) {
+  try {
+    if (!/^image\/(jpeg|png|webp)$/.test(blob.type)) return blob
+    const bmp = await createImageBitmap(blob, { imageOrientation: 'from-image' })
+    const k = Math.min(1, 3000 / Math.max(bmp.width, bmp.height))
+    const c = document.createElement('canvas')
+    c.width = Math.round(bmp.width * k)
+    c.height = Math.round(bmp.height * k)
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height)
+    bmp.close?.()
+    const out = await new Promise((r) => c.toBlob(r, 'image/jpeg', 0.88))
+    return out && out.size < blob.size ? out : blob
+  } catch {
+    return blob
+  }
+}
+
 const ARENA = {
   supabase,
   perfil: null,
@@ -345,7 +364,7 @@ const ARENA = {
   async enviarRedacao(P, dataUrl, atraso) {
     try {
       if (!ARENA.aluno || !dataUrl) return false
-      const blob = await (await fetch(dataUrl)).blob()
+      const blob = await comprimirFoto(await (await fetch(dataUrl)).blob())
       const ext = blob.type === 'image/png' ? 'png' : blob.type === 'image/svg+xml' ? 'svg' : 'jpg'
       const path = `${ARENA.aluno.id}/${P._pid}-v${P._v}-${Date.now()}.${ext}`
       const up = await supabase.storage.from('redacoes').upload(path, blob, { contentType: blob.type || 'image/jpeg' })
