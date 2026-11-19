@@ -9,6 +9,23 @@ const fmtData = (d) => (d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '')
 
 const ACESSO_TESTE = true
 const CONTAS_TESTE = { aluno: '20260187', corretor: 'corretor@arena.com', coord: 'teste@arena.com', prof: 'professor@arena.com' }
+// Assina várias fotos de uma vez (8 horas: o corretor trabalha por longos períodos). Devolve {caminho: url}.
+async function assinarFotos(paths) {
+  const unicos = [...new Set(paths.filter(Boolean))]
+  if (!unicos.length) return {}
+  const { data } = await supabase.storage.from('redacoes').createSignedUrls(unicos, 28800)
+  return Object.fromEntries((data ?? []).filter((x) => x.signedUrl).map((x) => [x.path, x.signedUrl]))
+}
+
+// Aviso visível (usa a faixa de aviso da coordenação/professor ou a do corretor, conforme a tela aberta)
+function aviso(texto) {
+  const e = document.getElementById('coToast') || document.getElementById('toast')
+  if (!e) return
+  e.textContent = texto
+  e.className = 'toast show err'
+  setTimeout(() => { e.className = 'toast' }, 6000)
+}
+
 const NOMES_MES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
 const mesDe = (iso) => String(iso).slice(0, 7)
 const mesAtual = () => new Date().toISOString().slice(0, 7)
@@ -83,11 +100,12 @@ const ARENA = {
     const lista = K.byClass[`${s}|${t}`] || []
     if (!lista.length) return
     const { data } = await supabase.from('redacoes').select('id, aluno_id, foto_path, corretor_id, correcoes(n1,n2,n3,n4,n5,comentario,anulacao), marcacoes(dados)').eq('proposta_id', P.id).eq('versao', ver).in('aluno_id', lista.map((a) => a.id))
+    const urlsCache = await assinarFotos((data ?? []).map((r) => r.foto_path))
     for (const r of data ?? []) {
       const k = lista.findIndex((a) => a.id === r.aluno_id)
       const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes
       if (k < 0 || !c) continue
-      const fotoUrl = r.foto_path ? (await supabase.storage.from('redacoes').createSignedUrl(r.foto_path, 3600)).data?.signedUrl ?? null : null
+      const fotoUrl = urlsCache[r.foto_path] ?? null
       window.__corrCache[`${s}${t}|${k}|${num}|${ver}`] = {
         niv: c.n1 != null ? [c.n1, c.n2, c.n3, c.n4, c.n5] : [0, 0, 0, 0, 0], obsCrit: parseObs(c.comentario),
         marks: (r.marcacoes ?? []).map((m) => m.dados), fotoUrl, corretor: K.perf.find((x) => x.id === r.corretor_id)?.nome ?? null,
@@ -99,7 +117,7 @@ const ARENA = {
   async fotoDoAluno(alunoId, numero, versao) {
     const path = window.__coordDB?.fotoPath(alunoId, numero, versao)
     if (!path) return null
-    return (await supabase.storage.from('redacoes').createSignedUrl(path, 3600)).data?.signedUrl ?? null
+    return (await supabase.storage.from('redacoes').createSignedUrl(path, 28800)).data?.signedUrl ?? null
   },
 
   // Desempenho do corretor no mês selecionado (tela "Desempenho")
@@ -127,22 +145,21 @@ const ARENA = {
       .eq('corretor_id', ARENA.perfil.id)
       .order('numero')
     if (error) throw error
+    // 1ª versões (para as reescritas) buscadas em paralelo; fotos assinadas em lote
+    const v1De = {}
+    await Promise.all(pacs.filter((p) => p.reescrita && p.proposta_id).flatMap((p) => p.redacoes.map(async (r) => {
+      v1De[r.id] = (await supabase.from('redacoes').select('foto_path, correcoes(n1,n2,n3,n4,n5), marcacoes(dados)').eq('aluno_id', r.aluno_id).eq('proposta_id', p.proposta_id).eq('versao', 1).maybeSingle()).data
+    })))
+    const urls = await assinarFotos([...pacs.flatMap((p) => p.redacoes.map((r) => r.foto_path)), ...Object.values(v1De).map((v) => v?.foto_path)])
+    const um = (x) => (Array.isArray(x) ? x[0] : x)
     const novos = []
     for (const p of pacs) {
       const alunos = []
       for (const r of p.redacoes) {
-        const c = r.correcoes?.[0] ?? r.correcoes
-        let foto = null
-        if (r.foto_path) {
-          const { data: u } = await supabase.storage.from('redacoes').createSignedUrl(r.foto_path, 3600)
-          foto = u?.signedUrl ?? null
-        }
-        const a = { n: r.alunos.nome, t: r.alunos.turmas ? `${r.alunos.turmas.serie}º${r.alunos.turmas.nome}` : '', m: r.alunos.matricula, foto, _rid: r.id, reesc: p.reescrita }
-        let v1 = null
-        if (p.reescrita && p.proposta_id) {
-          v1 = (await supabase.from('redacoes').select('foto_path, correcoes(n1,n2,n3,n4,n5), marcacoes(dados)').eq('aluno_id', r.aluno_id).eq('proposta_id', p.proposta_id).eq('versao', 1).maybeSingle()).data
-        }
-        const c1 = v1 ? (Array.isArray(v1.correcoes) ? v1.correcoes[0] : v1.correcoes) : null
+        const c = um(r.correcoes)
+        const a = { n: r.alunos.nome, t: r.alunos.turmas ? `${r.alunos.turmas.serie}º${r.alunos.turmas.nome}` : '', m: r.alunos.matricula, foto: urls[r.foto_path] ?? null, _rid: r.id, reesc: p.reescrita }
+        const v1 = v1De[r.id] ?? null
+        const c1 = v1 ? um(v1.correcoes) : null
         const prev = c1 && c1.n1 != null ? [c1.n1, c1.n2, c1.n3, c1.n4, c1.n5] : null
         if (c && c.n1 != null) a.niv = [c.n1, c.n2, c.n3, c.n4, c.n5]
         else if (prev) a.niv = prev.slice() // a reescrita começa com os níveis da 1ª versão
@@ -163,7 +180,7 @@ const ARENA = {
         if (v1) {
           if (prev) a.prev = prev
           a.origMarks = (v1.marcacoes ?? []).map((m) => m.dados)
-          if (v1.foto_path) a.origFoto = (await supabase.storage.from('redacoes').createSignedUrl(v1.foto_path, 3600)).data?.signedUrl ?? null
+          if (v1.foto_path) a.origFoto = urls[v1.foto_path] ?? null
         }
         alunos.push(a)
       }
@@ -174,10 +191,11 @@ const ARENA = {
     window.__corretor.setMes(mesAtual())
     const { data: rets } = await supabase.from('retornos').select('id, resultado, antes, depois, resposta, visto, redacao_id, redacoes(foto_path, alunos(nome), pacotes(numero), correcoes(comentario, extras), marcacoes(dados))').eq('corretor_id', ARENA.perfil.id).eq('entendido', false).order('criado_em', { ascending: false })
     const itens = []
+    const urlsRets = await assinarFotos((rets ?? []).map((r) => r.redacoes?.foto_path))
     for (const r of rets ?? []) {
       const rd = r.redacoes
       const c = Array.isArray(rd?.correcoes) ? rd.correcoes[0] : rd?.correcoes
-      const foto = rd?.foto_path ? (await supabase.storage.from('redacoes').createSignedUrl(rd.foto_path, 3600)).data?.signedUrl ?? null : null
+      const foto = urlsRets[rd?.foto_path] ?? null
       itens.push({ id: r.id, aluno: rd?.alunos?.nome ?? '', pac: rd?.pacotes?.numero ?? '', res: r.resultado, antes: r.antes, depois: r.depois, resp: r.resposta, pergunta: c?.extras?.duvida?.pergunta ?? '', visto: r.visto, marks: (rd?.marcacoes ?? []).map((m) => m.dados), obs: c?.comentario ?? '', foto, seed: r.redacao_id })
     }
     window.__store.retornos = itens
@@ -232,6 +250,7 @@ const ARENA = {
     document.getElementById('alNm').textContent = `${al.nome} · ${turma}`.replace(/ · $/, '')
     document.getElementById('alAv').textContent = al.nome.split(' ').filter(Boolean).slice(0, 2).map((x) => x[0].toUpperCase()).join('')
 
+    const urlsAluno = await assinarFotos(reds.map((r) => r.foto_path))
     const hoje = new Date().toISOString().slice(0, 10)
     const PROPS = window.__aluno.PROPS
     const ESSAYS = window.__aluno.ESSAYS
@@ -294,8 +313,7 @@ const ARENA = {
           const etapa = r.etapa === 'aguardando_liberacao' ? 'ret' : 'corr'
           return { ...base, g, t: rot, s: `Enviada em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)}`, st: 'ok', l: etapa === 'ret' ? 'Aguardando liberação' : 'Enviada · aguardando correção', etapa }
         }
-        let fotoUrl = null
-        if (r.foto_path) fotoUrl = (await supabase.storage.from('redacoes').createSignedUrl(r.foto_path, 3600)).data?.signedUrl ?? null
+        const fotoUrl = urlsAluno[r.foto_path] ?? null
         const marks = (r.marcacoes ?? []).map((m) => m.dados)
         const circ = marks.filter((m) => m.t === 'o' && m.line).map((m) => ({ l: m.line, x: Math.round(m.cx), c: m.cat, ...(m.pal ? { w: m.pal } : {}) }))
         const cmts = marks.filter((m) => m.t === 'c').map((m) => ({ l: m.line, x: Math.round(m.x ?? 176), j: m.j ?? m.crit ?? 1, t: m.txt ?? '' }))
@@ -463,11 +481,8 @@ const ARENA = {
     const pacDe = Object.fromEntries(pacs.data.map((x) => [x.id, x.numero]))
     const retidas = reds.data.filter((r) => r.etapa === 'aguardando_liberacao')
     const marcasRet = retidas.length ? (await supabase.from('marcacoes').select('redacao_id, dados').in('redacao_id', retidas.map((r) => r.id))).data ?? [] : []
-    const fotosRet = {}
-    for (const r of retidas) {
-      const { data: full } = await supabase.from('redacoes').select('foto_path').eq('id', r.id).single()
-      if (full?.foto_path) fotosRet[r.id] = (await supabase.storage.from('redacoes').createSignedUrl(full.foto_path, 3600)).data?.signedUrl ?? null
-    }
+    const urlsRet = await assinarFotos(retidas.map((r) => r.foto_path))
+    const fotosRet = Object.fromEntries(retidas.map((r) => [r.id, urlsRet[r.foto_path] ?? null]))
     fill(C.FILA, retidas.map((r, i) => {
       const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes
       const a = alunos.find((x) => x.id === r.aluno_id)
@@ -542,9 +557,20 @@ const ARENA = {
   },
 
   _syncTimer: null,
+  _rodando: false,
+  _deNovo: false,
+  // Agrupa as mudanças feitas na tela e grava no banco; nunca roda duas gravações ao mesmo tempo
+  // (evita criar o mesmo registro duas vezes).
   sincronizarCoord() {
     clearTimeout(ARENA._syncTimer)
-    ARENA._syncTimer = setTimeout(() => ARENA._sincronizar().catch((e) => console.error('sync', e)), 400)
+    ARENA._syncTimer = setTimeout(async () => {
+      if (ARENA._rodando) { ARENA._deNovo = true; return }
+      ARENA._rodando = true
+      try { await ARENA._sincronizar() } catch (e) { console.error('sync', e); aviso('Não foi possível gravar no servidor. Confira a conexão e recarregue a página.') } finally {
+        ARENA._rodando = false
+        if (ARENA._deNovo) { ARENA._deNovo = false; ARENA.sincronizarCoord() }
+      }
+    }, 400)
   },
 
   async _sincronizar() {
@@ -725,8 +751,7 @@ const ARENA = {
 
     if (falhas.length) {
       console.error('Falhas ao gravar', falhas)
-      const t = document.getElementById('toast')
-      if (t) { t.textContent = 'Não foi possível gravar tudo no servidor. Recarregue a página e confira.'; t.classList.add('on') }
+      aviso('Não foi possível gravar tudo no servidor. Recarregue a página e confira.')
     }
     ARENA._snap = ARENA.tirarFoto()
   },
