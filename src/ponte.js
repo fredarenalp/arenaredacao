@@ -499,6 +499,7 @@ const ARENA = {
     })))
     fill(C.LOG, even.data.filter((e) => e.texto).map((e) => ({ t: dh(e.em), bim: bimAtual, q: nomeDe[e.autor] || 'Coordenação', k: e.tipo || 'outro', x: e.texto })))
     { const nums = prop.data.filter((q) => q.bimestre === bimAtual).map((q) => q.numero).sort((a, b) => a - b); if (nums.length && !nums.includes(C.S.ent.prop)) C.S.ent.prop = nums[0] }
+    C.S.x.ae.r = 'prof'
     C.GP.length = 0
     window.__coordDB.GN().forEach((g) => C.GP.push(g))
     C.resetAidx()
@@ -693,6 +694,7 @@ const ARENA = {
     if (eqAgora !== prev.equipe) {
       for (const p of C.EQUIPE) {
         const antigo = JSON.parse(prev.equipe).find((x) => x[0] === p._id)
+        if (p.r === 'leit') { falhas.push('O papel "somente leitura" ainda não existe: ' + p.n + ' não foi criado'); continue }
         if (!p._id) {
           if (!p.e) { falhas.push('Informe o e-mail de ' + p.n); continue }
           const senha = Math.random().toString(36).slice(2, 10)
