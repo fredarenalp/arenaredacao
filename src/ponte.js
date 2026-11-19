@@ -157,7 +157,7 @@ const ARENA = {
       const alunos = []
       for (const r of p.redacoes) {
         const c = um(r.correcoes)
-        const a = { n: r.alunos.nome, t: r.alunos.turmas ? `${r.alunos.turmas.serie}º${r.alunos.turmas.nome}` : '', m: r.alunos.matricula, foto: urls[r.foto_path] ?? null, _rid: r.id, reesc: p.reescrita }
+        const a = { n: r.alunos.nome, t: r.alunos.turmas ? `${r.alunos.turmas.serie}º${r.alunos.turmas.nome}` : '', m: r.alunos.matricula, foto: urls[r.foto_path] ?? null, _rid: r.id, reesc: p.reescrita, aee: !!p.aee }
         const v1 = v1De[r.id] ?? null
         const c1 = v1 ? um(v1.correcoes) : null
         const prev = c1 && c1.n1 != null ? [c1.n1, c1.n2, c1.n3, c1.n4, c1.n5] : null
@@ -184,7 +184,7 @@ const ARENA = {
         }
         alunos.push(a)
       }
-      novos.push({ n: p.numero, _pid: p.id, serie: p.serie, prop: p.rotulo, entrega: fmtData(p.entrega), prazo: fmtData(p.prazo), alunos, reesc: p.reescrita, atr: p.atrasadas })
+      novos.push({ n: p.numero, _pid: p.id, serie: p.serie, prop: p.rotulo, entrega: fmtData(p.entrega), prazo: fmtData(p.prazo), alunos, reesc: p.reescrita, atr: p.atrasadas, aee: !!p.aee })
     }
     const { data: minhas } = await supabase.from('redacoes').select('versao, etapa, corretor_id, correcoes(atualizada_em, n1, anulacao)').eq('corretor_id', ARENA.perfil.id).limit(5000)
     ARENA.definirFinanceiro((minhas ?? []).flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao }] : [] }))
@@ -221,7 +221,7 @@ const ARENA = {
     }
     const soma = a.anul ? 0 : a.niv.reduce((x, y) => x + y, 0)
     // retida: anulada, nota 0 ou 10, suspeita de IA ou dúvida pendente -> o professor/coordenação decide
-    const retida = !!a.anul || soma === 0 || soma === 20 || !!a.ia || !!(a.duvida && a.duvida.st === 'pend')
+    const retida = !!a.anul || soma === 0 || soma === 20 || !!a.aee || !!a.ia || !!(a.duvida && a.duvida.st === 'pend')
     row.extras = { nCorr: a.nCorr || 0, retida, segundos: a._seg || 0, ...(a.duvida && a.duvida.st === 'pend' ? { duvida: { pergunta: a.duvida.txt, crit: a.duvida.crit ?? '', linha: a.duvida.linha ?? '' } } : {}), ...(a.ia ? { ia: { txt: a.ia.txt } } : {}) }
     row.liberada = !retida
     const r1 = await supabase.from('correcoes').upsert(row)
@@ -366,15 +366,16 @@ const ARENA = {
     if (ARENA.perfil.tipo === 'coordenacao') await supabase.rpc('gerar_pacotes')
     const q = (t, sel = '*') => supabase.from(t).select(sel).limit(5000)
     const desde = new Date(Date.now() - 70 * 86400000).toISOString()
-    const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess] = await Promise.all([
+    const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess, aeeRes] = await Promise.all([
       q('perfis'), q('turmas'), q('alunos', '*, turmas(serie, nome)'), q('propostas'), q('pacotes'),
       q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, foto_path, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario,atualizada_em)'),
       q('avisos', '*, alunos(nome, turmas(serie, nome)), propostas(numero, genero)'),
       supabase.from('eventos').select('*').order('em', { ascending: false }).limit(300),
       q('professor_turmas'),
       supabase.from('acessos').select('aluno_id, em').gte('em', desde).not('aluno_id', 'is', null).limit(20000),
+      supabase.from('alunos_aee').select('aluno_id'),
     ])
-    for (const r of [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess]) if (r.error) throw r.error
+    for (const r of [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess, aeeRes]) if (r.error) throw r.error
     const dm = (d) => (d ? `${String(d).slice(8, 10)}/${String(d).slice(5, 7)}` : null)
     const dh = (t) => { const d = new Date(t); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` }
     const C = window.__coord
@@ -458,7 +459,10 @@ const ARENA = {
 
     // --- listas globais do protótipo (conteúdo trocado no lugar)
     const fill = (arr, items) => { arr.length = 0; items.forEach((x) => arr.push(x)) }
-    fill(C.CORR, perf.data.filter((x) => x.tipo === 'corretor').map((x) => ({ id: x.id, n: x.nome, pausado: !x.ativo })))
+    fill(C.CORR, perf.data.filter((x) => x.tipo === 'corretor').map((x) => ({ id: x.id, n: x.nome, pausado: !x.ativo, aee: !!x.especialista_aee })))
+    const idsAee = new Set(aeeRes.data.map((x) => x.aluno_id))
+    Object.keys(C.AEE).forEach((k) => delete C.AEE[k])
+    alunos.filter((a) => idsAee.has(a.id)).forEach((a) => { C.AEE[a.matricula] = true })
     fill(C.PROFS, perf.data.filter((x) => x.tipo === 'professor').map((x) => {
       const tid = ptur.data.find((y) => y.perfil_id === x.id)?.turma_id
       const serie = Number(turm.data.find((y) => y.id === tid)?.serie) || 7
@@ -474,7 +478,7 @@ const ARENA = {
     fill(C.PACS, pacs.data.map((x) => {
       const rs = nPac[x.id]
       const feitas = rs.filter((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && (c.n1 != null || c.anulacao) }).length
-      const o = { id: x.numero, turma: x.serie, prop: x.rotulo, ver: x.reescrita ? '2ª' : '1ª', n: rs.length, prazo: dm(x.prazo) || '', c: x.corretor_id, ok: feitas, _pid: x.id }
+      const o = { id: x.numero, turma: x.serie, prop: x.rotulo, ver: x.reescrita ? '2ª' : '1ª', n: rs.length, prazo: dm(x.prazo) || '', c: x.corretor_id, ok: feitas, _pid: x.id, aee: !!x.aee }
       o.g = C.genero(x.rotulo); o.sg = x.reescrita; o.gan = { aluno: null, prof: null, cor: null }
       return o
     }))
@@ -489,7 +493,7 @@ const ARENA = {
       const niv = c && c.n1 != null ? [c.n1, c.n2, c.n3, c.n4, c.n5] : [0, 0, 0, 0, 0]
       const ex = c?.extras || {}
       const retidaTipo = ex.duvida ? 'duvida' : ex.ia ? 'ia' : ''
-      return { id: r.id, pac: pacDe[r.pacote_id] ?? 0, idx: i, aluno: a?.nome ?? '', c: r.corretor_id, nota: c?.nota != null ? Number(c.nota) : 0, niv, st: 'pend', mot: c?.anulacao ? `Redação anulada: ${c.anulacao}` : ex.ia ? 'Suspeita de IA' : '', tipo: retidaTipo, anot: ex.ia?.txt || '', pergunta: ex.duvida?.pergunta || '', crit: ex.duvida?.crit ?? '', linha: ex.duvida?.linha ?? '', marks: marcasRet.filter((m) => m.redacao_id === r.id).map((m) => m.dados), obs: c?.comentario ?? '', foto: fotosRet[r.id] ?? null, seed: r.id, _rid: r.id }
+      return { id: r.id, pac: pacDe[r.pacote_id] ?? 0, idx: i, aluno: a?.nome ?? '', c: r.corretor_id, nota: c?.nota != null ? Number(c.nota) : 0, niv, st: 'pend', mot: c?.anulacao ? `Redação anulada: ${c.anulacao}` : ex.ia ? 'Suspeita de IA' : idsAee.has(r.aluno_id) ? 'Correção AEE: o professor libera' : '', tipo: retidaTipo, anot: ex.ia?.txt || '', pergunta: ex.duvida?.pergunta || '', crit: ex.duvida?.crit ?? '', linha: ex.duvida?.linha ?? '', marks: marcasRet.filter((m) => m.redacao_id === r.id).map((m) => m.dados), obs: c?.comentario ?? '', foto: fotosRet[r.id] ?? null, seed: r.id, _rid: r.id }
     }))
     fill(C.AVISOS, avis.data.map((x) => ({
       id: x.id, aluno: x.alunos?.nome ?? '', turma: x.alunos?.turmas ? `${x.alunos.turmas.serie}º ano ${x.alunos.turmas.nome}` : '',
@@ -552,6 +556,8 @@ const ARENA = {
       comem: JSON.stringify(C.COMEM),
       cad: Object.fromEntries(C.aidx().map((a) => [a.mat, serTur(a).join('|')])),
       saiu: JSON.stringify(C.SAIU),
+      aee: JSON.stringify(C.AEE),
+      corraee: JSON.stringify(Object.fromEntries(C.CORR.map((c) => [c.id, !!c.aee]))),
       senha: JSON.stringify(C.SENHA),
       equipe: JSON.stringify(C.EQUIPE.map((p) => [p._id || '', p.n, p.e, p.r, p.s || 0])),
     }
@@ -681,6 +687,16 @@ const ARENA = {
     for (const mat of new Set([...Object.keys(saiuAgora), ...Object.keys(saiuAntes)])) {
       if (!!saiuAgora[mat] !== !!saiuAntes[mat] && K.byMat[mat]) { ok(await supabase.from('alunos').update({ saiu: !!saiuAgora[mat] }).eq('id', K.byMat[mat].id)); K.byMat[mat].saiu = !!saiuAgora[mat] }
     }
+    // AEE: marca do aluno (tabela sigilosa) e corretor especialista
+    const aeeAgora = JSON.parse(JSON.stringify(C.AEE)), aeeAntes = JSON.parse(prev.aee)
+    for (const mat of new Set([...Object.keys(aeeAgora), ...Object.keys(aeeAntes)])) {
+      const al = K.byMat[mat]
+      if (!al || !!aeeAgora[mat] === !!aeeAntes[mat]) continue
+      if (aeeAgora[mat]) ok(await supabase.from('alunos_aee').upsert({ aluno_id: al.id, criado_por: eu }))
+      else ok(await supabase.from('alunos_aee').delete().eq('aluno_id', al.id))
+    }
+    const caeeAntes = JSON.parse(prev.corraee)
+    for (const c of C.CORR) if (caeeAntes[c.id] !== undefined && caeeAntes[c.id] !== !!c.aee) ok(await supabase.from('perfis').update({ especialista_aee: !!c.aee }).eq('id', c.id))
     const sAgora = JSON.parse(JSON.stringify(C.SENHA)), sAntes = JSON.parse(prev.senha)
     for (const mat of Object.keys(sAgora)) {
       if (sAgora[mat] !== sAntes[mat] && K.byMat[mat]?.perfil_id) {

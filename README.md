@@ -40,6 +40,7 @@ Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PR
 - [x] Entregas → "Ver redação" mostra a foto real do aluno
 - [x] Relatórios impressos das correções (turma e aluno) com níveis, comentários, marcações, foto e corretor reais
 - Fora do escopo (decisão do dono): contestação do aluno e notificações por e-mail
+- [x] AEE: a coordenação marca o aluno (Pessoas → Alunos) e o corretor especialista (Pessoas → Corretores); as redações de alunos AEE vão para um pacote próprio por série, só corretor especialista recebe, as contagens do assistente dobram (3 erros = nível 3 viram 6) e a correção fica retida para o professor liberar. A marca é sigilosa (tabela `alunos_aee`, o aluno não lê). Teste: `e2e/aee-real.mjs`
 - [x] Pacotes: criados automaticamente (turma + proposta + versão, prazo vencido) quando a coordenação abre o sistema; distribuição gravada
 
 ### Testes
