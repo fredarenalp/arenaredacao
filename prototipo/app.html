@@ -3570,9 +3570,19 @@ function instrucoes(k,late){
   var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 100"><rect width="120" height="100" fill="#2b2b27"/>'+fr().replace(/^<svg[^>]*>|<\/svg>$/g,'').replace('<rect width="120" height="100" fill="#2b2b27"/>','')+'</svg>';
   mostra('data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg));};
  $('alEnv').onclick=function(){
-  $('alMain').innerHTML='<div class="sent"><div class="big"><svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg></div><h2>'+(late?'Redação enviada com atraso':'Redação enviada!')+'</h2><p class="lead">Recebemos a foto da '+P.t.split(' · ')[0]+'. '+(late?'A coordenação vai avaliar a sua justificativa e, se aceita, libera a redação para os corretores.':'A coordenação confere e libera para os corretores.')+' Você acompanha o andamento aqui.</p><button type="button" class="btn" style="max-width:260px;margin:0 auto" id="alOk">Voltar às propostas</button></div>';
-  var _p0=P;PROPS[k]=late?{t:P.t,s:'Enviada hoje · justificativa: '+late.mot,st:'at',l:'Enviada com atraso · em análise',etapa:'lib',_pid:P._pid,_v:P._v}:{t:P.t,s:'Enviada hoje',st:'ok',l:'Enviada · aguardando correção',etapa:'corr',_pid:P._pid,_v:P._v};$('alOk').onclick=lista;
-  if(window.ARENA&&P._pid)window.ARENA.enviarRedacao(_p0,window.__alFoto,late).then(function(ok){if(!ok){PROPS[k]=_p0;lista();var _m=$('alMain');if(_m)_m.insertAdjacentHTML('afterbegin','<div class="atr" role="alert" style="border:1px solid #c0392b;color:#c0392b;margin-bottom:12px"><b>Não conseguimos enviar a foto.</b> Confira a internet e tente de novo. Se continuar, avise a coordenação.</div>');}});};
+  var _p0=P;
+  var okTela=function(){
+   $('alMain').innerHTML='<div class="sent"><div class="big"><svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg></div><h2>'+(late?'Redação enviada com atraso':'Redação enviada!')+'</h2><p class="lead">Recebemos a foto da '+P.t.split(' · ')[0]+'. '+(late?'A coordenação vai avaliar a sua justificativa e, se aceita, libera a redação para os corretores.':'A coordenação confere e libera para os corretores.')+' Você acompanha o andamento aqui.</p><button type="button" class="btn" style="max-width:260px;margin:0 auto" id="alOk">Voltar às propostas</button></div>';
+   PROPS[k]=late?{t:P.t,s:'Enviada hoje · justificativa: '+late.mot,st:'at',l:'Enviada com atraso · em análise',etapa:'lib',_pid:P._pid,_v:P._v}:{t:P.t,s:'Enviada hoje',st:'ok',l:'Enviada · aguardando correção',etapa:'corr',_pid:P._pid,_v:P._v};$('alOk').onclick=lista;};
+  if(!(window.ARENA&&P._pid)){okTela();return;}
+  var btn=$('alEnv'),fo=$('alFoto'),old=btn.textContent;
+  btn.disabled=true;fo.disabled=true;btn.textContent='Enviando… não feche esta tela';
+  var er=$('alErr');if(er)er.remove();
+  window.ARENA.enviarRedacao(_p0,window.__alFoto,late).then(function(ok){
+   if(ok){okTela();return;}
+   btn.disabled=false;fo.disabled=false;btn.textContent='Tentar enviar de novo';
+   btn.insertAdjacentHTML('beforebegin','<div class="atr" id="alErr" role="alert" style="border:1px solid #c0392b;color:#c0392b;margin-bottom:12px"><b>Não conseguimos enviar a foto.</b> Confira a internet e toque em “Tentar enviar de novo”. Se continuar, avise a coordenação.</div>');
+  });};
 }
 
 // ===== Proposta atrasada: justificativa antes do envio =====
