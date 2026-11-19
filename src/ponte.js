@@ -61,6 +61,22 @@ async function comprimirFoto(blob) {
   }
 }
 
+// Sinônimos (dicionário no banco): busca a palavra e variações simples de plural/feminino.
+const _sinCache = new Map()
+const _semAcento = (w) => w.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+function _variantes(w) {
+  const v = new Set([w])
+  if (w.endsWith('oes') || w.endsWith('aes')) v.add(w.slice(0, -3) + (w.endsWith('oes') ? 'ao' : 'ao'))
+  if (w.endsWith('ais')) v.add(w.slice(0, -3) + 'al')
+  if (w.endsWith('eis')) v.add(w.slice(0, -3) + 'el')
+  if (w.endsWith('ns')) v.add(w.slice(0, -2) + 'm')
+  if (w.endsWith('es')) { v.add(w.slice(0, -2)); v.add(w.slice(0, -1)) }
+  if (w.endsWith('s')) v.add(w.slice(0, -1))
+  if (w.endsWith('a')) v.add(w.slice(0, -1) + 'o')
+  if (w.endsWith('as')) v.add(w.slice(0, -2) + 'o')
+  return [...v].filter((x) => x.length >= 2)
+}
+
 const ARENA = {
   supabase,
   perfil: null,
@@ -361,6 +377,28 @@ const ARENA = {
   },
 
   // Envia a foto da redação (data URL escolhida no celular/computador) e cria o registro.
+  // Sugestões de sinônimos para a palavra repetida. Devolve [{ sentidos: [[palavra,...],...] }] (vazio se não achar).
+  async sinonimos(palavra) {
+    try {
+      const w = _semAcento(String(palavra || ''))
+      if (w.length < 2) return []
+      if (_sinCache.has(w)) return _sinCache.get(w)
+      const vs = _variantes(w)
+      const { data, error } = await supabase.from('sinonimos_grupos').select('id, sentidos, norm').overlaps('norm', vs).limit(8)
+      if (error) return []
+      const out = (data ?? []).map((g) => ({
+        id: g.id,
+        sentidos: g.sentidos
+          .map((s) => s.filter((x) => !vs.includes(_semAcento(x))))
+          .filter((s) => s.length),
+      })).filter((g) => g.sentidos.length)
+      _sinCache.set(w, out)
+      return out
+    } catch {
+      return []
+    }
+  },
+
   async enviarRedacao(P, dataUrl, atraso) {
     try {
       if (!ARENA.aluno || !dataUrl) return false
