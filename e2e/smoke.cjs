@@ -28,7 +28,7 @@ const ok = (c, m) => { console.log(c ? 'ok   ' : 'FALHA', m); if (!c) falhas++ }
 
   // aluno
   p = await pagina(b)
-  await p.click('.p[data-k=aluno]'); await p.fill('#mat', '20260187'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
+  await p.click('.p[data-k=aluno]'); await p.fill('#mat', '20260187'); await p.fill('#pwd', '0000'); await p.click('#entrar')
   await p.waitForSelector('#alMain .bimq', { timeout: 20000 }); if (await p.locator('#alIntro:not(.hide)').count()) { await p.keyboard.press('ArrowRight'); await p.waitForTimeout(400) }
   for (const aba of ['bol', 'crit', 'lista']) { await p.click(`[data-al=${aba}]`); await p.waitForTimeout(500) }
   ok(p.erros.length === 0, 'aluno: lista, boletim e critérios sem erros ' + p.erros.join('|'))

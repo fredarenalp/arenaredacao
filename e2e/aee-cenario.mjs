@@ -3,7 +3,7 @@
 import { createClient } from '@supabase/supabase-js'
 const URL = 'https://nklkchelknnvovoilybc.supabase.co'
 const KEY = 'sb_publishable_5rLex1ybuXDwGsKFjf1L3g_utKRNP3E'
-const entrar = async (email, senha = 'teste') => { const c = createClient(URL, KEY, { auth: { persistSession: false } }); const { error } = await c.auth.signInWithPassword({ email, password: senha }); if (error) throw error; return c }
+const entrar = async (email, senha = email.startsWith('20260187') ? '0000' : 'teste') => { const c = createClient(URL, KEY, { auth: { persistSession: false } }); const { error } = await c.auth.signInWithPassword({ email, password: senha }); if (error) throw error; return c }
 const coord = await entrar('teste@arena.com')
 const { data: al } = await coord.from('alunos').select('id').eq('matricula', '20269999').single()
 const { data: cor } = await coord.from('perfis').select('id').eq('email', 'corretor@arena.com').single()

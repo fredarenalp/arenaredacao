@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js'
 const URL = 'https://nklkchelknnvovoilybc.supabase.co'
 const KEY = 'sb_publishable_5rLex1ybuXDwGsKFjf1L3g_utKRNP3E'
 const novo = () => createClient(URL, KEY, { auth: { persistSession: false } })
-const entrar = async (email, senha = 'teste') => { const c = novo(); const { error } = await c.auth.signInWithPassword({ email, password: senha }); if (error) throw new Error(email + ': ' + error.message); return c }
+const entrar = async (email, senha = email.startsWith('20260187') ? '0000' : 'teste') => { const c = novo(); const { error } = await c.auth.signInWithPassword({ email, password: senha }); if (error) throw new Error(email + ': ' + error.message); return c }
 let falhas = 0
 const ok = (c, m) => { console.log(c ? 'ok   ' : 'FALHA', m); if (!c) falhas++ }
 
