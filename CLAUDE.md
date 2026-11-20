@@ -11,6 +11,9 @@
 4. Dados reais de alunos nunca vão para o repositório (ele é público).
 5. Usuários de teste (senha `teste`): `teste@arena.com` (coordenação), `corretor@arena.com`, aluno pela matrícula `20260187`.
 
+## Vocabulário do dono
+- **AC** = Assistente de correção (o painel/popover da tela de correção do corretor: categorias, Ortografia, Vocabulário, Verbo…).
+
 ## Como trabalhar
 - Lint/testes/build: `npm run lint && npm test && npm run build`.
 - Ciclo de dados no banco real: `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node e2e/ciclo-real.mjs`.

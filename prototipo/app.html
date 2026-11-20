@@ -1438,6 +1438,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .right.caderno::before{content:"";position:absolute;left:64px;top:0;bottom:0;width:2px;background:rgba(217,128,111,.5);pointer-events:none}
 .right.caderno .form{position:relative}
 @media(max-width:640px){.right.caderno::before{left:14px}}
+
+/* "Ver proposta": botão de contorno em todos os estados (o hover genérico de .pbtn escurecia o fundo e sumia o texto) */
+.pc2 .pbtn.vpb,.pc2.feito .pbtn.vpb,.pc2.late .pbtn.vpb,.pc2.zero .pbtn.vpb{background:transparent;color:#2f5f61;border:2px solid #3c7678}
+.pc2 .pbtn.vpb:hover,.pc2.feito .pbtn.vpb:hover,.pc2.late .pbtn.vpb:hover,.pc2.zero .pbtn.vpb:hover{background:#e4eeee;color:#2f5f61}
 </style>
 <!--PONTE--></head>
 <body>
@@ -2675,7 +2679,7 @@ function fechaCat(){if(catAtual){catAtual._sub=null;catAtual._pal=null;catAtual=
 var catTab='tx';
 function abreCat(m,keep){
  if(!keep&&m.cat&&m.cat!=='cm')catTab=(ESTET[m.cat]&&!PROG[m.cat])?'es':'tx';
- if(!keep){m._trocar=false;m._sub=null;}
+ if(!keep){m._trocar=false;m._sub=null;if(catAtual!==m){sideCur=null;try{localStorage.setItem('arena_side','')}catch(x){}}} // outra marca: o painel lateral: o painel lateral (Ortografia, Vocabulário…) começa fechado
  catAtual=m;drawMarks();
  var el=$('catp');var rpCompact=(m.cat==='rp'||m.cat==='pr')&&!m._trocar;
  var bt=function(c,k){return '<button type="button" role="menuitem" data-cat="'+c.k+'" title="'+(c.k==='ac'?'Acento errado: o círculo marca o que está inadequado':c.k==='pt'?'Sinal errado: o círculo marca o que está inadequado':(c.tip||''))+'" class="'+(m.cat===c.k?'cur':'')+(ESTET[c.k]?' est'+gcl(c.k):'')+'"><span>'+(c.s||c.l)+'</span> <small>'+atalho(k)+'</small></button>'};
