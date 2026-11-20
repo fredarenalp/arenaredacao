@@ -15,3 +15,19 @@
 - Lint/testes/build: `npm run lint && npm test && npm run build`.
 - Ciclo de dados no banco real: `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node e2e/ciclo-real.mjs`.
 - Estado da ligação protótipo ↔ banco: ver o final do `README.md`.
+
+## Decisões de produto já tomadas (aluno, feed, destaques) — ainda NÃO implementadas
+Desenhos feitos (imagens de exemplo, fora do repositório); nada disto foi construído, exceto onde indicado.
+- **Já implementado:** aba Análise do professor/coordenação (critérios por turma, erros, palavras, evolução); Vocabulário (Oralidade e Precisão com sinônimos do Houaiss); autocompletar da Ortografia; "Em texto" como aba padrão na correção do aluno.
+- **Primeira tela do aluno** (ao entrar): "Parabéns, <nome>! Sua redação voltou" (só quando há correção nova e ainda não vista). Deslizar para CIMA = análise da correção em cartões (estilo stories); deslizar para o LADO (ou "Pular ›") = menu principal (Redações, Boletim, Critérios). No computador: setas e teclado.
+- **Tom por nota** (usa a nota de corte da escola, hoje 6): 9–10 comemoração; 6–8,9 incentivo; abaixo de 6 apoio (sem "Parabéns", começa pelo que está bom, UM passo concreto, caminho fácil até o professor, reescrita como oportunidade); anulada = aviso neutro (motivo, o que fazer, prazo). **Abaixo de 6: a nota fica atrás de um toque ("Toque para ver").**
+- **Sem correção nova:** primeira tela mostra a próxima redação (prazo) e o foco; primeiro acesso explica o caminho; várias correções = uma tela reunindo as novidades.
+- **Cartões de critério do aluno:** sem círculos; 4 degraus por critério + uma frase; um foco só ("Seu foco para a próxima redação").
+- **Palavras para treinar:** grafia errada riscada + certa, palavra vaga com sugestões, repetida. Compara só com o próprio aluno (nada de ranking/turma).
+- **Interações do aluno (feed da correção):** estrelas 1–3 ("Mais ou menos / Ajudou / Ajudou muito") + o que mais ajudou + comentário opcional; anotação privada; dúvida ao professor (conversa no sistema). Nada muda a nota; dúvida NÃO é contestação (contestação está fora do escopo). Coordenação vê agregado, comentários sem nome, avaliação por corretor só com mínimo de 10 respostas e sem virar nota do corretor.
+- **Feed é uma TELA SEPARADA** (não é a primeira tela). Abas: Redações destaque, Trechos que brilharam, Erros da série. Feed da série = só números agregados e dicas, sem notas.
+- **Trecho que brilhou:** aparece sempre que houver elogio (estrela) do corretor; só com autorização do aluno.
+- **Redação destaque:** a COORDENAÇÃO escolhe; sem nome; mostra o TEXTO DIGITADO (não a foto, a letra identifica); **quem digita o texto é a coordenação**. O aluno recebe convite ("Aceito / Prefiro não", pode retirar). **Autorização da família: papel assinado no início do ano** ("o professor pode destacar"), registrada pela coordenação. **O professor compartilha com a SÉRIE inteira.**
+- **QUIZ: guardado como ideia, NÃO fazer por enquanto.**
+- Paleta: o verde da tela de login (gradiente #52989a → #3c7678; texto #2f5f61); coral apagado só para alertas; fundo creme; cartões brancos com cantos bem arredondados; números grandes.
+- Pendência de limpeza no banco: alunos de matrícula "ZA*" ("Zz Análise"), proposta "ZZ análise (descartável)" e suas correções/marcações — apagar quando o dono aprovar.
