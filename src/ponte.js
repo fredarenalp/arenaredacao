@@ -63,6 +63,7 @@ async function comprimirFoto(blob) {
 
 // Sinônimos (dicionário no banco): busca a palavra e variações simples de plural/feminino.
 const _sinCache = new Map()
+const _palCache = new Map()
 const _semAcento = (w) => w.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 function _variantes(w) {
   const v = new Set([w])
@@ -402,6 +403,23 @@ const ARENA = {
       for (const v of h.data ?? []) for (const s of v.sentidos) add(s.glosa || '', s.sin)
       for (const g of r.data ?? []) for (const s of g.sentidos) add('', s)
       _sinCache.set(w, out)
+      return out
+    } catch {
+      return []
+    }
+  },
+
+  // Autocompletar da Ortografia: palavras (com acento) que começam com o que foi digitado; as comuns primeiro.
+  async palavras(prefixo) {
+    try {
+      const q = _semAcento(String(prefixo || '')).replace(/[^a-z-]/g, '')
+      if (q.length < 3) return []
+      if (_palCache.has(q)) return _palCache.get(q)
+      const { data, error } = await supabase.from('palavras_pt').select('palavra').like('norm', q + '%')
+        .order('comum', { ascending: false }).order('tam', { ascending: true }).order('palavra').limit(6)
+      if (error) return []
+      const out = (data ?? []).map((x) => x.palavra)
+      _palCache.set(q, out)
       return out
     } catch {
       return []
