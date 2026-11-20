@@ -547,6 +547,21 @@ const ARENA = {
   },
 
   // Autocompletar da Ortografia: palavras (com acento) que começam com o que foi digitado; as comuns primeiro.
+  // Dicionário de conectivos por função (tabela conectivos). { funcao: [texto, ...] } na ordem do material.
+  async conectivos() {
+    try {
+      if (ARENA._cn) return ARENA._cn
+      const { data, error } = await supabase.from('conectivos').select('funcao, texto, ordem').order('ordem')
+      if (error) return {}
+      const por = {}
+      for (const r of data ?? []) (por[r.funcao] ??= []).push(r.texto)
+      ARENA._cn = por
+      return por
+    } catch {
+      return {}
+    }
+  },
+
   async palavras(prefixo) {
     try {
       const q = _semAcento(String(prefixo || '')).replace(/[^a-z-]/g, '')

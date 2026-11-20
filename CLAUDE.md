@@ -14,6 +14,11 @@
 ## Vocabulário do dono
 - **AC** = Assistente de correção (o painel/popover da tela de correção do corretor: categorias, Ortografia, Vocabulário, Verbo…).
 
+## AC · conectivos (implementado)
+Conectivo errado/ausente no AC abre "Só marcar | Corrigir"; Corrigir abre o painel lateral com a função sugerida (palavra usada → função, ou posição da linha),
+chips de função e os conectivos (3 + Ver mais). As escolhas ficam em `m.sin` (e a palavra usada em `m.pal`), entram no comentário da Progressão ("Experimente: …")
+e aparecem ao aluno em "Palavras para treinar". Dicionário na tabela privada `conectivos` (16 funções, inclui verbos de fala); o conteúdo NÃO está no repositório.
+
 ## Como trabalhar
 - Lint/testes/build: `npm run lint && npm test && npm run build`.
 - Ciclo de dados no banco real: `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node e2e/ciclo-real.mjs`.
