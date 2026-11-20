@@ -49,7 +49,7 @@ async function clicaTodos(p, seletor, onde, sel) {
 
   // aluno
   p = await nova(b, 'aluno')
-  await p.click('.p[data-k=aluno]'); await p.fill('#mat', 'teste'); await p.fill('#pwd', '0000'); await p.click('#entrar')
+  await p.click('.p[data-k=aluno]'); await p.fill('#mat', 'teste'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
   await p.waitForSelector('#alMain .bimq', { timeout: 20000 }); if (await p.locator('#alIntro:not(.hide)').count()) { await p.keyboard.press('ArrowRight'); await p.waitForTimeout(400) }; await p.waitForTimeout(500)
   for (const aba of ['lista', 'bol', 'crit', 'lista']) { await p.locator(`[data-al=${aba}]`).click().catch(() => {}); await p.waitForTimeout(400); await confere(p, 'aluno ' + aba, '#alMain') }
   for (const bim of [1, 2, 3, 4]) { await p.locator(`[data-bim="${bim}"]`).click().catch(() => {}); await p.waitForTimeout(300); await confere(p, `bimestre ${bim}`, '#alMain') }

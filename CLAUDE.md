@@ -9,7 +9,7 @@
    Não perguntar antes. (Continua valendo cuidado: nada destrutivo fora dos dados de teste e nada de segredos no repositório.)
 3. Não criar pull request, a menos que o dono peça. Desenvolver na branch `claude/great-albattani-415kor`.
 4. Dados reais de alunos nunca vão para o repositório (ele é público).
-5. Usuários de teste (senha `teste`): `teste@arena.com` (coordenação), `corretor@arena.com`. Aluno pela matrícula `20260187` (ou usuário `teste`): senha `0000`.
+5. Usuários de teste (senha `teste`): `teste@arena.com` (coordenação), `corretor@arena.com`. Aluno: usuário `0000` (ou `teste`, ou a matrícula `20260187`), senha `teste`.
 
 ## Vocabulário do dono
 - **AC** = Assistente de correção (o painel/popover da tela de correção do corretor: categorias, Ortografia, Vocabulário, Verbo…).

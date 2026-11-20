@@ -5,7 +5,7 @@ const URL = 'https://nklkchelknnvovoilybc.supabase.co'
 const KEY = 'sb_publishable_5rLex1ybuXDwGsKFjf1L3g_utKRNP3E'
 const entrar = async (email) => {
   const c = createClient(URL, KEY, { auth: { persistSession: false } })
-  const { error } = await c.auth.signInWithPassword({ email, password: email.startsWith('20260187') ? '0000' : 'teste' })
+  const { error } = await c.auth.signInWithPassword({ email, password: 'teste' })
   if (error) throw new Error(`login ${email}: ${error.message}`)
   return c
 }

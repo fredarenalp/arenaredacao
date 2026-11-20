@@ -85,10 +85,10 @@ const ARENA = {
   // Devolve 'ok' | 'erro' (credenciais/perfil inválidos) | 'sys' (falha de conexão/servidor).
   async entrar(login, { email, mat, senha }) {
     try {
-      // Acesso de teste simplificado: usuário "teste" + senha "teste" em qualquer perfil.
+      // Acesso de teste simplificado: usuário "teste" + senha "teste" em qualquer perfil (aluno também por "0000").
       // Desative (ACESSO_TESTE = false) antes de usar com alunos reais.
       const idDigitado = (login === 'aluno' ? mat : email).trim().toLowerCase()
-      const teste = ACESSO_TESTE && idDigitado === 'teste'
+      const teste = ACESSO_TESTE && (idDigitado === 'teste' || (login === 'aluno' && idDigitado === '0000'))
       const em = login === 'aluno' ? emailAluno(teste ? CONTAS_TESTE.aluno : mat) : teste ? CONTAS_TESTE[login] : email.trim().toLowerCase()
       const { data, error } = await supabase.auth.signInWithPassword({ email: em, password: senha })
       if (error) return error.status && error.status < 500 ? 'erro' : 'sys'
