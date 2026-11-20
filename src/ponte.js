@@ -466,19 +466,14 @@ const ARENA = {
   },
   // Coordenação/professor: destaques, alunos (com a autorização da família) e elogios dos corretores.
   async carregarDestaques() {
-    const [d, a, el] = await Promise.all([
+    const [d, a] = await Promise.all([
       supabase.from('destaques').select('id, redacao_id, aluno_id, serie, tipo, titulo, texto, nota_elogio, status, resposta_em, criado_em').order('criado_em', { ascending: false }),
       supabase.from('alunos').select('id, nome, autoriza_destaque, saiu, turmas(serie, nome)').order('nome'),
-      supabase.from('marcacoes').select('id, redacao_id, dados, redacoes(id, aluno_id, propostas(numero, titulo), correcoes(liberada))').eq('tipo', 'c').contains('dados', { elogio: true }).limit(400),
     ])
     if (d.error) throw d.error
     const alunos = (a.data ?? []).map((x) => ({ id: x.id, nome: x.nome, aut: !!x.autoriza_destaque, saiu: !!x.saiu, serie: x.turmas?.serie ?? '', turma: x.turmas ? `${x.turmas.serie}º ${x.turmas.nome}` : '' }))
     const porId = Object.fromEntries(alunos.map((x) => [x.id, x]))
-    const elogios = (el.data ?? []).filter((m) => {
-      const c = m.redacoes?.correcoes
-      return (Array.isArray(c) ? c[0] : c)?.liberada && m.dados?.txt
-    }).map((m) => ({ mid: m.id, rid: m.redacao_id, aid: m.redacoes.aluno_id, txt: m.dados.txt, prop: m.redacoes.propostas?.numero ?? null, tema: m.redacoes.propostas?.titulo ?? '' }))
-    return { destaques: (d.data ?? []).map((x) => ({ ...x, aluno: porId[x.aluno_id]?.nome ?? '' })), alunos, elogios }
+    return { destaques: (d.data ?? []).map((x) => ({ ...x, aluno: porId[x.aluno_id]?.nome ?? '' })), alunos }
   },
   async redacoesAluno(aid) {
     const { data } = await supabase.from('redacoes').select('id, versao, propostas(numero, titulo), correcoes(liberada)').eq('aluno_id', aid).order('id')
