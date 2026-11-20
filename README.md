@@ -69,3 +69,9 @@ Ciclo completo contra o banco real (usa os usuários de teste): `NODE_USE_ENV_PR
 ## SQL
 Tudo que já foi aplicado ao banco está em `supabase/migrations/`. O que ainda **não** foi aplicado fica em
 `supabase/pendente.sql`. Ao final do trabalho será gerado um script único e completo: `supabase/schema-completo.sql`.
+
+## Sugestões de sinônimos (corretor)
+- Marcações **Vocabulário → Precisão** e **Repetição** abrem "Qual palavra?" e mostram 3 sugestões (+ "ver mais", por sentido).
+- Fontes (no banco, nunca no repositório): `sinonimos_verbetes` (Houaiss, por sentido) e `sinonimos_grupos` (Rocha Pombo, complemento).
+- Precisão: a mesma palavra conta **1** desvio de Linguagem; Oralidade conta cada ocorrência.
+- Preparar/recarregar os dados: `scripts/houaiss/` (OCR, extração, limpeza) e `scripts/semear-houaiss.mjs`; `scripts/extrair-sinonimos.py` + `scripts/semear-sinonimos.mjs` para o dicionário antigo.

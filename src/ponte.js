@@ -377,21 +377,30 @@ const ARENA = {
   },
 
   // Envia a foto da redação (data URL escolhida no celular/computador) e cria o registro.
-  // Sugestões de sinônimos para a palavra repetida. Devolve [{ sentidos: [[palavra,...],...] }] (vazio se não achar).
+  // Sugestões de sinônimos para a palavra digitada. Devolve [{ glosa, sin: [palavra,...] }], um item por sentido
+  // (Houaiss primeiro; o dicionário antigo entra como complemento). Vazio se não achar.
   async sinonimos(palavra) {
     try {
       const w = _semAcento(String(palavra || ''))
       if (w.length < 2) return []
       if (_sinCache.has(w)) return _sinCache.get(w)
       const vs = _variantes(w)
-      const { data, error } = await supabase.from('sinonimos_grupos').select('id, sentidos, norm').overlaps('norm', vs).limit(8)
-      if (error) return []
-      const out = (data ?? []).map((g) => ({
-        id: g.id,
-        sentidos: g.sentidos
-          .map((s) => s.filter((x) => !vs.includes(_semAcento(x))))
-          .filter((s) => s.length),
-      })).filter((g) => g.sentidos.length)
+      const [h, r] = await Promise.all([
+        supabase.from('sinonimos_verbetes').select('sentidos').overlaps('norm', vs).limit(6),
+        supabase.from('sinonimos_grupos').select('sentidos').overlaps('norm', vs).limit(4),
+      ])
+      const fora = new Set(vs)
+      const limpa = (lista) => lista.filter((x) => !fora.has(_semAcento(x)))
+      const out = []
+      const vistos = new Set()
+      const add = (glosa, lista) => {
+        const sin = limpa(lista).filter((x) => !vistos.has(x))
+        if (!sin.length) return
+        sin.forEach((x) => vistos.add(x))
+        out.push({ glosa, sin })
+      }
+      for (const v of h.data ?? []) for (const s of v.sentidos) add(s.glosa || '', s.sin)
+      for (const g of r.data ?? []) for (const s of g.sentidos) add('', s)
       _sinCache.set(w, out)
       return out
     } catch {
@@ -509,7 +518,7 @@ const ARENA = {
         }).sort((x, y) => (x.nome < y.nome ? -1 : 1))
       },
       fotoPath: (aid, num, ver) => { const P = propByNum[num]; const r = P ? redOf(aid, P.id, ver) : null; return r?.foto_path ?? null },
-      GN: () => { const g = ['']; for (const x of prop.data.filter((q) => q.bimestre === bimAtual)) g[x.numero] = x.genero; return g },
+      GN: () => { const g = ['']; for (const x of prop.data.filter((q) => q.bimestre === bimAtual)) g[x.numero] = x.genero; for (let k = 0; k < g.length; k++) if (g[k] == null) g[k] = ''; return g },
       mat: (s, t, k) => (byClass[`${s}|${t}`] || [])[k]?.matricula ?? '',
       PR: (s) => prop.data.filter((x) => x.bimestre === bimAtual && x.series.includes(s)).map((x) => x.numero).sort((a, b) => a - b),
     }
@@ -562,7 +571,7 @@ const ARENA = {
     { const nums = prop.data.filter((q) => q.bimestre === bimAtual).map((q) => q.numero).sort((a, b) => a - b); if (nums.length && !nums.includes(C.S.ent.prop)) C.S.ent.prop = nums[0] }
     C.S.x.ae.r = 'prof'
     C.GP.length = 0
-    window.__coordDB.GN().forEach((g) => C.GP.push(g))
+    for (const g of window.__coordDB.GN()) C.GP.push(g)
     C.resetAidx()
     const prazoPac = Object.fromEntries(pacs.data.map((x) => [x.id, x.prazo]))
     ARENA.definirFinanceiro(reds.data.flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && r.corretor_id ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao, seg: c.extras?.segundos || 0, noPrazo: prazoPac[r.pacote_id] ? c.atualizada_em.slice(0, 10) <= prazoPac[r.pacote_id] : null }] : [] }))
