@@ -695,7 +695,7 @@ create table public.sinonimos_verbetes (
 create index sinonimos_verbetes_norm_idx on public.sinonimos_verbetes using gin (norm);
 alter table public.sinonimos_verbetes enable row level security;
 create policy sinverb_le on public.sinonimos_verbetes for select to authenticated
-  using (public.meu_tipo() in ('coordenacao','professor','corretor'));
+  using ((select public.meu_tipo()) in ('coordenacao','professor','corretor'));
 create policy sinverb_coord on public.sinonimos_verbetes for all to authenticated
   using (public.meu_tipo() = 'coordenacao') with check (public.meu_tipo() = 'coordenacao');
 
@@ -711,6 +711,6 @@ create table public.palavras_pt (
 create index palavras_pt_norm_idx on public.palavras_pt (norm text_pattern_ops);
 alter table public.palavras_pt enable row level security;
 create policy palavras_le on public.palavras_pt for select to authenticated
-  using (public.meu_tipo() in ('coordenacao','professor','corretor'));
+  using ((select public.meu_tipo()) in ('coordenacao','professor','corretor'));
 create policy palavras_coord on public.palavras_pt for all to authenticated
-  using (public.meu_tipo() = 'coordenacao') with check (public.meu_tipo() = 'coordenacao');
+  using ((select public.meu_tipo()) = 'coordenacao') with check ((select public.meu_tipo()) = 'coordenacao');

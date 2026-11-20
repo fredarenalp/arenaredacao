@@ -3648,7 +3648,7 @@ function verCorrecao(k){
  var cmts=P.cmts||[{l:9,x:176,j:2,t:'Este período está muito longo. Divida em duas frases e use um conectivo para ligar as ideias.'},{l:15,l2:18,par:2,x:176,j:2,t:'Este parágrafo repete a mesma ideia. Reorganize as frases para o raciocínio avançar.'},{l:20,x:176,j:4,t:'Explique em detalhes quais são esses impactos.'}];
  aluno.marks=circ.filter(function(c){return isMg(c.c)}).map(function(c){return {t:'o',cat:c.c,line:c.l}});
  var NV={ce:1,ca:1,lac:1,ele:1,eli:1,el:1};
- var por={},est={};circ.forEach(function(c){if(NV[c.c])return;if(c.c==='ra'||isMg(c.c))est[isMg(c.c)?'mg':c.c]=(est[isMg(c.c)?'mg':c.c]||0)+1;else por[c.c]=(por[c.c]||0)+1});
+ var por={},est={},prSeen={};circ.forEach(function(c){if(NV[c.c])return;if(c.c==='ra'||isMg(c.c))est[isMg(c.c)?'mg':c.c]=(est[isMg(c.c)?'mg':c.c]||0)+1;else if(c.c==='pr'){var _pk=String(c.w||'').trim().toLowerCase();if(_pk&&!prSeen[_pk]){prSeen[_pk]=1;por.pr=(por.pr||0)+1}}else por[c.c]=(por[c.c]||0)+1});
  var linhas={};circ.forEach(function(c){if(!NV[c.c]&&c.c!=='ra'&&!isMg(c.c))linhas[c.l]=(linhas[c.l]||0)+1});
  var catN={ac:'Acentuação',pt:'Pontuação',or:'Ortografia',il:'Ilegibilidade',cj:'Conjugação verbal',cn:'Concordância verbal',rg:'Regência verbal',cr:'Crase',ol:'Oralidade',pr:'Precisão',tr:'Truncamento',vi:'Vírgula',mi:'Uso de letra maiúscula',ra:'Rasura',ce:'Conectivo (errado)',ca:'Conectivo (ausente)',mg:'Margens',mr:'Linha curta',ma:'Passou da margem',pc:'Parágrafo curto',pe:'Parágrafo longo',pd:'Parágrafo desalinhado',ss:'Translineação',el:'Elogio',lac:'Lacuna',ele:'Elemento ausente',eli:'Elemento insuficiente'},sig={rg:'RG',ce:'CE',ca:'C',lac:'LAC',ele:'EL',eli:'EI',ac:'AC',pt:'PT',or:'OR',il:'IL',cj:'CJ',cn:'CN',cr:'CR',ol:'OL',pr:'PR',tr:'TR',vi:'VI',mi:'MI',ra:'RA',mg:'MG',mr:'MR',ma:'MA',pc:'PC',pe:'PE',pd:'PD',ss:'SS'};
  var sel=null,zoom=80;
@@ -3665,7 +3665,9 @@ function verCorrecao(k){
  var fl=function(a){a=sorted(a);return (a.length>1?'linhas ':'linha ')+(a.length<2?pad(a[0]):a.slice(0,-1).map(pad).join(', ')+' e '+pad(a[a.length-1]))};
  var nD=0;Object.keys(por).forEach(function(c){nD+=por[c]});
  var ortW=[];circ.forEach(function(c){if(c.c==='or'&&c.w&&ortW.indexOf(c.w)<0)ortW.push(c.w)});var ortS=ortW.length?' Atenção à grafia '+(ortW.length>1?'das palavras ':'da palavra ')+(ortW.length<2?'“'+ortW[0]+'”':ortW.slice(0,-1).map(function(w){return '“'+w+'”'}).join(', ')+' e “'+ortW[ortW.length-1]+'”')+'.':'';
- var detLing=nD?'Circulei '+(nD===1?'1 desvio':nD+' desvios')+' na sua folha: '+['ac','pt','or','ss','cj','cn','rg','cr','ol','tr','il','vi','mi'].filter(function(c){return porLin[c]}).map(function(c){return catN[c].toLowerCase()+' ('+fl(porLin[c])+')'}).join('; ')+'.'+ortS:'';
+ var prW={};circ.forEach(function(c){if(c.c==='pr'&&c.w){var k=String(c.w).trim().toLowerCase(),G=prW[k]=prW[k]||{w:String(c.w).trim(),s:[]};(c.s||[]).forEach(function(x){if(G.s.indexOf(x)<0)G.s.push(x)})}});
+ var prS=Object.keys(prW).map(function(k){var G=prW[k];return ' A palavra “'+G.w+'” é imprecisa: procure uma mais específica'+(G.s.length?', por exemplo: '+(G.s.length<2?G.s[0]:G.s.slice(0,-1).join(', ')+' ou '+G.s[G.s.length-1]):'')+'.'}).join('');
+ var detLing=nD?'Circulei '+(nD===1?'1 desvio':nD+' desvios')+' na sua folha: '+['ac','pt','or','ss','cj','cn','rg','cr','ol','pr','tr','il','vi','mi'].filter(function(c){return porLin[c]}).map(function(c){return catN[c].toLowerCase()+' ('+fl(porLin[c])+')'}).join('; ')+'.'+ortS:'';
  var estP=[];if(porLin.ra)estP.push((est.ra===1?'1 rasura':est.ra+' rasuras')+' ('+fl(porLin.ra)+')');
  var detEst=estP.length?'Também marquei '+estP.join(' e ')+'.'+(porLin.ra?' '+A.RA_TXT:''):'';
 
@@ -3687,7 +3689,7 @@ function verCorrecao(k){
  var lc=function(s){return s.charAt(0).toLowerCase()+s.slice(1)},jn=function(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' e '+a[a.length-1]};
  var sn=function(a){return a.slice().sort(function(x,y){return x-y})};
  var lnT=function(a,curto){a=sn(a);return (a.length>1?'nas ':'na ')+(curto?'':(a.length>1?'linhas ':'linha '))+jn(a)};
- var tipos=['ac','pt','or','ss','cj','cn','rg','cr','ol','tr','il','vi','mi'].filter(function(c){return porLin[c]}).map(function(c){return catN[c].toLowerCase()+' ('+jn(sn(porLin[c]))+')'});
+ var tipos=['ac','pt','or','ss','cj','cn','rg','cr','ol','pr','tr','il','vi','mi'].filter(function(c){return porLin[c]}).map(function(c){return catN[c].toLowerCase()+' ('+jn(sn(porLin[c]))+')'});
  var todasL=[];Object.keys(porLin).forEach(function(c){if(c!=='ra'&&c!=='mg')porLin[c].forEach(function(l){if(todasL.indexOf(l)<0)todasL.push(l)})});
  var FORTE=['na apresentação do texto','na linguagem','na ligação entre os trechos','na estrutura do gênero','no desenvolvimento do tema'];
  var FDET=['título e parágrafos estão organizados','os desvios são raros','os conectivos e o vocabulário são variados','todos os elementos pedidos estão no lugar','todas as partes foram trabalhadas'];
@@ -3699,7 +3701,7 @@ function verCorrecao(k){
    var d=[];if(porLin.ra)d.push((est.ra===1?'uma rasura ':est.ra+' rasuras ')+lnT(porLin.ra));
    mel.push({t:(n===4?'Na apresentação, só um detalhe':n===3?'Na apresentação, falta pouco':n===2?'A apresentação precisa de mais cuidado':'A apresentação precisa de bastante atenção')+(d.length?': há '+d.join(' e ')+'.':'.')+(porLin.ra?' '+A.RA_TXT:'')+(porLin.mg?' '+A.margemTxt(aluno).join(' '):''),imp:false});
   }else if(j===1&&nD){
-   mel.push({t:(n===4?'Na linguagem, só alguns ajustes.':n===3?'Na linguagem, o texto está bem cuidado, mas ainda há alguns desvios.':n===2?'A linguagem merece uma revisão com calma.':'A linguagem precisa de uma revisão cuidadosa, parágrafo por parágrafo.')+' Marquei '+nD+' na sua folha, '+lnT(todasL)+': '+jn(tipos)+'. Releia as linhas assinaladas e identifique o que precisa ser ajustado em cada uma.'+ortS+(porLin.ss?' '+A.SS_TXT:''),imp:false});
+   mel.push({t:(n===4?'Na linguagem, só alguns ajustes.':n===3?'Na linguagem, o texto está bem cuidado, mas ainda há alguns desvios.':n===2?'A linguagem merece uma revisão com calma.':'A linguagem precisa de uma revisão cuidadosa, parágrafo por parágrafo.')+' Marquei '+nD+' na sua folha, '+lnT(todasL)+': '+jn(tipos)+'. Releia as linhas assinaladas e identifique o que precisa ser ajustado em cada uma.'+ortS+prS+(porLin.ss?' '+A.SS_TXT:''),imp:false});
   }else if(n<4){mel.push({t:c.ori[n],imp:true});}
  });
  var CON=['Além disso, ','Também ','Por fim, '];
