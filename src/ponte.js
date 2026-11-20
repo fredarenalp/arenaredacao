@@ -280,6 +280,8 @@ const ARENA = {
     ARENA.aluno = al
     const { data: props } = await supabase.from('propostas').select('*').order('bimestre').order('id')
     const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao,vista_em), marcacoes(dados)').eq('aluno_id', al.id)
+    const { data: gens } = await supabase.from('generos').select('*')
+    const genDe = (nome) => (gens ?? []).find((g) => g.nome === nome)
     const { data: prazosInd } = await supabase.from('prazos_individuais').select('proposta_id, ate, vale_nota').eq('aluno_id', al.id)
     window.__real = true
     const turma = al.turmas ? `${al.turmas.serie}º ano ${al.turmas.nome}` : ''
@@ -326,7 +328,8 @@ const ARENA = {
       const orig = reds.find((r) => r.proposta_id === p.id && r.versao === 1)
       const re = reds.find((r) => r.proposta_id === p.id && r.versao === 2)
       const item = async (r, versao) => {
-        const base = { _pid: p.id, _v: versao, p2: p.prazo2 ? `${p.prazo2.slice(8, 10)}/${p.prazo2.slice(5, 7)}` : '' }
+        const gd = genDe(p.genero)
+        const base = { _pid: p.id, _v: versao, prop: { n: num, g: p.genero, tema: p.titulo, orient: p.orientacoes || '', desc: gd?.descricao || '', elem: (p.elementos?.length ? p.elementos : gd?.elementos) ?? [], prazo: p.prazo ? `${p.prazo.slice(8, 10)}/${p.prazo.slice(5, 7)}` : '', prazo2: p.prazo2 ? `${p.prazo2.slice(8, 10)}/${p.prazo2.slice(5, 7)}` : '' }, p2: p.prazo2 ? `${p.prazo2.slice(8, 10)}/${p.prazo2.slice(5, 7)}` : '' }
         const rot = versao === 1 ? `Proposta ${num} · ${p.genero}` : `2ª versão (reescrita) · Proposta ${num}`
         const g = versao === 1 ? 'o' : 'r'
         const prazo = p.prazo ? `${p.prazo.slice(8, 10)}/${p.prazo.slice(5, 7)}` : ''
@@ -494,7 +497,7 @@ const ARENA = {
     if (ARENA.perfil.tipo === 'coordenacao') await supabase.rpc('gerar_pacotes')
     const q = (t, sel = '*') => supabase.from(t).select(sel).limit(5000)
     const desde = new Date(Date.now() - 70 * 86400000).toISOString()
-    const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess, aeeRes] = await Promise.all([
+    const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess, aeeRes, genRes] = await Promise.all([
       q('perfis'), q('turmas'), q('alunos', '*, turmas(serie, nome)'), q('propostas'), q('pacotes'),
       q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, foto_path, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario,atualizada_em)'),
       q('avisos', '*, alunos(nome, turmas(serie, nome)), propostas(numero, genero)'),
@@ -502,8 +505,9 @@ const ARENA = {
       q('professor_turmas'),
       supabase.from('acessos').select('aluno_id, em').gte('em', desde).not('aluno_id', 'is', null).limit(20000),
       supabase.from('alunos_aee').select('aluno_id'),
+      supabase.from('generos').select('*'),
     ])
-    for (const r of [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess, aeeRes]) if (r.error) throw r.error
+    for (const r of [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess, aeeRes, genRes]) if (r.error) throw r.error
     const dm = (d) => (d ? `${String(d).slice(8, 10)}/${String(d).slice(5, 7)}` : null)
     const dh = (t) => { const d = new Date(t); return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}` }
     const C = window.__coord
@@ -600,7 +604,10 @@ const ARENA = {
     fill(C.PRP, prop.data.map((x) => ({
       id: x.id, bim: x.bimestre, n: x.numero, g: x.genero, t: x.titulo, ser: x.series, p1: dm(x.prazo), p2: dm(x.prazo2),
       ...(x.sem_reescrita ? { semRe: true } : {}), st: x.status,
+      ...(x.elementos?.length ? { elem: x.elementos } : {}), orient: x.orientacoes || '',
     })))
+    C.GENS = Object.fromEntries(genRes.data.map((g) => [g.nome, g.descricao]))
+    C.GENS_EL = Object.fromEntries(genRes.data.map((g) => [g.nome, g.elementos]))
     // (os bimestres são preenchidos depois de ler as regras)
     const nPac = Object.fromEntries(pacs.data.map((x) => [x.id, reds.data.filter((r) => r.pacote_id === x.id)]))
     fill(C.PACS, pacs.data.map((x) => {
@@ -676,7 +683,8 @@ const ARENA = {
       pacs: Object.fromEntries(C.PACS.map((x) => [x.id, x.c || ''])),
       fila: Object.fromEntries(C.FILA.map((f) => [f.id, f.st])),
       corr: Object.fromEntries(C.CORR.map((c) => [c.id, !!c.pausado])),
-      prp: Object.fromEntries(C.PRP.map((q) => [q.id, JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])])),
+      prp: Object.fromEntries(C.PRP.map((q) => [q.id, JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe, q.elem ?? null, q.orient ?? ''])])),
+      gen: { ...C.GENS },
       regras: JSON.stringify({ r1: C.S.r1, ...C.R }),
       bimc: JSON.stringify(C.BIMC.map((b) => b.st)),
       gs: JSON.stringify(C.GS.map((g) => ({ ...g, fotoUrl: undefined }))),
@@ -764,14 +772,20 @@ const ARENA = {
 
     // propostas: criar / alterar
     for (const q of C.PRP) {
-      const assin = JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe])
+      const assin = JSON.stringify([q.bim, q.n, q.g, q.t, q.ser, q.p1, q.p2, q.st, !!q.semRe, q.elem ?? null, q.orient ?? ''])
       if (prev.prp[q.id] === assin) continue
       const ano = new Date().getFullYear()
-      const row = { ano, bimestre: q.bim, numero: q.n, genero: q.g, titulo: q.t, series: q.ser, prazo: ymd(q.p1), prazo2: ymd(q.p2), status: q.st, sem_reescrita: !!q.semRe }
+      const row = { ano, bimestre: q.bim, numero: q.n, genero: q.g, titulo: q.t, series: q.ser, prazo: ymd(q.p1), prazo2: ymd(q.p2), status: q.st, sem_reescrita: !!q.semRe, elementos: q.elem?.length ? q.elem : null, orientacoes: q.orient || null }
       if (prev.prp[q.id] === undefined) {
         const r = await supabase.from('propostas').insert(row).select('id').single()
         if (r.error) ok(r); else { q.id = r.data.id; prev.prp[q.id] = assin }
       } else ok(await supabase.from('propostas').update(row).eq('id', q.id))
+    }
+
+    // gêneros: explicação editável pela coordenação
+    for (const [nome, desc] of Object.entries(C.GENS ?? {})) {
+      if ((prev.gen ?? {})[nome] === desc) continue
+      ok(await supabase.from('generos').upsert({ nome, descricao: desc, elementos: C.GENS_EL?.[nome] ?? [] }))
     }
 
     // alunos: novos, mudança de turma, saída, nova senha
