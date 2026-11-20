@@ -925,6 +925,7 @@ select.crsel.on{background:#e0f2f2;border-color:#a9d3d4;color:#2f5f61}.cl .crsel
 .fdl{display:grid;gap:12px}.fdk{background:#fff;border-radius:22px;padding:18px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
 .fdk small{color:#6a7b7b}.fdk h3{margin:4px 0 8px;color:#2f5f61}.fdel{margin:0 0 8px;color:#2f855a;font-weight:600}
 .fdtx{white-space:normal;line-height:1.55;color:#333}.fder{list-style:none;padding:0;margin:0}.fder li{padding:10px 0;border-top:1px solid #eee;display:grid;gap:2px}.fder span{color:#6a7b7b;font-size:13px}.fder em{color:#2f5f61;font-style:normal;font-size:14px}
+.btabs{display:flex;width:100%;box-sizing:border-box}.altabs.btabs button{flex:1;min-width:0;padding:9px 4px;font-size:13px;white-space:nowrap}
 .altabs{display:inline-flex;gap:4px;background:#ebe9e0;border-radius:var(--r-md);padding:3px;margin:0 0 14px}
 .altabs button{border:0;background:none;border-radius:var(--r-sm);padding:7px 16px;font:700 13px 'DM Sans',sans-serif;color:#505048;cursor:pointer}.altabs button.on{background:#fff;color:#3c7678;box-shadow:var(--sh1)}
 .bol-k{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:10px;margin:0 0 14px}.bk{background:#fff;border:1px solid var(--borda);border-radius:var(--r-md);padding:12px 14px}
@@ -3613,11 +3614,15 @@ function boletim(){
  var parts=ESSAYS.map(function(E){return [E.o,E.r]}).reduce(function(a,b){return a.concat(b)},[]).map(function(k){var n=notaDe(PROPS[k]);return n==null?'0':f1(n)}).join(' + ');
  var mA=bimMediaAtual(),pasN=[1,2,3,4].filter(function(b){return b<BATU&&BIMS[b]&&BIMS[b].notas.length}),ano=pasN.length?pasN.reduce(function(a,b){return a+bimMediaPas(b)},0)/pasN.length:0;
  var anoH='<div class="bol-ano"><div class="ba main"><small>Média dos bimestres encerrados</small><b>'+fmt1(ano)+'</b><span>de 10,0</span></div>'+[1,2,3,4].map(function(b){var pas=b<BATU,at=b===BATU;return '<div class="ba '+(pas?'ps':at?'at':'fu')+'"><small>'+b+'º bimestre</small><b>'+(pas?(BIMS[b]&&BIMS[b].notas.length?fmt1(bimMediaPas(b)):'–'):at?fmt1(mA):'–')+'</b><span>'+(pas?'encerrado':at?'em andamento':'começa em '+BINI[b])+'</span></div>'}).join('')+'</div>';
- $('alMain').innerHTML=abasAl('bol')+'<h2>Boletim</h2><p class="lead">Redação · média por bimestre</p>'+anoH+cpHtml()+'<h3 class="bol-h3">'+BATU+'º bimestre em detalhe</h3>'+
+ var det='<h3 class="bol-h3">'+BATU+'º bimestre em detalhe</h3>'+
  '<div class="bol-k"><div class="bk main"><small>Média da redação</small><b>'+f1(media)+'</b><span>de 10,0</span></div><div class="bk"><small>Redações corrigidas</small><b>'+corr+' de '+QTD_BOL+'</b><span>'+ESSAYS.length+' na 1ª versão e '+(QTD_BOL-ESSAYS.length)+' na reescrita</span></div><div class="bk"><small>Pontos somados</small><b>'+f1(soma)+'</b><span>de '+f1(QTD_BOL*10)+' possíveis</span></div></div>'+
  '<div class="bol-f"><b>Como a média é calculada</b><p>Soma das notas ÷ número de redações do bimestre.</p><p class="eq">('+parts+') ÷ '+QTD_BOL+' = <b>'+f1(media)+'</b></p>'+(faltam?'<p class="sm">Faltam '+faltam+' redações. Enquanto não são corrigidas, elas entram como 0. Se você tirar 10 em todas as que faltam, a média chega a '+f1(max)+'.</p>':'')+'</div>'+
  '<div class="bol-t"><table class="bt"><thead><tr><th>Proposta</th><th class="n">1ª versão</th><th class="n">2ª versão (reescrita)</th></tr></thead><tbody>'+rows+'</tbody><tfoot><tr><td>Soma das notas</td><td class="n" colspan="2">'+f1(soma)+'</td></tr></tfoot></table></div>';
+ var BT=[['at','Bimestre atual'],["med","Médias"],['evo','Evolução']],LD={at:'Redação · notas e média do '+BATU+'º bimestre',med:'Redação · média de cada bimestre',evo:'Critérios ao longo do ano'};
+ if(!LD[BOLT])BOLT='at';
+ $('alMain').innerHTML=abasAl('bol')+'<h2>Boletim</h2><p class="lead">'+LD[BOLT]+'</p><div class="altabs btabs" role="tablist" aria-label="Seções do boletim">'+BT.map(function(t){return '<button type="button" role="tab" data-bt="'+t[0]+'" aria-selected="'+(BOLT===t[0])+'" class="'+(BOLT===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div>'+(BOLT==='med'?anoH:BOLT==='evo'?cpHtml():det);
 }
+var BOLT='at';
 
 // ilustrações
 function fr(o){
@@ -3851,7 +3856,7 @@ function verCorrecao(k){
  document.querySelectorAll('.crs-r').forEach(function(b){b.addEventListener('click',function(){var j=+b.dataset.cj;if(fj!==j){fj=j;sel=null;chips();desenha()}})});
  $('alVolta').onclick=lista;chips();desenha();
 }
-$('alMain').addEventListener('click',function(e){var ab=e.target.closest('[data-al]');if(ab){if(ab.dataset.al==='bol')boletim();else if(ab.dataset.al==='crit')conhecer();else if(ab.dataset.al==='feed'){FEED=null;feed()}else lista();return;}var fdt=e.target.closest('[data-fd-t]');if(fdt){FEEDT=fdt.dataset.fdT;feed();return;}var fdr=e.target.closest('[data-fd-r]');if(fdr){fdr.disabled=true;ARENA.responderDestaque(+fdr.dataset.fdR,fdr.dataset.v==='1').then(function(ok){FEED=null;ok?feed():(fdr.disabled=false)});return;}var vk=e.target.closest('[data-vk]');if(vk){verCorrecao(+vk.dataset.vk);return;}var b=e.target.closest('button.pc,button.pbtn,button.plnk,button.stpb');if(!b)return;var k=+b.dataset.k,kd=PROPS[k]&&PROPS[k].cta?PROPS[k].kind:'';if(kd==='corr')verCorrecao(k);else if(kd==='late')atraso(k);else if(kd==='open')instrucoes(k,null);});
+$('alMain').addEventListener('click',function(e){var ab=e.target.closest('[data-al]');if(ab){if(ab.dataset.al==='bol')boletim();else if(ab.dataset.al==='crit')conhecer();else if(ab.dataset.al==='feed'){FEED=null;feed()}else lista();return;}var bt=e.target.closest('[data-bt]');if(bt){BOLT=bt.dataset.bt;boletim();return;}var fdt=e.target.closest('[data-fd-t]');if(fdt){FEEDT=fdt.dataset.fdT;feed();return;}var fdr=e.target.closest('[data-fd-r]');if(fdr){fdr.disabled=true;ARENA.responderDestaque(+fdr.dataset.fdR,fdr.dataset.v==='1').then(function(ok){FEED=null;ok?feed():(fdr.disabled=false)});return;}var vk=e.target.closest('[data-vk]');if(vk){verCorrecao(+vk.dataset.vk);return;}var b=e.target.closest('button.pc,button.pbtn,button.plnk,button.stpb');if(!b)return;var k=+b.dataset.k,kd=PROPS[k]&&PROPS[k].cta?PROPS[k].kind:'';if(kd==='corr')verCorrecao(k);else if(kd==='late')atraso(k);else if(kd==='open')instrucoes(k,null);});
 $('alMx').onclick=function(){$('alMdl').classList.remove('on')};
 $('alMdl').addEventListener('click',function(e){if(e.target===$('alMdl'))$('alMdl').classList.remove('on')});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')$('alMdl').classList.remove('on')});
