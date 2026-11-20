@@ -17,7 +17,7 @@ const ok = (c, m) => { console.log(c ? 'ok   ' : 'FALHA', m); if (!c) falhas++ }
 
   p = await nova()
   await p.click('.p[data-k=aluno]'); await p.fill('#mat', 'teste'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
-  await p.waitForSelector('#alMain .bimq', { timeout: 20000 }).catch(() => {})
+  await p.waitForSelector('#alMain .bimq', { timeout: 20000 }); if (await p.locator('#alIntro:not(.hide)').count()) { await p.keyboard.press('ArrowRight'); await p.waitForTimeout(400) }.catch(() => {})
   ok(await p.evaluate(() => document.body.classList.contains('in-aluno')), 'aluno: teste / teste')
 
   p = await nova()

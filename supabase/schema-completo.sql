@@ -714,3 +714,39 @@ create policy palavras_le on public.palavras_pt for select to authenticated
   using ((select public.meu_tipo()) in ('coordenacao','professor','corretor'));
 create policy palavras_coord on public.palavras_pt for all to authenticated
   using ((select public.meu_tipo()) = 'coordenacao') with check ((select public.meu_tipo()) = 'coordenacao');
+
+-- ===== 0023_aluno_vistas =====
+-- O aluno "viu" a correção: usado pela primeira tela (só comemora/avisa correção ainda não vista).
+alter table public.correcoes add column vista_em timestamptz;
+create or replace function public.aluno_marca_vista(p_redacao bigint) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  update public.correcoes c set vista_em = coalesce(c.vista_em, now())
+  where c.redacao_id = p_redacao
+    and exists (select 1 from public.redacoes r where r.id = p_redacao and r.aluno_id = public.meu_aluno_id());
+end $$;
+revoke execute on function public.aluno_marca_vista(bigint) from public, anon;
+grant execute on function public.aluno_marca_vista(bigint) to authenticated;
+
+-- ===== 0024_plantoes =====
+-- "Pedir uma conversa": pedidos de plantão de redação feitos pelo aluno; a coordenação combina o horário.
+create table public.plantoes (
+  id bigint generated always as identity primary key,
+  aluno_id bigint not null references public.alunos(id) on delete cascade,
+  proposta_id bigint references public.propostas(id),
+  texto text,
+  status text not null default 'pend' check (status in ('pend','agendado','atendido')),
+  horario text,
+  criado_em timestamptz not null default now(),
+  tratado_por uuid references public.perfis(id),
+  tratado_em timestamptz
+);
+create index on public.plantoes (aluno_id);
+create index on public.plantoes (status);
+alter table public.plantoes enable row level security;
+create policy plantoes_aluno_le on public.plantoes for select to authenticated
+  using (aluno_id = (select public.meu_aluno_id()) or (select public.meu_tipo()) in ('coordenacao','professor'));
+create policy plantoes_aluno_cria on public.plantoes for insert to authenticated
+  with check (aluno_id = (select public.meu_aluno_id()) and status = 'pend');
+create policy plantoes_coord on public.plantoes for update to authenticated
+  using ((select public.meu_tipo()) = 'coordenacao') with check ((select public.meu_tipo()) = 'coordenacao');

@@ -411,6 +411,28 @@ button.pc{cursor:pointer}button.pc:hover{border-color:#3c7678;box-shadow:var(--s
 .mk .xm.rp ellipse{stroke:#f08300}.mk .xm.rp .mt{stroke:#f08300;color:#f08300}.mk .xm.rp .cl{fill:#f08300}.mk .rpar{fill:none;stroke:#f08300;stroke-width:.9;stroke-dasharray:2.4 1.6;pointer-events:none}
 .catp .prg button{background:rgba(240,131,0,.4)}.catp .prg button:hover,.catp .prg button.cur{background:#f08300}.catp .g2.prg{grid-template-columns:1fr}
 .rpw{margin:-4px 0 10px;display:flex;flex-direction:column;gap:6px}.rpw label{font-size:11px;font-weight:700;letter-spacing:.5px;color:#ffc680}.rpw input{height:36px;border-radius:var(--r-sm);border:1.5px solid #f08300;background:#2b2b27;color:#fff;padding:0 10px;font:inherit;font-size:14px}
+
+.ai{position:fixed;inset:0;z-index:80;background:rgba(20,40,40,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)}.ai.hide{display:none}body.ai-on{overflow:hidden}
+.ai-wrap{position:relative;width:min(440px,100vw);height:min(820px,100vh);background:#f4f2ec;border-radius:30px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.35)}@media(max-width:560px){.ai-wrap{border-radius:0;height:100vh}}
+.ai-bars{position:absolute;top:14px;left:16px;right:16px;display:flex;gap:5px;z-index:5}.ai-bars i{flex:1;height:4px;border-radius:3px;background:rgba(0,0,0,.14)}.ai-bars i.on{background:#2f5f61}.ai-wrap:has(.ai-card.ag) .ai-bars i{background:rgba(255,255,255,.38)}.ai-wrap:has(.ai-card.ag) .ai-bars i.on{background:#fff}
+.ai-skip{position:absolute;top:30px;right:18px;z-index:6;border:0;background:none;color:#fff;font:700 13px "DM Sans",sans-serif;cursor:pointer;padding:6px 8px}.ai-wrap:has(.ai-card:not(.ag)) .ai-skip{color:#2f5f61}
+.ai-card{position:absolute;inset:0;padding:78px 26px 96px;display:flex;flex-direction:column;justify-content:center;overflow:auto}.ai-card.ag{background:linear-gradient(165deg,#52989a,#3c7678);color:#fff}.ai-card.acr{background:#f4f2ec;color:#1c1c19}.ai-card.awh{background:#fff;color:#1c1c19}
+.ai-tg{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:8px;opacity:.95}.ai-tg.d{color:#2f5f61}
+.ai-h1{font-size:42px;line-height:1.05;font-weight:800;letter-spacing:-.02em;margin:0 0 10px}.ai-h2{font-size:25px;line-height:1.2;font-weight:800;letter-spacing:-.01em;margin:6px 0 10px}.ai-p{font-size:17px;line-height:1.5;margin:0 0 14px;opacity:.96}.ai-p.d{color:#505048;opacity:1}
+.ai-big{font-size:116px;line-height:.95;font-weight:800;letter-spacing:-.05em;margin:6px 0 12px}.ai-big small{font-size:34px;font-weight:600;opacity:.85;letter-spacing:0}.ai-big.m{font-size:86px}
+.ai-chip{display:inline-block;background:rgba(255,255,255,.22);border-radius:20px;padding:6px 13px;font-size:13px;font-weight:700;margin:0 6px 6px 0}.ai-chip.d{background:rgba(255,255,255,.2)}
+.ai-ch{display:flex;flex-wrap:wrap;margin-top:6px}
+.ai-btn{display:block;width:100%;border-radius:30px;padding:14px;font:800 15.5px "DM Sans",sans-serif;cursor:pointer;margin-top:10px;border:2px solid transparent}.ai-btn.w{background:#fff;color:#2f5f61}.ai-btn.gh{background:transparent;color:#fff;border-color:rgba(255,255,255,.7)}.ai-btn.t{background:#3c7678;color:#fff}.ai-btn.o{background:transparent;color:#2f5f61;border-color:#3c7678}.ai-btn:disabled{opacity:.6}
+.ai-nb{display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.16);border-radius:16px;padding:13px 16px;margin:6px 0 10px;cursor:pointer;font-size:15px}.ai-nb b{background:rgba(255,255,255,.26);border-radius:20px;padding:5px 12px;font-size:13px}.ai-nb b.on{font-size:18px;background:#fff;color:#2f5f61}
+.ai-mot{background:#fbeed0;color:#5c4000;border-radius:16px;padding:13px 16px;margin:10px 0 12px;font-size:15px;line-height:1.45}.ai-mot b{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}.ai-mini{font-size:12.5px;color:#6b6b62;margin:10px 0 0;line-height:1.4}
+.ai-fc{background:#fff;border-radius:18px;padding:14px 16px;margin:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.06)}.ai-fc b{font-size:16px;display:flex;justify-content:space-between}.ai-fc b em{font-style:normal;color:#2f5f61}.ai-fc span{display:block;font-size:13.5px;color:#505048;margin-top:3px;line-height:1.4}
+.ai-step{background:#e4eeee;border-radius:18px;padding:16px;margin:12px 0}.ai-step small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#505048;font-weight:700}.ai-step p{margin:6px 0 0;font-size:16.5px;line-height:1.45;font-weight:700;color:#2f5f61}
+.ai-crt{margin:12px 0}.ai-crt b{font-size:15.5px;display:flex;justify-content:space-between}.ai-crt b em{font-style:normal;font-weight:700;color:#2f5f61}.ai-crt span{font-size:13px;color:#505048;display:block;line-height:1.35}.ai-stp{display:flex;gap:5px;margin:6px 0 4px}.ai-stp i{flex:1;height:13px;border-radius:5px;background:#ddd9cc}.ai-stp i.f{background:#3c7678}.ai-stp.w i.f{background:#d9806f}
+.ai-wd{background:#f4f2ec;border-radius:18px;padding:14px 16px;margin:10px 0}.ai-wd small{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6b6b62}.ai-wd b{display:block;font-size:24px;margin:4px 0 2px;letter-spacing:-.02em}.ai-wd b.ok{color:#2f5f61}.ai-wd span{display:block;font-size:13.5px;color:#505048}.ai-wd u{text-decoration:none;font-weight:800;color:#2f5f61}
+.ai-peek{position:absolute;right:0;top:50%;transform:translateY(-50%);z-index:6;border:0;background:rgba(255,255,255,.95);border-radius:18px 0 0 18px;padding:26px 7px 26px 9px;box-shadow:0 2px 10px rgba(0,0,0,.18);cursor:pointer}.ai-peek:after{content:'›';font:800 22px/1 "DM Sans",sans-serif;color:#2f5f61}
+.ai-hint{position:absolute;bottom:18px;left:0;right:0;z-index:6;border:0;background:none;font:700 12px "DM Sans",sans-serif;letter-spacing:.04em;cursor:pointer;color:#fff}.ai-wrap:has(.ai-card:not(.ag)) .ai-hint{color:#2f5f61}.ai-hint span{display:block;font-size:20px;line-height:.8;margin-bottom:4px}
+.ai-sheet{position:absolute;inset:0;z-index:9;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center}.ai-sheet.hide{display:none}.ai-sh{background:#fff;border-radius:28px 28px 0 0;padding:12px 20px 24px;width:min(440px,100vw);box-shadow:0 -10px 30px rgba(0,0,0,.2)}.ai-sh .hd{width:44px;height:5px;border-radius:3px;background:#d8d4c8;margin:0 auto 12px}.ai-sh h3{margin:0 0 6px;font-size:20px}.ai-sh p{margin:0 0 10px;font-size:14.5px;line-height:1.5;color:#333}.ai-sh textarea{width:100%;border:1.5px solid #d9d5c8;border-radius:14px;padding:11px 13px;font:14px "DM Sans",sans-serif;margin-bottom:6px;resize:none}
+.ai-reabre{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:30;border:0;background:linear-gradient(165deg,#52989a,#3c7678);color:#fff;font:800 12px "DM Sans",sans-serif;padding:14px 10px 14px 8px;border-radius:0 18px 18px 0;box-shadow:0 2px 10px rgba(0,0,0,.2);cursor:pointer;display:none}body.in-aluno:not(.ai-on) .ai-reabre{display:block}.ai-reabre:before{content:'‹ '}
 .anins{list-style:none;margin:0;padding:4px 18px 8px}.anins li{display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid var(--borda)}.anins li:first-child{border-top:0}.anic{flex:0 0 34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}.anins p{margin:0;flex:1;font-size:15px;line-height:1.45}.anlk{border:0;background:none;color:var(--cor);font:700 13px "DM Sans",sans-serif;cursor:pointer;padding:6px 8px;border-radius:var(--r-sm)}.anlk:hover{background:var(--soft)}
 .aner{list-style:none;margin:0;padding:6px 18px 14px}.aner li{display:grid;grid-template-columns:150px 1fr 44px;align-items:center;gap:12px;padding:8px 0;font-size:13px}.aner i{display:block;height:8px;background:#efede5;border-radius:6px;overflow:hidden}.aner i b{display:block;height:100%;background:#e5a093;border-radius:6px}.aner em{font-style:normal;font-weight:800;text-align:right}
 .anpl{padding:2px 18px 14px}.anpl h4{margin:12px 0 7px;font-size:12px;color:var(--mut);font-weight:600}.anch{display:flex;flex-wrap:wrap;gap:7px}.anch span{background:var(--soft);border-radius:var(--r-pill);padding:5px 12px;font-size:13px}.anch b{margin-left:7px;color:var(--cor)}.anvz{margin:0;color:var(--mut);font-size:12px}
@@ -3488,7 +3510,7 @@ function contestar(k){
   $('alMain').innerHTML='<div class="sent"><div class="big"><svg viewBox="0 0 24 24"><path d="m5 12 5 5L20 7"/></svg></div><h2>Contestação enviada</h2><p class="lead">O professor vai analisar os argumentos que você escreveu. Você acompanha a resposta aqui na correção.</p><button type="button" class="btn" style="max-width:260px;margin:0 auto" id="ctOk">Voltar à correção</button></div>';$('ctOk').onclick=function(){verCorrecao(k)};};
 }
 window.__aluno={setSemRe:function(n,sem,p2){var P=PROPS[(ESSAYS[n-1]||{r:n-1}).r];if(!P)return;if(sem&&P.kind==='block'){P.kind='norew';P.st='bl';P.l='Sem reescrita';P.s='Esta proposta não tem reescrita';delete P.cta}else if(!sem&&P.kind==='norew'){P.kind='block';P.st='bl';P.l='Ainda não liberada';delete P.cta}if(P.kind==='block')P.s='Libera depois da correção da Proposta '+n+(p2?' · entregue até '+p2:'');QTD_BOL=ESSAYS.length*2-ESSAYS.filter(function(E){return PROPS[E.r].kind==='norew'}).length},setFase:function(n,kind,p1,fim){var P=PROPS[(ESSAYS[n-1]||{o:n-1}).o];if(!P||P.kind==='corr'||P.kind==='warned'||P.novaEnt)return;if(kind==='late'){P.st='at';P.kind='late';P.l='Atrasada · ainda dá para enviar';P.cta='Enviar com atraso';P.s='Prazo encerrado em '+p1+' · envio de atraso até '+fim;P.fimAt=fim;P.pz0=p1}else{P.st='bl';P.kind='closed';P.l='Prazo encerrado';delete P.cta;P.s='Prazo encerrado em '+p1+' · procure a coordenação'}},novaEntrega:function(n,prazo,vale){var P=PROPS[(ESSAYS[n-1]||{o:n-1}).o];if(!P||P.kind==='corr')return;P.st='ab';P.kind='open';P.l='Nova oportunidade de entrega';P.cta='Enviar redação';P.s='Prazo '+prazo+' · aberto pela coordenação';P.novaEnt=prazo;P.vale=!!vale},setAtraso:function(n,d){var P=PROPS[(ESSAYS[n-1]||{o:n-1}).o];if(P){P.decAtraso=d;P.semNota=d==='rec'}},setNiv:function(k,niv){PROPS[k].niv=niv.slice()},setAberta:function(n,ab,prazo){var P=PROPS[(ESSAYS[n-1]||{o:n-1}).o];if(!P||P.kind==='corr'||P.kind==='warned')return;if(ab){P.st='ab';P.kind='open';P.l='Aberta para envio';P.cta='Enviar redação';P.s='Prazo '+prazo}else{P.st='at';P.kind='late';P.l='Atrasada · ainda dá para enviar';P.cta='Enviar com atraso';P.s='Prazo encerrado em '+prazo}}};
-var QTD_BOL=ESSAYS.length*2;window.__aluno={PROPS:PROPS,ESSAYS:ESSAYS,recalc:function(){QTD_BOL=ESSAYS.length*2},setBim:function(b){BATU=b;BSEL=b;GB=b},BIMS:BIMS,BFIM:BFIM,BINI:BINI}; // redações do bimestre: 3 na 1ª versão e 3 na reescrita, cada uma vale 10
+var QTD_BOL=ESSAYS.length*2;window.__aluno={PROPS:PROPS,ESSAYS:ESSAYS,verCorrecao:function(k){verCorrecao(k)},lista:function(){lista()},recalc:function(){QTD_BOL=ESSAYS.length*2},setBim:function(b){BATU=b;BSEL=b;GB=b},BIMS:BIMS,BFIM:BFIM,BINI:BINI}; // redações do bimestre: 3 na 1ª versão e 3 na reescrita, cada uma vale 10
 function notaDe(p){return p&&p.kind==='corr'&&p.niv?p.niv.reduce(function(a,b){return a+b},0)*.5:null}
 /* ===== Boletim: critérios ao longo do ano (todas as produções contam, inclusive as zeradas) ===== */
 var CCOL=['#3c7678','#1a4888','#6a3a8a','#b07a10','#2f855a'],GB=3,GC=-1;
@@ -3790,7 +3812,121 @@ $('alMx').onclick=function(){$('alMdl').classList.remove('on')};
 $('alMdl').addEventListener('click',function(e){if(e.target===$('alMdl'))$('alMdl').classList.remove('on')});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')$('alMdl').classList.remove('on')});
 $('alSair').onclick=function(){document.body.classList.remove('in-aluno');if(window.resetLogin)window.resetLogin();};
-window.abreAluno=function(){document.body.classList.add('in-aluno');lista();window.scrollTo(0,0);$('al').scrollTop=0;};
+
+/* ===== Primeira tela do aluno: parabéns / apoio / aviso, com os cartões da análise (deslizar para cima) e o menu (para o lado) ===== */
+var AI={i:0,sl:[],k:-1,novas:[],vistos:[],busy:0};
+var AI_CORTE=6;
+var AI_DICA=['Capriche na apresentação: parágrafos com recuo e margens respeitadas.','Leia o texto em voz alta e confira acentos e pontuação.','Organize o texto em 3 partes: começo, meio e fim.','Releia a proposta e confira se o texto tem todos os elementos do gênero.','Desenvolva cada ideia com um exemplo ou um argumento.'];
+var AI_FRASE=['Apresentação excelente','Quase lá','Em desenvolvimento','Precisa de atenção','Ainda não atende'];
+var AI_CATC={ra:0,mr:0,ma:0,pc:0,pe:0,pd:0,ac:1,pt:1,or:1,ss:1,cj:1,cn:1,rg:1,cr:1,ol:1,pr:1,tr:1,il:1,vi:1,mi:1,rp:2,ce:2,ca:2,ele:3,eli:3,lac:4};
+var AI_CATN={ac:'Acentuação',pt:'Pontuação',or:'Ortografia',ss:'Translineação',cj:'Conjugação',cn:'Concordância',rg:'Regência',cr:'Crase',ol:'Oralidade',pr:'Precisão',tr:'Truncamento',il:'Ilegibilidade',vi:'Vírgula',mi:'Maiúscula',rp:'Repetição',ce:'Conectivo errado',ca:'Falta conectivo',ra:'Rasura',mr:'Linha curta',ma:'Passou da margem',pc:'Parágrafo curto',pe:'Parágrafo longo',pd:'Parágrafo desalinhado',ele:'Elemento ausente',eli:'Elemento insuficiente',lac:'Lacuna'};
+function aiEsc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function aiNome(){var n=($('alNm').textContent||'').split('·')[0].trim().split(/\s+/)[0];return n||'aluno'}
+function aiF1(n){return String(Number(n).toFixed(1)).replace('.',',')}
+function aiLinhas(a){a=a.slice().sort(function(x,y){return x-y});return (a.length>1?'linhas ':'linha ')+(a.length<2?a[0]:a.slice(0,-1).join(', ')+' e '+a[a.length-1])}
+function aiTom(P){return P.anul?'anul':P.nota>=9?'alta':P.nota>=AI_CORTE?'meio':'baixa'}
+function aiResumo(t,n){var f=String(t||'').replace(/\s+/g,' ').trim().match(/[^.!?]+[.!?]+/g)||[];return f.slice(0,n).join(' ').trim()||String(t||'').slice(0,160)}
+function aiDegraus(n,w){return '<div class="ai-stp'+(w?' w':'')+'">'+[1,2,3,4].map(function(q){return '<i class="'+(q<=n?'f':'')+'"></i>'}).join('')+'</div>'}
+function aiBtn(cls,txt,act){return '<button type="button" class="ai-btn '+cls+'" data-ai="'+act+'">'+txt+'</button>'}
+function aiNovas(){return PROPS.map(function(q,k){return {P:q,k:k}}).filter(function(x){return x.P.kind==='corr'&&x.P.vista===false})}
+function aiCons(){return PROPS.map(function(q,k){return {P:q,k:k}}).filter(function(x){return x.P.kind==='corr'})}
+function aiSlides(k){
+ var P=PROPS[k],tom=aiTom(P),nm=aiNome(),S=[],rot=P.t.split(' · ')[0]+' ('+P.t.split(' · ')[1]+')',rees=PROPS.filter(function(q){return q._pid===P._pid&&q._v===2&&q.kind==='open'})[0];
+ var prev=aiCons().filter(function(x){return x.k!==k&&x.P.nota!=null})[0],dif=prev?P.nota-prev.P.nota:null;
+ var s0;
+ if(tom==='anul'){var mot=(window.__arena&&__arena.MOT&&__arena.MOT[P.anul]&&__arena.MOT[P.anul].l)||P.anul;
+  s0={c:'acr',h:'<div class="ai-tg d">Aviso</div><div class="ai-h1">Sua redação não pôde ser corrigida.</div><div class="ai-mot"><b>Motivo</b>'+aiEsc(mot)+'</div><p class="ai-p d">Você pode enviar de novo. Se tiver dúvida, converse com o professor.</p>'+(rees?aiBtn('t','Enviar de novo','enviar'):'')+aiBtn('o','Pedir uma conversa','plantao')+'<p class="ai-mini">Agende um horário para ser atendido no plantão de redação.</p>'};
+  S.push(s0);return S}
+ if(tom==='alta')s0={c:'ag',h:'<div class="ai-tg">Novidade</div><div class="ai-h1">Parabéns, '+aiEsc(nm)+'!</div><p class="ai-p">Sua redação da '+aiEsc(rot)+' voltou da correção.</p><div class="ai-big">'+aiF1(P.nota)+'<small>/10</small></div>'+(dif!=null&&dif>0.04?'<span class="ai-chip">▲ +'+aiF1(dif)+' desde a última</span>':'')};
+ else if(tom==='meio'){var fo=P.niv.indexOf(Math.max.apply(null,P.niv));s0={c:'ag',h:'<div class="ai-tg">Novidade</div><div class="ai-h1">Sua redação voltou, '+aiEsc(nm)+'!</div><p class="ai-p">Você foi bem em <b>'+CRIT[fo]+'</b>. Veja o que dá para melhorar na próxima.</p><div class="ai-big">'+aiF1(P.nota)+'<small>/10</small></div>'+(dif!=null&&dif>0.04?'<span class="ai-chip">▲ +'+aiF1(dif)+' desde a última</span>':'')}}
+ else s0={c:'ag',h:'<div class="ai-tg">Novidade</div><div class="ai-h1">Sua redação voltou, '+aiEsc(nm)+'.</div><p class="ai-p">Vamos olhar juntos o que dá para melhorar.'+(rees?' Você pode reescrever'+(rees.p2?' até '+aiEsc(rees.p2):'')+'.':'')+'</p><div class="ai-nb" data-ai="nota"><span>Sua nota</span><b id="aiNotaB">Toque para ver</b></div>'+aiBtn('w','Ver minha correção','correcao')+aiBtn('gh','Pedir uma conversa','plantao')};
+ s0.nota=1;S.push(s0);
+ // critérios
+ var ord=P.niv.map(function(n,j){return [n,j]});
+ if(tom==='baixa'){
+  var fortes=ord.slice().sort(function(a,b){return b[0]-a[0]||a[1]-b[1]}).slice(0,2),fraco=ord.slice().sort(function(a,b){return a[0]-b[0]||a[1]-b[1]})[0];
+  S.push({c:'acr',h:'<div class="ai-tg d">O que você já faz bem</div>'+fortes.map(function(x){return '<div class="ai-fc"><b>'+CRIT[x[1]]+'<em>'+x[0]+'/4</em></b><span>'+aiEsc(aiResumo(P.obsCrit&&P.obsCrit[x[1]],1)||AI_FRASE[4-x[0]])+'</span></div>'}).join('')+'<div class="ai-step"><small>Seu primeiro passo</small><p>'+aiEsc(AI_DICA[fraco[1]])+'</p></div>'});
+ } else {
+  S.push({c:'acr',h:'<div class="ai-tg d">Seus 5 critérios</div>'+ord.map(function(x){var n=x[0],j=x[1];return '<div class="ai-crt"><b>'+CRIT[j]+'<em>'+n+'/4</em></b>'+aiDegraus(n,n<=2)+'<span>'+aiEsc(aiResumo(P.obsCrit&&P.obsCrit[j],1)||AI_FRASE[4-n]||'')+'</span></div>'}).join('')});
+  // um ponto por vez: os critérios abaixo de 4, do mais fraco ao mais forte (até 2)
+  ord.filter(function(x){return x[0]<4}).sort(function(a,b){return a[0]-b[0]||a[1]-b[1]}).slice(0,2).forEach(function(x){var n=x[0],j=x[1],ls={};(P.circ||[]).forEach(function(c){if(AI_CATC[c.c]===j){(ls[c.c]=ls[c.c]||[]).push(c.l)}});
+   var ch=Object.keys(ls).map(function(c){var a=ls[c].filter(function(l,q,A){return A.indexOf(l)===q});return '<span class="ai-chip d">'+AI_CATN[c]+' · '+aiLinhas(a)+'</span>'}).join('');
+   S.push({c:'ag',h:'<div class="ai-tg">'+CRIT[j]+'</div><div class="ai-big m">'+n+'<small>/4</small></div><div class="ai-h2">'+aiEsc(aiResumo(P.obsCrit&&P.obsCrit[j],2)||AI_FRASE[4-n])+'</div><div class="ai-ch">'+ch+'</div>'})});
+ }
+ // palavras para treinar
+ var pal=[],vis={};
+ (P.circ||[]).forEach(function(c){if(!c.w)return;var key=c.c+'|'+String(c.w).toLowerCase();if(vis[key])return;vis[key]=1;
+  if(c.c==='or')pal.push({k:'Grafia',a:'<b class="ok">'+aiEsc(c.w)+'</b>',b:'Essa é a grafia certa.'});
+  else if(c.c==='pr')pal.push({k:'Palavra vaga',a:'<b>'+aiEsc(c.w)+'</b>',b:(c.s&&c.s.length?'Troque por: <u>'+c.s.map(aiEsc).join(' · ')+'</u>':'Procure uma palavra mais precisa.')});
+  else if(c.c==='rp')pal.push({k:'Repetida',a:'<b>'+aiEsc(c.w)+'</b>',b:(c.s&&c.s.length?'Que tal: <u>'+c.s.map(aiEsc).join(' · ')+'</u>':'Use sinônimos ou um pronome.')})});
+ if(pal.length)S.push({c:'awh',h:'<div class="ai-tg d">Palavras para treinar</div>'+pal.slice(0,4).map(function(w){return '<div class="ai-wd"><small>'+w.k+'</small>'+w.a+'<span>'+w.b+'</span></div>'}).join('')});
+ S.push({c:'ag',h:'<div class="ai-tg">Pronto</div><div class="ai-h1" style="font-size:34px">Quer ver a correção completa?</div><p class="ai-p">Com a foto da sua redação, as marcações e todos os comentários.</p>'+aiBtn('w','Ver a correção completa','correcao')+aiBtn('gh','Ir para o menu','menu')});
+ return S}
+function aiSlidesSem(){
+ var ab=PROPS.map(function(q,k){return {P:q,k:k}}).filter(function(x){return x.P.kind==='open'||x.P.kind==='late'})[0],nm=aiNome(),S=[];
+ if(ab){var P=ab.P,rot=P.t.split(' · ');var dias='';var mm=/(\d{2})\/(\d{2})/.exec(String(P.s||''));if(mm){var d=new Date(new Date().getFullYear(),+mm[2]-1,+mm[1]),n=Math.round((d-new Date(new Date().toDateString()))/864e5);dias=n>=0?'· faltam '+n+' dia'+(n===1?'':'s'):'· prazo encerrado'}
+  S.push({c:'acr',h:'<div class="ai-tg d">Olá, '+aiEsc(nm)+'</div><div class="ai-h1">'+(P.kind==='late'?'Ainda dá para enviar':'Próxima redação')+'</div><div class="ai-fc"><b>'+aiEsc(rot[0])+(rot[1]?' · '+aiEsc(rot[1]):'')+'</b><span>'+aiEsc(P.s||'')+' '+dias+'</span></div>'+aiBtn('t',P.kind==='late'?'Enviar com atraso':'Enviar redação','enviar')+'<p class="ai-mini">Leia a proposta antes de escrever e confira a lista antes de enviar.</p>',k:ab.k});return S}
+ var cs=aiCons();
+ if(!cs.length){S.push({c:'acr',h:'<div class="ai-tg d">Primeiro acesso</div><div class="ai-h1">Bem-vindo, '+aiEsc(nm)+'!</div><p class="ai-p d">Quando sua primeira redação voltar da correção, ela aparece aqui. Até lá, você pode conhecer os critérios.</p>'+aiBtn('t','Conhecer os critérios','criterios')});return S}
+ return []}
+function aiMultiplas(novas){
+ return [{c:'ag',h:'<div class="ai-tg">Novidade</div><div class="ai-h1" style="font-size:36px">'+novas.length+' redações voltaram!</div><p class="ai-p">Escolha por onde começar.</p>'+novas.map(function(x){return '<button type="button" class="ai-btn gh" data-ai="ver" data-k="'+x.k+'">'+aiEsc(x.P.t.split(' · ').slice(0,2).join(' · '))+'</button>'}).join('')}]}
+function aiDesenha(){
+ var el=$('alIntro');if(!el)return;var S=AI.sl,i=AI.i,c=S[i];if(!c)return;
+ var st='<div class="ai-bars">'+S.map(function(_,q){return '<i class="'+(q<=i?'on':'')+'"></i>'}).join('')+'</div>';
+ el.innerHTML='<div class="ai-wrap">'+st+'<button type="button" class="ai-skip" data-ai="menu">Pular ›</button><div class="ai-card '+c.c+'" id="aiCard">'+c.h+'</div><button type="button" class="ai-peek" data-ai="menu" aria-label="Ir para o menu principal"></button>'+(i<S.length-1?'<button type="button" class="ai-hint" data-ai="prox"><span>⌃</span>DESLIZE PARA CONTINUAR</button>':'')+'</div><div class="ai-sheet hide" id="aiSheet"></div>';
+}
+function aiAbre(force){
+ if(!window.__real||!window.ARENA)return;
+ var novas=aiNovas(),sl=[];
+ AI.novas=novas;AI.k=-1;
+ if(force){var cs=aiCons();if(cs.length){var u=cs[cs.length-1];AI.k=u.k;sl=aiSlides(u.k)}}
+ else if(novas.length>1){sl=aiMultiplas(novas)}
+ else if(novas.length===1){AI.k=novas[0].k;sl=aiSlides(novas[0].k)}
+ else sl=aiSlidesSem();
+ if(!sl.length)return;
+ AI.sl=sl;AI.i=0;
+ var el=$('alIntro');if(!el){el=document.createElement('div');el.id='alIntro';el.className='ai';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-label','Novidades da sua redação');$('al').appendChild(el)}
+ el.classList.remove('hide');document.body.classList.add('ai-on');aiDesenha();
+}
+function aiFecha(dest,k){
+ var el=$('alIntro'),rids=AI.novas.map(function(x){return x.P.rid}).filter(Boolean);
+ if(el)el.classList.add('hide');document.body.classList.remove('ai-on');
+ if(rids.length&&window.ARENA&&ARENA.marcarVista){ARENA.marcarVista(rids);AI.novas.forEach(function(x){x.P.vista=true});AI.novas=[]}
+ if(dest==='correcao'&&k>=0){verCorrecao(k)}
+ else if(dest==='criterios'){var b=document.querySelector('[data-al="crit"]');if(b)b.click()}
+ else if(dest==='enviar'&&k>=0){var q=document.querySelector('#alMain [data-k="'+k+'"]');if(q)q.click()}
+}
+function aiIr(d){var n=AI.i+d;if(n<0||n>=AI.sl.length)return;AI.i=n;aiDesenha()}
+function aiPlantao(){
+ var sh=$('aiSheet');if(!sh)return;var P=PROPS[AI.k]||{};
+ sh.classList.remove('hide');
+ sh.innerHTML='<div class="ai-sh"><div class="hd"></div><h3>Plantão de redação</h3><p>Agende um horário para ser atendido no plantão de redação. A coordenação vai combinar o horário com você.</p><textarea id="aiPlT" rows="3" maxlength="300" placeholder="Quer contar o assunto? (opcional)"></textarea><button type="button" class="ai-btn t" data-ai="plenv">Pedir horário</button><button type="button" class="ai-btn o" data-ai="plfecha">Agora não</button></div>';
+}
+function aiPlEnvia(){
+ var P=PROPS[AI.k]||{},t=($('aiPlT')||{}).value||'',sh=$('aiSheet');
+ var b=sh.querySelector('[data-ai="plenv"]');if(b){b.disabled=true;b.textContent='Enviando…'}
+ ARENA.pedirPlantao(P,t.trim()).then(function(ok){sh.innerHTML='<div class="ai-sh"><div class="hd"></div><h3>'+(ok?'Pedido enviado!':'Não deu certo')+'</h3><p>'+(ok?'A coordenação vai combinar o horário do plantão com você.':'Confira a internet e tente de novo.')+'</p><button type="button" class="ai-btn t" data-ai="plfecha">Ok</button></div>'});
+}
+(function(){
+ var root=$('al'),sy=0,sx=0,t0=0,lastW=0;
+ root.addEventListener('click',function(e){var b=e.target.closest('#alIntro [data-ai]');if(!b)return;var a=b.dataset.ai;
+  if(a==='prox')aiIr(1);else if(a==='menu')aiFecha('menu');
+  else if(a==='correcao')aiFecha('correcao',AI.k);else if(a==='enviar'){var k=(AI.sl[AI.i]&&AI.sl[AI.i].k!=null)?AI.sl[AI.i].k:AI.k;aiFecha('enviar',k)}
+  else if(a==='criterios')aiFecha('criterios');
+  else if(a==='nota'){var n=$('aiNotaB'),P=PROPS[AI.k];if(n&&P){n.textContent=aiF1(P.nota)+' / 10';n.classList.add('on')}}
+  else if(a==='ver'){var k2=+b.dataset.k;AI.k=k2;AI.sl=aiSlides(k2);AI.i=0;aiDesenha()}
+  else if(a==='plantao')aiPlantao();else if(a==='plenv')aiPlEnvia();else if(a==='plfecha'){var sh=$('aiSheet');if(sh)sh.classList.add('hide')}
+ });
+ root.addEventListener('pointerdown',function(e){if(!e.target.closest('#alIntro .ai-card'))return;sy=e.clientY;sx=e.clientX;t0=Date.now()});
+ root.addEventListener('pointerup',function(e){if(!sy||!$('alIntro')||$('alIntro').classList.contains('hide'))return;var dy=sy-e.clientY,dx=sx-e.clientX;sy=0;
+  if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.4&&dx>0){aiFecha('menu');return}
+  if(Math.abs(dy)>50&&Math.abs(dy)>Math.abs(dx)){aiIr(dy>0?1:-1)}});
+ root.addEventListener('wheel',function(e){var el=$('alIntro');if(!el||el.classList.contains('hide'))return;e.preventDefault();var n=Date.now();if(n-lastW<650)return;if(Math.abs(e.deltaY)>25){lastW=n;aiIr(e.deltaY>0?1:-1)}},{passive:false});
+ document.addEventListener('keydown',function(e){var el=$('alIntro');if(!el||el.classList.contains('hide'))return;var tg=(e.target&&e.target.tagName)||'';if(tg==='TEXTAREA'||tg==='INPUT')return;
+  if(e.key==='ArrowDown'||e.key==='PageDown'){e.preventDefault();aiIr(1)}else if(e.key==='ArrowUp'||e.key==='PageUp'){e.preventDefault();aiIr(-1)}else if(e.key==='ArrowRight'||e.key==='Escape'){e.preventDefault();aiFecha('menu')}});
+})();
+window.abreAluno=function(){document.body.classList.add('in-aluno');lista();window.scrollTo(0,0);$('al').scrollTop=0;aiAbre(false);var rb=$('aiReabre');if(!rb){rb=document.createElement('button');rb.id='aiReabre';rb.type='button';rb.className='ai-reabre';rb.setAttribute('aria-label','Voltar ao início');rb.textContent='Início';rb.onclick=function(){aiAbre(true)};$('al').appendChild(rb)}};
 })();
 
 </script>

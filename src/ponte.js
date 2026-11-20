@@ -279,7 +279,7 @@ const ARENA = {
     if (e0 || !al) throw e0 || new Error('Cadastro de aluno não vinculado')
     ARENA.aluno = al
     const { data: props } = await supabase.from('propostas').select('*').order('bimestre').order('id')
-    const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao), marcacoes(dados)').eq('aluno_id', al.id)
+    const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao,vista_em), marcacoes(dados)').eq('aluno_id', al.id)
     const { data: prazosInd } = await supabase.from('prazos_individuais').select('proposta_id, ate, vale_nota').eq('aluno_id', al.id)
     window.__real = true
     const turma = al.turmas ? `${al.turmas.serie}º ano ${al.turmas.nome}` : ''
@@ -326,7 +326,7 @@ const ARENA = {
       const orig = reds.find((r) => r.proposta_id === p.id && r.versao === 1)
       const re = reds.find((r) => r.proposta_id === p.id && r.versao === 2)
       const item = async (r, versao) => {
-        const base = { _pid: p.id, _v: versao }
+        const base = { _pid: p.id, _v: versao, p2: p.prazo2 ? `${p.prazo2.slice(8, 10)}/${p.prazo2.slice(5, 7)}` : '' }
         const rot = versao === 1 ? `Proposta ${num} · ${p.genero}` : `2ª versão (reescrita) · Proposta ${num}`
         const g = versao === 1 ? 'o' : 'r'
         const prazo = p.prazo ? `${p.prazo.slice(8, 10)}/${p.prazo.slice(5, 7)}` : ''
@@ -351,13 +351,14 @@ const ARENA = {
         }
         const fotoUrl = urlsAluno[r.foto_path] ?? null
         const marks = (r.marcacoes ?? []).map((m) => m.dados)
-        const circ = marks.filter((m) => m.t === 'o' && m.line).map((m) => ({ l: m.line, x: Math.round(m.cx), c: m.cat, ...(m.pal ? { w: m.pal } : {}), ...(m.sin?.length ? { s: m.sin } : {}) }))
+        const circ = marks.filter((m) => m.t === 'o' && m.line).map((m) => ({ l: m.line, x: Math.round(m.cx), c: m.cat, ...((m.pal || m.cor) ? { w: m.pal || m.cor } : {}), ...(m.sin?.length ? { s: m.sin } : {}) }))
         const cmts = marks.filter((m) => m.t === 'c').map((m) => ({ l: m.line, x: Math.round(m.x ?? 176), j: m.j ?? m.crit ?? 1, t: m.txt ?? '' }))
         const dd = (c.liberada_em ?? r.enviada_em).slice(0, 10)
         return {
           ...base, g, t: rot, s: `Entregue em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)} · corrigida`, st: 'ok',
           l: `Corrigida · nota ${novaNota(c.anulacao ? 0 : c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: c.anulacao ? [0, 0, 0, 0, 0] : [c.n1, c.n2, c.n3, c.n4, c.n5],
           circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario),
+          nota: c.anulacao ? 0 : Number(c.nota), anul: c.anulacao || null, rid: r.id, vista: !!c.vista_em, liberadaEm: c.liberada_em ?? r.enviada_em,
         }
       }
       const io = PROPS.length
@@ -378,6 +379,26 @@ const ARENA = {
   },
 
   // Envia a foto da redação (data URL escolhida no celular/computador) e cria o registro.
+  // O aluno viu a correção (a primeira tela só comemora uma vez).
+  async marcarVista(rids) {
+    try {
+      for (const id of rids ?? []) await supabase.rpc('aluno_marca_vista', { p_redacao: id })
+    } catch { /* sem efeito para o aluno */ }
+  },
+
+  // "Pedir uma conversa": cria um pedido de plantão de redação (tabela plantoes); a coordenação combina o horário.
+  async pedirPlantao(P, texto) {
+    try {
+      if (!ARENA.aluno) return false
+      const { error } = await supabase.from('plantoes').insert({
+        aluno_id: ARENA.aluno.id, proposta_id: P?._pid ?? null, texto: texto || null,
+      })
+      return !error
+    } catch {
+      return false
+    }
+  },
+
   // Sugestões de sinônimos para a palavra digitada. Devolve [{ glosa, sin: [palavra,...] }], um item por sentido
   // (Houaiss primeiro; o dicionário antigo entra como complemento). Vazio se não achar.
   async sinonimos(palavra) {
