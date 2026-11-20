@@ -21,7 +21,7 @@ const ok = (c, m) => { console.log(c ? 'ok   ' : 'FALHA', m); if (!c) falhas++ }
 
   // corretor
   let p = await pagina(b)
-  await p.fill('#email', 'corretor@arena.com'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
+  await p.click('.p[data-k=corretor]'); await p.fill('#email', 'corretor@arena.com'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
   await p.waitForSelector('#phCards', { timeout: 20000 })
   ok(await p.textContent('#phOla') === 'Olá, Corretor', 'corretor: saudação com o nome real')
   ok(p.erros.length === 0, 'corretor: sem erros de página ' + p.erros.join('|'))
@@ -51,7 +51,7 @@ const ok = (c, m) => { console.log(c ? 'ok   ' : 'FALHA', m); if (!c) falhas++ }
 
   // credenciais erradas e perfil errado
   p = await pagina(b)
-  await p.fill('#email', 'corretor@arena.com'); await p.fill('#pwd', 'errada'); await p.click('#entrar'); await p.waitForTimeout(2500)
+  await p.click('.p[data-k=corretor]'); await p.fill('#email', 'corretor@arena.com'); await p.fill('#pwd', 'errada'); await p.click('#entrar'); await p.waitForTimeout(2500)
   ok((await p.textContent('#alerts')).includes('incorreta'), 'login: senha errada é recusada')
 
   await b.close()

@@ -11,13 +11,13 @@ const ok = (c, m) => { console.log(c ? 'ok   ' : 'FALHA', m); if (!c) falhas++ }
   const nova = async () => { const p = await (await b.newContext({ viewport: { width: 1366, height: 850 }, ignoreHTTPSErrors: true })).newPage(); await p.goto(URL); await p.waitForTimeout(500); return p }
 
   let p = await nova()
-  await p.fill('#email', 'teste'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
+  await p.click('.p[data-k=corretor]'); await p.fill('#email', 'teste'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
   await p.waitForSelector('#phCards', { timeout: 20000 }).catch(() => {})
   ok(await p.evaluate(() => document.body.classList.contains('in-portal')), 'corretor: teste / teste')
 
   p = await nova()
   await p.click('.p[data-k=aluno]'); await p.fill('#mat', 'teste'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
-  await p.waitForSelector('#alMain .bimq', { timeout: 20000 }); if (await p.locator('#alIntro:not(.hide)').count()) { await p.keyboard.press('ArrowRight'); await p.waitForTimeout(400) }.catch(() => {})
+  await p.waitForSelector('#alMain .bimq', { timeout: 20000 })
   ok(await p.evaluate(() => document.body.classList.contains('in-aluno')), 'aluno: teste / teste')
 
   p = await nova()

@@ -35,7 +35,7 @@ async function clicaTodos(p, seletor, onde, sel) {
 
   // corretor
   let p = await nova(b, 'corretor')
-  await p.fill('#email', 'teste'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
+  await p.click('.p[data-k=corretor]'); await p.fill('#email', 'teste'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
   await p.waitForSelector('#phCards', { timeout: 20000 }); await p.waitForTimeout(800)
   await confere(p, 'home', 'body')
   for (const aba of ['ab', 'co']) { await p.locator(`[data-pt="${aba}"]`).click().catch(() => {}); await p.waitForTimeout(300); await confere(p, 'pacotes ' + aba, '#portal') }
