@@ -280,6 +280,7 @@ const ARENA = {
     ARENA.aluno = al
     const { data: props } = await supabase.from('propostas').select('*').order('bimestre').order('id')
     const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao,vista_em), marcacoes(dados)').eq('aluno_id', al.id)
+    const { data: avs } = await supabase.from('avaliacoes_correcao').select('redacao_id, estrelas').eq('aluno_id', al.id)
     const { data: gens } = await supabase.from('generos').select('*')
     const genDe = (nome) => (gens ?? []).find((g) => g.nome === nome)
     const { data: prazosInd } = await supabase.from('prazos_individuais').select('proposta_id, ate, vale_nota').eq('aluno_id', al.id)
@@ -361,7 +362,7 @@ const ARENA = {
           ...base, g, t: rot, s: `Entregue em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)} · corrigida`, st: 'ok',
           l: `Corrigida · nota ${novaNota(c.anulacao ? 0 : c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: c.anulacao ? [0, 0, 0, 0, 0] : [c.n1, c.n2, c.n3, c.n4, c.n5],
           circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario),
-          nota: c.anulacao ? 0 : Number(c.nota), anul: c.anulacao || null, rid: r.id, vista: !!c.vista_em, liberadaEm: c.liberada_em ?? r.enviada_em,
+          nota: c.anulacao ? 0 : Number(c.nota), anul: c.anulacao || null, rid: r.id, vista: !!c.vista_em, aval: (avs ?? []).find((x) => x.redacao_id === r.id)?.estrelas ?? null, liberadaEm: c.liberada_em ?? r.enviada_em,
         }
       }
       const io = PROPS.length
@@ -382,6 +383,62 @@ const ARENA = {
   },
 
   // Envia a foto da redação (data URL escolhida no celular/computador) e cria o registro.
+  // Estrelas (1 a 3) e comentário do aluno sobre a correção.
+  async avaliar(P, { estrelas, ajudou, comentario }) {
+    try {
+      if (!ARENA.aluno || !P?.rid) return false
+      const { error } = await supabase.from('avaliacoes_correcao').insert({
+        redacao_id: P.rid, aluno_id: ARENA.aluno.id, estrelas, ajudou: ajudou ?? [], comentario: (comentario || '').trim() || null,
+      })
+      if (!error) P.aval = estrelas
+      return !error
+    } catch {
+      return false
+    }
+  },
+
+  // Anotação privada do aluno sobre uma correção (só ele lê).
+  async anotacao(P, texto) {
+    try {
+      if (!ARENA.aluno || !P?.rid) return texto === undefined ? '' : false
+      if (texto === undefined) {
+        const { data } = await supabase.from('anotacoes_aluno').select('texto').eq('aluno_id', ARENA.aluno.id).eq('redacao_id', P.rid).maybeSingle()
+        return data?.texto ?? ''
+      }
+      const { error } = await supabase.from('anotacoes_aluno').upsert({ aluno_id: ARENA.aluno.id, redacao_id: P.rid, texto, atualizada_em: new Date().toISOString() }, { onConflict: 'aluno_id,redacao_id' })
+      return !error
+    } catch {
+      return false
+    }
+  },
+
+  // Opinião dos alunos e pedidos de plantão (coordenação e professor; o banco filtra o que cada um pode ver).
+  async carregarOpinioes() {
+    const [av, pl] = await Promise.all([
+      supabase.from('avaliacoes_correcao').select('id, estrelas, ajudou, comentario, oculto, criado_em, redacao_id, redacoes(corretor_id, propostas(numero, bimestre), alunos(turmas(serie, nome))), alunos(id)').order('criado_em', { ascending: false }).limit(2000),
+      supabase.from('plantoes').select('id, texto, status, horario, criado_em, alunos(nome, turmas(serie, nome)), propostas(numero)').order('criado_em', { ascending: false }).limit(500),
+    ])
+    if (av.error) throw av.error
+    const cor = Object.fromEntries((ARENA._coord?.perf ?? []).map((x) => [x.id, x.nome]))
+    return {
+      avals: (av.data ?? []).map((a) => ({
+        id: a.id, e: a.estrelas, aj: a.ajudou ?? [], c: a.comentario || '', oculto: a.oculto, em: a.criado_em,
+        turma: a.redacoes?.alunos?.turmas ? `${a.redacoes.alunos.turmas.serie}º ${a.redacoes.alunos.turmas.nome}` : '', serie: Number(a.redacoes?.alunos?.turmas?.serie),
+        prop: a.redacoes?.propostas?.numero ?? null, cid: a.redacoes?.corretor_id ?? null, corretor: cor[a.redacoes?.corretor_id] ?? '',
+      })),
+      plant: pl.error ? [] : (pl.data ?? []).map((x) => ({
+        id: x.id, t: x.texto || '', st: x.status, h: x.horario || '', em: x.criado_em,
+        aluno: x.alunos?.nome ?? '', turma: x.alunos?.turmas ? `${x.alunos.turmas.serie}º ${x.alunos.turmas.nome}` : '', prop: x.propostas?.numero ?? null,
+      })),
+    }
+  },
+  async ocultarAvaliacao(id, oculto) {
+    return !(await supabase.from('avaliacoes_correcao').update({ oculto }).eq('id', id)).error
+  },
+  async tratarPlantao(id, status, horario) {
+    return !(await supabase.from('plantoes').update({ status, horario: horario || null, tratado_por: ARENA.perfil?.id ?? null, tratado_em: new Date().toISOString() }).eq('id', id)).error
+  },
+
   // O aluno viu a correção (a primeira tela só comemora uma vez).
   async marcarVista(rids) {
     try {
