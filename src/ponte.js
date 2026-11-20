@@ -444,6 +444,29 @@ const ARENA = {
     }
   },
 
+  // ===== Análise (professor e coordenação): só correções liberadas; o banco já limita ao que cada perfil pode ver =====
+  async carregarAnalise(forcar) {
+    if (!forcar && ARENA._analise && Date.now() - ARENA._analise.em < 120000) return ARENA._analise.linhas
+    const { data, error } = await supabase
+      .from('redacoes')
+      .select('id, versao, alunos(turmas(serie, nome)), propostas(bimestre, numero), correcoes!inner(n1,n2,n3,n4,n5,anulacao,liberada), marcacoes(categoria, pal:dados->>pal, cor:dados->>cor)')
+      .eq('correcoes.liberada', true)
+      .limit(5000)
+    if (error) throw error
+    const linhas = []
+    for (const r of data ?? []) {
+      const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes
+      if (!c || c.anulacao || [c.n1, c.n2, c.n3, c.n4, c.n5].some((x) => x == null)) continue
+      linhas.push({
+        id: r.id, ver: r.versao, serie: Number(r.alunos?.turmas?.serie), turma: r.alunos?.turmas?.nome ?? '',
+        bim: r.propostas?.bimestre ?? null, niv: [c.n1, c.n2, c.n3, c.n4, c.n5],
+        marcas: (r.marcacoes ?? []).filter((m) => m.categoria).map((m) => ({ c: m.categoria, p: (m.pal || '').trim().toLowerCase(), o: (m.cor || '').trim().toLowerCase() })),
+      })
+    }
+    ARENA._analise = { em: Date.now(), linhas }
+    return linhas
+  },
+
   // ===== Coordenação / Professor =====
   async carregarCoord() {
     // agrupa em pacotes as redações já vencidas e ainda sem pacote (só a coordenação executa)
