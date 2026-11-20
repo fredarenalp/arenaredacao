@@ -1431,6 +1431,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .row1 .ico,.row2 .ico{font-size:26px;width:26px;height:26px}
 .row2 .p{font-size:14px}
 @media(max-width:640px){.left .lk,.left .ltag,.left .lsheet{display:none}.left{width:100%}}
+
+/* Aluno: o lado do formulário vira folha de caderno */
+.right{position:relative;transition:background-color .2s}
+.right.caderno{background-image:repeating-linear-gradient(transparent 0 33px,rgba(60,118,120,.12) 33px 34px);background-position:0 18px}
+.right.caderno::before{content:"";position:absolute;left:64px;top:0;bottom:0;width:2px;background:rgba(217,128,111,.5);pointer-events:none}
+.right.caderno .form{position:relative}
+@media(max-width:640px){.right.caderno::before{left:14px}}
 </style>
 <!--PONTE--></head>
 <body>
@@ -1677,6 +1684,7 @@ function render(){
  $('row2').innerHTML=SEC.map(function(k){return btn(k)}).join('');$('row2').style.display=SEC.length?'':'none';
  var p=PERFIS[cur],f=$('form').style;
  f.setProperty('--cor',p.c);f.setProperty('--soft',p.s);
+ var rt=document.querySelector('.right');if(rt)rt.classList.toggle('caderno',cur==='aluno');
  $('desc').textContent=p.d;
  $('pwd').placeholder=p.ph;
  $('fMat').classList.toggle('hide',cur!=='aluno');
