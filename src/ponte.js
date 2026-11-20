@@ -435,8 +435,68 @@ const ARENA = {
   async ocultarAvaliacao(id, oculto) {
     return !(await supabase.from('avaliacoes_correcao').update({ oculto }).eq('id', id)).error
   },
+  // Agenda do plantão (coordenação): pedidos + horários já ocupados.
+  async carregarPlantao() {
+    const { data, error } = await supabase.from('plantoes').select('id, texto, status, data, hora, criado_em, alunos(nome, turmas(serie, nome)), propostas(numero)').order('criado_em', { ascending: false }).limit(500)
+    if (error) throw error
+    return (data ?? []).map((x) => ({ id: x.id, t: x.texto || '', st: x.status, data: x.data, hora: x.hora, em: x.criado_em, aluno: x.alunos?.nome ?? '', turma: x.alunos?.turmas ? `${x.alunos.turmas.serie}º ${x.alunos.turmas.nome}` : '', prop: x.propostas?.numero ?? null }))
+  },
+  async agendarPlantao(id, data, hora, rotulo) {
+    const { error } = await supabase.from('plantoes').update({ status: 'agendado', data, hora, horario: rotulo, tratado_por: ARENA.perfil?.id ?? null, tratado_em: new Date().toISOString() }).eq('id', id)
+    return !error
+  },
   async tratarPlantao(id, status, horario) {
     return !(await supabase.from('plantoes').update({ status, horario: horario || null, tratado_por: ARENA.perfil?.id ?? null, tratado_em: new Date().toISOString() }).eq('id', id)).error
+  },
+
+  // ===== Feed e destaques =====
+  // Aluno: convites e destaques próprios, feed da série (sem nomes) e erros da série (agregado).
+  async carregarFeed() {
+    const al = ARENA.aluno
+    const [meus, feed, erros] = await Promise.all([
+      supabase.from('destaques').select('id, tipo, titulo, texto, nota_elogio, status, resposta_em, criado_em').order('criado_em', { ascending: false }),
+      supabase.rpc('feed_destaques'),
+      supabase.rpc('feed_erros_serie'),
+    ])
+    const { data: auth } = await supabase.from('alunos').select('autoriza_destaque').eq('id', al.id).maybeSingle()
+    return { meus: meus.data ?? [], feed: feed.data ?? [], erros: erros.data ?? [], autoriza: !!auth?.autoriza_destaque }
+  },
+  async responderDestaque(id, aceita) {
+    return !(await supabase.rpc('responder_destaque', { p_id: id, p_aceita: aceita })).error
+  },
+  // Coordenação/professor: destaques, alunos (com a autorização da família) e elogios dos corretores.
+  async carregarDestaques() {
+    const [d, a, el] = await Promise.all([
+      supabase.from('destaques').select('id, redacao_id, aluno_id, serie, tipo, titulo, texto, nota_elogio, status, resposta_em, criado_em').order('criado_em', { ascending: false }),
+      supabase.from('alunos').select('id, nome, autoriza_destaque, saiu, turmas(serie, nome)').order('nome'),
+      supabase.from('marcacoes').select('id, redacao_id, dados, redacoes(id, aluno_id, propostas(numero, titulo), correcoes(liberada))').eq('tipo', 'c').contains('dados', { elogio: true }).limit(400),
+    ])
+    if (d.error) throw d.error
+    const alunos = (a.data ?? []).map((x) => ({ id: x.id, nome: x.nome, aut: !!x.autoriza_destaque, saiu: !!x.saiu, serie: x.turmas?.serie ?? '', turma: x.turmas ? `${x.turmas.serie}º ${x.turmas.nome}` : '' }))
+    const porId = Object.fromEntries(alunos.map((x) => [x.id, x]))
+    const elogios = (el.data ?? []).filter((m) => {
+      const c = m.redacoes?.correcoes
+      return (Array.isArray(c) ? c[0] : c)?.liberada && m.dados?.txt
+    }).map((m) => ({ mid: m.id, rid: m.redacao_id, aid: m.redacoes.aluno_id, txt: m.dados.txt, prop: m.redacoes.propostas?.numero ?? null, tema: m.redacoes.propostas?.titulo ?? '' }))
+    return { destaques: (d.data ?? []).map((x) => ({ ...x, aluno: porId[x.aluno_id]?.nome ?? '' })), alunos, elogios }
+  },
+  async redacoesAluno(aid) {
+    const { data } = await supabase.from('redacoes').select('id, versao, propostas(numero, titulo), correcoes(liberada)').eq('aluno_id', aid).order('id')
+    return (data ?? []).filter((r) => (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes)?.liberada)
+      .map((r) => ({ id: r.id, rot: `Proposta ${r.propostas?.numero ?? '?'} · ${r.versao === 2 ? '2ª' : '1ª'} versão${r.propostas?.titulo ? ' — ' + r.propostas.titulo : ''}`, tema: r.propostas?.titulo ?? '' }))
+  },
+  async autorizarAluno(id, aut) {
+    return !(await supabase.from('alunos').update({ autoriza_destaque: aut }).eq('id', id)).error
+  },
+  async salvarDestaque({ redacao_id, aluno_id, serie, tipo, titulo, texto, nota_elogio }) {
+    const { error } = await supabase.from('destaques').insert({ redacao_id, aluno_id, serie: String(serie), tipo, titulo: titulo || null, texto, nota_elogio: nota_elogio || null, criado_por: ARENA.perfil?.id ?? null })
+    return !error
+  },
+  async statusDestaque(id, status) {
+    return !(await supabase.from('destaques').update({ status, resposta_em: new Date().toISOString() }).eq('id', id)).error
+  },
+  async removerDestaque(id) {
+    return !(await supabase.from('destaques').delete().eq('id', id)).error
   },
 
   // O aluno viu a correção (a primeira tela só comemora uma vez).
