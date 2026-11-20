@@ -3919,7 +3919,7 @@ function aiMultiplas(novas){
 function aiDesenha(){
  var el=$('alIntro');if(!el)return;var S=AI.sl,i=AI.i,c=S[i];if(!c)return;
  var st='<div class="ai-bars">'+S.map(function(_,q){return '<i class="'+(q<=i?'on':'')+'"></i>'}).join('')+'</div>';
- el.innerHTML='<div class="ai-wrap">'+st+'<button type="button" class="ai-skip" data-ai="menu">Pular ›</button><div class="ai-card '+c.c+'" id="aiCard">'+c.h+'</div><button type="button" class="ai-peek" data-ai="menu" aria-label="Ir para o menu principal"></button>'+(AI.k>=0&&PROPS[AI.k]&&PROPS[AI.k].prop&&aiTom(PROPS[AI.k])!=='anul'?'<button type="button" class="ai-rail" data-ai="duvida" aria-label="Dúvida: entender o gênero e a proposta"><i>?</i><small>Dúvida</small></button>':'')+(i<S.length-1?'<button type="button" class="ai-hint" data-ai="prox"><span>⌃</span>DESLIZE PARA CONTINUAR</button>':'')+'</div><div class="ai-sheet hide" id="aiSheet"></div>';
+ el.innerHTML='<div class="ai-wrap">'+st+'<button type="button" class="ai-skip" data-ai="menu">Pular ›</button><div class="ai-card '+c.c+'" id="aiCard">'+c.h+'</div><button type="button" class="ai-peek" data-ai="'+(i<S.length-1?'prox':'menu')+'" aria-label="'+(i<S.length-1?'Próxima tela':'Ir para o menu principal')+'"></button>'+(AI.k>=0&&PROPS[AI.k]&&PROPS[AI.k].prop&&aiTom(PROPS[AI.k])!=='anul'?'<button type="button" class="ai-rail" data-ai="duvida" aria-label="Dúvida: entender o gênero e a proposta"><i>?</i><small>Dúvida</small></button>':'')+'</div><div class="ai-sheet hide" id="aiSheet"></div>';
 }
 function aiAbre(force){
  if(!window.__real||!window.ARENA)return;
