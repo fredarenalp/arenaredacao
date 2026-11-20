@@ -453,13 +453,14 @@ const ARENA = {
   // Aluno: convites e destaques próprios, feed da série (sem nomes) e erros da série (agregado).
   async carregarFeed() {
     const al = ARENA.aluno
-    const [meus, feed, erros] = await Promise.all([
+    const [meus, feed, erros, serie] = await Promise.all([
       supabase.from('destaques').select('id, tipo, titulo, texto, nota_elogio, status, resposta_em, criado_em').order('criado_em', { ascending: false }),
       supabase.rpc('feed_destaques'),
       supabase.rpc('feed_erros_serie'),
+      supabase.rpc('feed_serie'),
     ])
     const { data: auth } = await supabase.from('alunos').select('autoriza_destaque').eq('id', al.id).maybeSingle()
-    return { meus: meus.data ?? [], feed: feed.data ?? [], erros: erros.data ?? [], autoriza: !!auth?.autoriza_destaque }
+    return { meus: meus.data ?? [], feed: feed.data ?? [], erros: erros.data ?? [], serie: (serie.data ?? [])[0] ?? null, autoriza: !!auth?.autoriza_destaque }
   },
   async responderDestaque(id, aceita) {
     return !(await supabase.rpc('responder_destaque', { p_id: id, p_aceita: aceita })).error
