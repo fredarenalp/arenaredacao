@@ -1443,13 +1443,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .pc2 .pbtn.vpb,.pc2.feito .pbtn.vpb,.pc2.late .pbtn.vpb,.pc2.zero .pbtn.vpb{background:transparent;color:#2f5f61;border:2px solid #3c7678}
 .pc2 .pbtn.vpb:hover,.pc2.feito .pbtn.vpb:hover,.pc2.late .pbtn.vpb:hover,.pc2.zero .pbtn.vpb:hover{background:#e4eeee;color:#2f5f61}
 
-/* AC · conectivos */
+/* AC · conectivos (opção B) */
 .catp .cnq{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}.catp .cnq button{border:1.5px solid #cfd8d8;background:#fff;border-radius:8px;padding:8px 10px;font:700 12.5px "DM Sans",sans-serif;color:#2f5f61;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:4px}.catp .cnq .cnq2{background:#1f8a8c;color:#fff;border-color:#1f8a8c}.catp .cnq .cnq2 svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4}
-.catps .cnsug{background:#e6f4f4;border:1.5px solid #1f8a8c;border-radius:10px;padding:8px 10px;margin:6px 0 8px}.catps .cnsug small{display:block;color:#2f5f61;font-weight:700;font-size:11px}.catps .cnsug b{display:block;font:800 16px "Outfit","DM Sans",sans-serif;color:#1f6a6c;margin:1px 0 2px}.catps .cnsug span{display:block;font-size:11.5px;color:#55604f;line-height:1.35}
-.catps .cnfn,.catps .cnlist{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0 6px}.catps .cnf{border:1.5px solid #d8d6cc;background:#fff;border-radius:14px;padding:4px 9px;font:600 12px "DM Sans",sans-serif;color:#55604f;cursor:pointer}.catps .cnf.on{border-color:#1f8a8c;background:#e6f4f4;color:#1f6a6c}
-.catps .cnt{border:0;background:#1f8a8c;color:#fff;border-radius:8px;padding:7px 10px;font:700 12.5px "DM Sans",sans-serif;cursor:pointer}.catps .cnt.on{background:#14595b;box-shadow:0 0 0 2px #fff,0 0 0 4px #1f8a8c}.catps .cnmais{border:0;background:none;color:#6a7b7b;font-size:11.5px;text-decoration:underline;cursor:pointer;padding:2px 0 6px}
+.catps .cnsel{position:relative;margin:2px 0 4px}.catps .cnselb{width:100%;border:1.5px solid #3a4443;background:transparent;color:#cfe0e0;border-radius:9px;padding:9px 11px;display:flex;justify-content:space-between;align-items:center;font:500 13.5px "DM Sans",sans-serif;cursor:pointer;text-align:left}.catps .cnselb[aria-expanded="true"]{border-color:#1f8a8c}.catps .cnselb b{color:#fff}.catps .cnselb small{color:#9fd3d4;margin-left:6px;font-size:11.5px}
+.catps .cndd{background:#242a29;border:1px solid #3a4443;border-radius:10px;padding:4px;margin-top:4px}.catps .cndd button{width:100%;border:0;background:none;color:#cfe0e0;display:flex;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:6px;font:500 13.5px "DM Sans",sans-serif;cursor:pointer;text-align:left}.catps .cndd button:hover{background:rgba(255,255,255,.06)}.catps .cndd button.on{background:rgba(31,138,140,.3);color:#fff;font-weight:700}.catps .cndd small{color:#8fa5a5;font-size:12px;white-space:nowrap}
+.catps .cnwhy{font-size:12px;color:#8fa5a5;margin:4px 0 6px}.catps .cnwhy button{background:none;border:0;color:#9fd3d4;text-decoration:underline;cursor:pointer;padding:0;font:inherit}
+.catps .cnlist{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}.catps .cnt{border:0;background:#1f8a8c;color:#fff;border-radius:8px;padding:8px 12px;font:700 13.5px "DM Sans",sans-serif;cursor:pointer}.catps .cnlist.has .cnt:not(.on){background:rgba(255,255,255,.08);color:#cfe0e0;font-weight:600}.catps .cnt.on{background:#14595b;box-shadow:0 0 0 2px #1c1f1e,0 0 0 4px #1f8a8c;color:#fff}.catps .cnmais{border:0;background:none;color:#8fa5a5;font-size:12.5px;text-decoration:underline;cursor:pointer;padding:2px 0 8px}
+.catps .orok:disabled{opacity:.4;cursor:default}
+.catp .cnq .cnq1{background:rgba(255,255,255,.08);border-color:transparent;color:#d6e6e6}
 #catpS.catps{max-height:calc(100vh - 16px);overflow-y:auto}
-.catp .cnq .cnq1{background:rgba(255,255,255,.08);border-color:transparent;color:#d6e6e6}.catps .cnf{background:rgba(255,255,255,.08);border-color:transparent;color:#cfe0e0}.catps .cnf.on{background:rgba(31,138,140,.35);border-color:#1f8a8c;color:#fff}.catps .cnsug{background:rgba(31,138,140,.22);border-color:#1f8a8c}.catps .cnsug small{color:#9fd3d4}.catps .cnsug b{color:#fff}.catps .cnsug span{color:#cfe0e0}.catps .cnmais{color:#9fb4b4}
+#catpS.catps[data-k="cnx"]{width:250px}
 </style>
 <!--PONTE--></head>
 <body>
@@ -2808,7 +2811,7 @@ function orSug(){var w=$('orW'),box=$('orSug');if(!w||!box)return;var q=w.value.
  ARENA.palavras(q).then(function(L){var b=$('orSug');if(tk!==_orTok||!b)return;
   b.innerHTML=L.length?'<div class="rpsh">Sugestões · toque para corrigir com a palavra</div><div class="rpsr">'+L.map(function(x){return '<button type="button" class="orsg" data-ortw="'+esc2(x)+'">'+esc2(x)+'</button>'}).join('')+'</div>':'<small class="rpsm">Sem sugestão. Pode escrever a palavra completa.</small>'})}
 /* ===== AC · conectivos: dicionário por função (tabela conectivos), sugestão da função mais provável ===== */
-var CN={por:null};
+var CN={por:null,dd:false,ddAll:false,why:false};
 var CN_LBL={adicao:'Adição',conclusao:'Conclusão',contexto:'Continuidade',explicacao:'Explicação',oposicao:'Oposição',ordem:'Ordem',causa:'Causa',consequencia:'Consequência',exemplo:'Exemplo',comparacao:'Comparação',concessao:'Concessão',finalidade:'Finalidade',enfase:'Ênfase',condicao:'Condição',reformulacao:'Reformulação',fala:'Fala (narrativa)'};
 var CN_ORD=['adicao','conclusao','contexto','explicacao','oposicao','ordem','causa','consequencia','exemplo','comparacao','concessao','finalidade','enfase','condicao','reformulacao','fala'];
 var CN_CONF={oposicao:['adicao','consequencia'],adicao:['oposicao','consequencia'],explicacao:['consequencia','adicao'],causa:['consequencia','adicao'],consequencia:['causa','explicacao'],conclusao:['explicacao','adicao'],concessao:['oposicao','adicao'],comparacao:['oposicao','adicao'],ordem:['adicao','conclusao'],contexto:['adicao'],exemplo:['adicao'],enfase:['adicao'],finalidade:['consequencia'],condicao:['consequencia'],reformulacao:['adicao']};
@@ -2819,19 +2822,23 @@ function cnSug(m){var u=cnFuncoesDe(m.pal);
  if(u.length){var c=(CN_CONF[u[0]]||['adicao'])[0];return {f:c,why:'O aluno usou “'+m.pal+'”, que expressa '+CN_LBL[u[0]].toLowerCase()+'. Costuma ser confundido com '+CN_LBL[c].toLowerCase()+'.'}}
  var L=m.line||1,f=L<=7?'contexto':L>=22?'conclusao':'adicao';
  return {f:f,why:'Pela posição no texto (linha '+L+'): '+(f==='contexto'?'início, costuma contextualizar.':f==='conclusao'?'final, costuma concluir.':'meio, costuma acrescentar ou organizar argumentos.')}}
+function cnTop(m){var sg=cnSug(m),u=cnFuncoesDe(m.pal),l=[sg.f];(u.length?(CN_CONF[u[0]]||[]):[]).forEach(function(f){if(l.indexOf(f)<0)l.push(f)});['adicao','conclusao','oposicao','consequencia','explicacao','contexto','causa'].forEach(function(f){if(l.length<5&&l.indexOf(f)<0&&f!==u[0])l.push(f)});return l.slice(0,5).filter(function(f){return (CN.por[f]||[]).length})}
+function cnPista(f){return (CN.por[f]||[]).slice(0,2).join(', ').toLowerCase()}
 function cnBox(m){if(!CN.por)return '<small class="rpsm">carregando…</small>';
- var s=cnSug(m),fs=m._cnf||s.f,L=CN.por[fs]||[],sel=m.sin||[],ver=m._cnmais?L:L.slice(0,3);
- return '<div class="cnsug"><small>Sugestão do AC</small><b>'+CN_LBL[s.f]+'</b><span>'+esc2(s.why)+'</span></div>'+
-  '<div class="gl gl2">Função</div><div class="cnfn">'+CN_ORD.filter(function(f){return (CN.por[f]||[]).length}).map(function(f){return '<button type="button" class="cnf'+(f===fs?' on':'')+'" data-cnf="'+f+'">'+CN_LBL[f]+'</button>'}).join('')+'</div>'+
-  '<div class="gl gl2">'+CN_LBL[fs]+'</div><div class="cnlist">'+ver.map(function(t){return '<button type="button" class="cnt'+(sel.indexOf(t)>=0?' on':'')+'" data-cnt="'+esc2(t).replace(/"/g,'&quot;')+'">'+esc2(t)+'</button>'}).join('')+'</div>'+(L.length>3?'<button type="button" class="cnmais" data-cnmais="1">'+(m._cnmais?'Ver menos':'Ver mais')+'</button>':'')}
+ var s=cnSug(m),fs=m._cnf||s.f,L=CN.por[fs]||[],sel=m.sin||[],ver=m._cnmais?L:L.slice(0,3),top=cnTop(m),ord=CN.ddAll?top.concat(CN_ORD.filter(function(f){return top.indexOf(f)<0&&(CN.por[f]||[]).length})):top;
+ var h='<div class="cnsel"><button type="button" class="cnselb" data-cnsel="1" aria-expanded="'+!!CN.dd+'"><span>Função: <b>'+CN_LBL[fs]+'</b>'+(fs===s.f?'<small>sugerida</small>':'')+'</span><span aria-hidden="true">'+(CN.dd?'▴':'▾')+'</span></button>';
+ if(CN.dd)h+='<div class="cndd" role="listbox">'+ord.map(function(f){return '<button type="button" role="option" data-cnf="'+f+'" class="'+(f===fs?'on':'')+'"><span>'+CN_LBL[f]+'</span><small>'+(f===s.f?'sugerida':esc2(cnPista(f)))+'</small></button>'}).join('')+(CN.ddAll?'':'<button type="button" data-cnall="1"><span>Mais funções…</span><small>'+(CN_ORD.filter(function(f){return (CN.por[f]||[]).length}).length-top.length)+'</small></button>')+'</div>';
+ h+='</div><div class="cnwhy">'+(CN.why?esc2(s.why)+' <button type="button" data-cnwhy="1">fechar</button>':'<button type="button" data-cnwhy="1">por que essa sugestão?</button>')+'</div>';
+ h+='<div class="cnlist'+(sel.length?' has':'')+'">'+ver.map(function(t){return '<button type="button" class="cnt'+(sel.indexOf(t)>=0?' on':'')+'" data-cnt="'+esc2(t).replace(/"/g,'&quot;')+'" aria-pressed="'+(sel.indexOf(t)>=0)+'">'+esc2(t)+'</button>'}).join('')+'</div>'+(L.length>3?'<button type="button" class="cnmais" data-cnmais="1">'+(m._cnmais?'Ver menos':'Ver mais')+'</button>':'');
+ return h+'<div class="g2 parg"><button type="button" class="orok" data-cnok="1"'+(sel.length?'':' disabled')+'>Aplicar</button><button type="button" data-cnx="0">Só marcar</button></div>'}
 function cnPos(){var sd=$('catpS'),c=$('catp'),tg=c.querySelector('[data-sidetog="cnx"]');if(!tg||sd.classList.contains('hide'))return;var r=c.getBoundingClientRect(),t=tg.getBoundingClientRect(),w=sd.offsetWidth,h=sd.offsetHeight,L=r.right+8,T=t.top-12;if(L+w>innerWidth-8){L=r.left-w-8;if(L<8){L=Math.max(8,Math.min(innerWidth-w-8,t.right-w));T=t.bottom+4}}sd.style.left=L+'px';sd.style.top=Math.max(8,Math.min(innerHeight-h-8,T))+'px'}
 function cnPaint(m){var b=$('cnBox');if(!b||!m)return;b.innerHTML=cnBox(m);cnPos()}
-function cnHtml(m){return '<div class="gl gl2">Corrigir conectivo</div>'+(m.cat==='ce'?'<input id="cnW" class="orw" type="text" maxlength="30" placeholder="Palavra que o aluno usou (opcional)" value="'+esc2(m.pal||'').replace(/"/g,'&quot;')+'" autocomplete="off" spellcheck="false" aria-label="Conectivo que o aluno usou">':'')+'<div id="cnBox">'+cnBox(m)+'</div><div class="g2 parg"><button type="button" class="orok" data-cnok="1">Aplicar</button><button type="button" data-cnx="0">Só marcar</button></div>'}
+function cnHtml(m){return '<div class="gl gl2">Corrigir conectivo</div>'+(m.cat==='ce'?'<input id="cnW" class="orw" type="text" maxlength="30" placeholder="Palavra que o aluno usou (opcional)" value="'+esc2(m.pal||'').replace(/"/g,'&quot;')+'" autocomplete="off" spellcheck="false" aria-label="Conectivo que o aluno usou">':'')+'<div id="cnBox">'+cnBox(m)+'</div>'}
 function sideSync(){var c=$('catp'),sd=$('catpS'),tg=sideCur?c.querySelector('[data-sidetog="'+sideCur+'"]'):null,src=sideCur?c.querySelector('.sidesrc[data-for="'+sideCur+'"]'):null;
  if(c.classList.contains('hide')||c.classList.contains('pal')||!tg||!src){sd.classList.add('hide');return}
  var fresh=sd.dataset.k!==sideCur||sd.classList.contains('hide'),pv=(sideCur==='ort'&&!fresh&&$('orW'))?$('orW').value:null;
  if(sideCur==='ort'){var cv=pv!=null?pv:((catAtual&&catAtual.cat==='or'&&catAtual.cor)||'');sd.innerHTML='<div class="gl gl2">Ortografia</div><input id="orW" class="orw" type="text" placeholder="Palavra correta" value="'+esc2(cv)+'" autocomplete="off" spellcheck="false" aria-label="Palavra escrita corretamente"><div id="orSug" class="orsug"></div><div class="g2 parg"><button type="button" class="orok" data-ortok="1">Corrigir</button><button type="button" data-ortok="0">Só marcar</button></div>'+(function(){var L=ortLista();return L.length?'<div class="gl gl2 orlt">Já corrigidas</div><div class="orl">'+L.map(function(w){return '<button type="button" class="orc" data-ortw="'+esc2(w)+'">'+esc2(w)+'</button>'}).join('')+'</div>':''})()}
- else if(sideCur==='cnx'){if(fresh||!$('cnBox'))sd.innerHTML=cnHtml(catAtual);cnCarrega(function(){if(sideCur==='cnx')cnPaint(catAtual)})}
+ else if(sideCur==='cnx'){if(fresh||!$('cnBox')){CN.dd=false;CN.ddAll=false;CN.why=false;sd.innerHTML=cnHtml(catAtual)}cnCarrega(function(){if(sideCur==='cnx')cnPaint(catAtual)})}
  else sd.innerHTML='<div class="gl gl2">'+src.dataset.t+'</div>'+src.innerHTML;
  sd.dataset.k=sideCur;sd.classList.remove('hide');if(sideCur==='ort'){ortFiltra();orSug()}if(fresh&&sideCur==='ort')setTimeout(function(){var w=$('orW');if(w){w.focus();w.select()}},40);
  var r=c.getBoundingClientRect(),t=tg.getBoundingClientRect(),w=sd.offsetWidth,h=sd.offsetHeight,L=r.right+8,T=t.top-12;if(L+w>innerWidth-8){L=r.left-w-8;if(L<8){L=Math.max(8,Math.min(innerWidth-w-8,t.right-w));T=t.bottom+4}} // sem espaço ao lado: abre logo abaixo do botão
@@ -2841,12 +2848,16 @@ $('catpS').addEventListener('keydown',function(e){if(e.target.id==='orW'&&e.key=
 $('catpS').addEventListener('input',function(e){if(e.target.id==='orW'){ortFiltra();clearTimeout(orSug.t);orSug.t=setTimeout(orSug,200)}});
 $('catpS').addEventListener('input',function(e){if(e.target.id==='cnW'&&catAtual){catAtual.pal=e.target.value.trim()||undefined;cnPaint(catAtual)}});
 $('catpS').addEventListener('click',function(e){var cf=e.target.closest('[data-cnf]'),ct=e.target.closest('[data-cnt]'),cm=e.target.closest('[data-cnmais]'),ck=e.target.closest('[data-cnok]'),cx=e.target.closest('[data-cnx]');
- if(catAtual&&(cf||ct||cm||ck||cx)){var m0=catAtual;
+ if(catAtual&&(cf||ct||cm||ck||cx||e.target.closest('[data-cnsel],[data-cnall],[data-cnwhy]'))){var m0=catAtual;
   if(cx){fechaCat();return}
-  if(cf){m0._cnf=cf.dataset.cnf}
+  var cs=e.target.closest('[data-cnsel]'),ca2=e.target.closest('[data-cnall]'),cw=e.target.closest('[data-cnwhy]');
+  if(cs){CN.dd=!CN.dd}
+  else if(ca2){CN.ddAll=true}
+  else if(cw){CN.why=!CN.why}
+  else if(cf){m0._cnf=cf.dataset.cnf;CN.dd=false;m0._cnmais=false;if(m0.sin&&m0.sin.length){reg({t:'mod',m:m0,antes:{sin:m0.sin}});m0.sin=undefined}}
   else if(cm){m0._cnmais=!m0._cnmais}
   else if(ct){var t=ct.dataset.cnt,a=(m0.sin||[]).slice(),k=a.indexOf(t);if(k>=0)a.splice(k,1);else if(a.length<3)a.push(t);else{toast('No máximo 3 sugestões por marca',1);return}reg({t:'mod',m:m0,antes:{sin:m0.sin}});m0.sin=a.length?a:undefined}
-  else if(ck){if(!(m0.sin&&m0.sin.length)){toast('Escolha ao menos um conectivo (ou use Só marcar)',1);return}catAtual=null;$('catp').classList.add('hide');drawMarks();aplicaAuto();return}
+  else if(ck){if(!(m0.sin&&m0.sin.length))return;catAtual=null;$('catp').classList.add('hide');drawMarks();aplicaAuto();return}
   cnPaint(m0);return}
  var oc=e.target.closest('[data-ortw]'),ob=oc||e.target.closest('[data-ortok]');if(ob&&catAtual){var m=catAtual,w=oc?oc.dataset.ortw:($('orW')?$('orW').value:'').trim(),corrige=oc||ob.dataset.ortok==='1';if(corrige&&!w){if($('orW'))$('orW').focus();toast('Escreva a palavra correta',1);return}
  reg({t:'mod',m:m,antes:{cat:m.cat,inad:m.inad,cor:m.cor}});m.cat='or';m.inad=false;m.cor=corrige?w:undefined;catAtual=null;$('catp').classList.add('hide');drawMarks();aplicaAuto();return}
