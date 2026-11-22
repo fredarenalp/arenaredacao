@@ -16,7 +16,10 @@ const corretor = await entrar('corretor@arena.com')
 const coord = await entrar('teste@arena.com')
 
 const { data: al } = await aluno.from('alunos').select('*').single()
-const { data: prop } = await aluno.from('propostas').select('*').limit(1).single()
+const { data: props } = await aluno.from('propostas').select('*').order('id')
+const { data: minhas } = await aluno.from('redacoes').select('proposta_id, versao').eq('aluno_id', al.id)
+const prop = (props ?? []).find((q) => !(minhas ?? []).some((r) => r.proposta_id === q.id && r.versao === 1))
+if (!prop) { console.log('pulou: o aluno de teste já tem a 1ª versão de todas as propostas'); process.exit(0) }
 const png = new Uint8Array([137,80,78,71,13,10,26,10])
 const path = `${al.id}/e2e-${Date.now()}.png`
 const up = await aluno.storage.from('redacoes').upload(path, png, { contentType: 'image/png' })

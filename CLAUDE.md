@@ -28,7 +28,7 @@ entra em `contagens().tit`, `sugAuto(a,0)`, `titTxt(a)` (comentário) e no alert
 - Lint/testes/build: `npm run lint && npm test && npm run build`.
 - Ciclo de dados no banco real: `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node e2e/ciclo-real.mjs`.
 - Estado da ligação protótipo ↔ banco: ver o final do `README.md`.
-- Caça-bugs (não gravam nada no banco): `node e2e/cacabugs-ac.cjs` (todas as categorias/painéis/atalhos do AC) e `node e2e/cacabugs-aluno.cjs` (aluno, desktop e celular, com marcas de todos os tipos injetadas). Preview em `localhost:4173`.
+- Caça-bugs (não gravam nada no banco): `node e2e/cacabugs-ac.cjs` (todas as categorias/painéis/atalhos do AC) `node e2e/cacabugs-aluno.cjs` (aluno, desktop e celular, com marcas de todos os tipos injetadas) e `node e2e/cacabugs-coord.cjs` (todas as abas da coordenação e do professor). Preview em `localhost:4173`.
 
 ## Decisões de produto (aluno, feed, destaques) — IMPLEMENTADAS (etapas 1 a 5), exceto o que está em "Pendente"
 Tudo abaixo foi construído (primeira tela, cartões, Ver proposta/Dúvida, estrelas/anotação/Opinião, plantão com agenda seg–qui 14h–16h de 20 em 20 min em Demandas → Plantão, aba Destaques do aluno, tela Destaques da coordenação com autorização da família, tabelas `destaques`/`plantoes`, funções `feed_destaques`/`feed_erros_serie`/`responder_destaque`). Pendente: aviso no celular (sem push), botão "Salvar" dos desenhos, quiz (guardado); "Trechos que brilharam" foi retirado (decisão do dono), aluno ainda não vê o horário do plantão agendado.

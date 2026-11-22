@@ -7,6 +7,8 @@ const emailAluno = (matricula) => `${String(matricula).trim().toLowerCase()}@alu
 const serTur = (a) => [a.s ?? Number(/(\d)º/.exec(a.turma || '')?.[1]), a.t ?? String(a.turma || '').trim().slice(-1)]
 const fmtData = (d) => (d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '')
 
+// Estado só da tela (chaves que começam com _) não vai para o banco.
+const semTemp = (m) => Object.fromEntries(Object.entries(m).filter(([k]) => !k.startsWith('_')))
 const ACESSO_TESTE = true
 const CONTAS_TESTE = { aluno: '20260187', corretor: 'corretor@arena.com', coord: 'teste@arena.com', prof: 'professor@arena.com' }
 // Assina várias fotos de uma vez (8 horas: o corretor trabalha por longos períodos). Devolve {caminho: url}.
@@ -263,7 +265,7 @@ const ARENA = {
     const r1 = await supabase.from('correcoes').upsert(row)
     if (r1.error) return false
     await supabase.from('marcacoes').delete().eq('redacao_id', a._rid)
-    const marcas = (a.marks || []).map((m) => ({ redacao_id: a._rid, tipo: m.t === 'c' ? 'c' : 'o', categoria: m.cat ?? null, linha: m.line ?? null, dados: m }))
+    const marcas = (a.marks || []).map((m) => ({ redacao_id: a._rid, tipo: m.t === 'c' ? 'c' : 'o', categoria: m.cat ?? null, linha: m.line ?? null, dados: semTemp(m) }))
     if (marcas.length) {
       const r2 = await supabase.from('marcacoes').insert(marcas)
       if (r2.error) return false
@@ -893,7 +895,7 @@ const ARENA = {
         ok(await supabase.from('correcoes').update(upd).eq('redacao_id', f._rid))
         if (f.novo && f.marks) {
           ok(await supabase.from('marcacoes').delete().eq('redacao_id', f._rid))
-          if (f.marks.length) ok(await supabase.from('marcacoes').insert(f.marks.map((m) => ({ redacao_id: f._rid, tipo: m.t === 'c' ? 'c' : 'o', categoria: m.cat ?? null, linha: m.line ?? null, dados: m }))))
+          if (f.marks.length) ok(await supabase.from('marcacoes').insert(f.marks.map((m) => ({ redacao_id: f._rid, tipo: m.t === 'c' ? 'c' : 'o', categoria: m.cat ?? null, linha: m.line ?? null, dados: semTemp(m) }))))
         }
         ok(await supabase.from('redacoes').update({ etapa: 'corrigida' }).eq('id', f._rid))
         if (f.c) ok(await supabase.from('retornos').insert({ corretor_id: f.c, redacao_id: f._rid, resultado: f.tipo === 'duvida' ? 'duvida' : f.res === 'modificada' ? 'modificada' : 'aprovada', antes: f.niv, depois: f.novo || null, resposta: f.resp || null }))
