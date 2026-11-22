@@ -2054,7 +2054,8 @@ function compoe(k,n,sents,a){
   if(n===4)out.pop(); // nível 4 sem orientação: só o elogio
   }
  }
- if(k===0&&a.autoSet&&a.autoSet[0]&&!(sents&&sents.length))out.length=0; // nível sugerido só por rasuras e margens: o comentário fala só do que foi marcado (nada sobre título ou parágrafos)
+ if(k===0&&(titTxt(a).length||raTxt(a).length||margemTxt(a).length||(a.autoSet&&a.autoSet[0]))&&!(sents&&sents.length))out.length=0; // Estética com título, rasura ou margem marcados: o comentário traz só a frase do que foi marcado (também com o nível escolhido à mão)
+ // nível sugerido só por rasuras e margens: o comentário fala só do que foi marcado (nada sobre título ou parágrafos)
  if(k===0){titTxt(a).forEach(function(s){out.push(s)});raTxt(a).forEach(function(s){out.push(s)});margemTxt(a).forEach(function(s){out.push(s)})} // recuo e avanço de margem: orientação sempre que houver marcação
 
  if(k===1){desTxt(a).forEach(function(s){out.push(s)});prTxt(a).forEach(function(s){out.push(s)});ssTxt(a).forEach(function(s){out.push(s)});sinTxt(a).forEach(function(s){out.push(s)})}
