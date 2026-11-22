@@ -3889,10 +3889,10 @@ function verCorrecao(k){
  var circ=P.circ||[{l:5,x:70,c:'or',w:'exceção'},{l:11,x:128,c:'ac'},{l:17,x:88,c:'pt'},{l:24,x:140,c:'cj'},{l:24,x:60,c:'or'},{l:14,x:100,c:'ra'},{l:19,x:80,c:'ss'},{l:28,x:176,c:'ma'},{l:21,x:60,c:'mr'},{l:7,x:90,c:'vi'},{l:15,x:60,c:'mi'},{l:30,x:110,c:'lac'},{l:12,x:90,c:'el'}];
  var cmts=P.cmts||[{l:9,x:176,j:2,t:'Este período está muito longo. Divida em duas frases e use um conectivo para ligar as ideias.'},{l:15,l2:18,par:2,x:176,j:2,t:'Este parágrafo repete a mesma ideia. Reorganize as frases para o raciocínio avançar.'},{l:20,x:176,j:4,t:'Explique em detalhes quais são esses impactos.'}];
  aluno.marks=circ.filter(function(c){return isMg(c.c)}).map(function(c){return {t:'o',cat:c.c,line:c.l}});
- var NV={ce:1,ca:1,lac:1,ele:1,eli:1,el:1,ti:1};
+ var NV={ce:1,ca:1,lac:1,ele:1,eli:1,el:1,ti:1,rp:1}; // não são desvios de escrita (coesão, abordagem, título): ficam fora da contagem por tipo
  var por={},est={},prSeen={};circ.forEach(function(c){if(NV[c.c])return;if(c.c==='ra'||isMg(c.c))est[isMg(c.c)?'mg':c.c]=(est[isMg(c.c)?'mg':c.c]||0)+1;else if(c.c==='pr'){var _pk=String(c.w||'').trim().toLowerCase();if(_pk&&!prSeen[_pk]){prSeen[_pk]=1;por.pr=(por.pr||0)+1}}else por[c.c]=(por[c.c]||0)+1});
  var linhas={};circ.forEach(function(c){if(!NV[c.c]&&c.c!=='ra'&&!isMg(c.c))linhas[c.l]=(linhas[c.l]||0)+1});
- var catN={ac:'Acentuação',pt:'Pontuação',or:'Ortografia',il:'Ilegibilidade',cj:'Conjugação verbal',cn:'Concordância verbal',rg:'Regência verbal',cr:'Crase',ol:'Oralidade',pr:'Precisão',tr:'Truncamento',vi:'Vírgula',mi:'Uso de letra maiúscula',ra:'Rasura',ce:'Conectivo (errado)',ca:'Conectivo (ausente)',mg:'Margens',mr:'Linha curta',ma:'Passou da margem',pc:'Parágrafo curto',pe:'Parágrafo longo',pd:'Parágrafo desalinhado',ss:'Translineação',el:'Elogio',lac:'Lacuna',ele:'Elemento ausente',eli:'Elemento insuficiente'},sig={rg:'RG',ce:'CE',ca:'C',lac:'LAC',ele:'EL',eli:'EI',ac:'AC',pt:'PT',or:'OR',il:'IL',cj:'CJ',cn:'CN',cr:'CR',ol:'OL',pr:'PR',tr:'TR',vi:'VI',mi:'MI',ra:'RA',mg:'MG',mr:'MR',ma:'MA',pc:'PC',pe:'PE',pd:'PD',ss:'SS'};
+ var catN={ac:'Acentuação',pt:'Pontuação',or:'Ortografia',il:'Ilegibilidade',cj:'Conjugação verbal',cn:'Concordância verbal',rg:'Regência verbal',cr:'Crase',ol:'Oralidade',pr:'Precisão',tr:'Truncamento',vi:'Vírgula',mi:'Uso de letra maiúscula',ra:'Rasura',ce:'Conectivo (errado)',ca:'Conectivo (ausente)',mg:'Margens',mr:'Linha curta',ma:'Passou da margem',pc:'Parágrafo curto',pe:'Parágrafo longo',pd:'Parágrafo desalinhado',ss:'Translineação',el:'Elogio',lac:'Lacuna',ele:'Elemento ausente',eli:'Elemento insuficiente',rp:'Repetição de palavra',ti:'Título'},sig={rg:'RG',ce:'CE',ca:'C',lac:'LAC',ele:'EL',eli:'EI',ac:'AC',pt:'PT',or:'OR',il:'IL',cj:'CJ',cn:'CN',cr:'CR',ol:'OL',pr:'PR',tr:'TR',vi:'VI',mi:'MI',ra:'RA',mg:'MG',mr:'MR',ma:'MA',pc:'PC',pe:'PE',pd:'PD',ss:'SS'};
  var sel=null,zoom=80;
  var critDe=function(c){return c==='el'?-1:(c==='ra'||isMg(c)||c==='ti')?0:(c==='ce'||c==='ca'||c==='rp')?2:(c==='ele'||c==='eli')?3:c==='lac'?4:1};
  var fj=null,FN=['Estética','Linguagem','Progressão','Proposta','Abordagem'];
@@ -3976,7 +3976,7 @@ function verCorrecao(k){
  function imprime(){montaImpressao();document.body.classList.add('printing');window.addEventListener('afterprint',function(){document.body.classList.remove('printing')},{once:true});setTimeout(function(){window.print()},60);}
  var pri=[];
  var ls=function(a){a=sn(a);return (a.length>1?'Linhas ':'Linha ')+jn(a)};
- if(nD)pri.push({t:'Revise '+jn(Object.keys(por).map(function(c){return catN[c].toLowerCase()})),s:ls(todasL),l:sn(todasL)[0]});
+ if(nD)pri.push({t:'Revise '+jn(Object.keys(por).map(function(c){return (catN[c]||c).toLowerCase()})),s:ls(todasL),l:sn(todasL)[0]});
  if(porLin.ra)pri.push({t:'Troque a rasura por um risco simples',s:ls(porLin.ra),l:sn(porLin.ra)[0]});
  if(porLin.mg)pri.push({t:'Cuide das margens e da entrada dos parágrafos',s:ls(porLin.mg),l:sn(porLin.mg)[0]});
  cmts.forEach(function(c){var f=c.t.split(/(?<=[.!?])\s/)[0];if(f.length>70)f=f.slice(0,67).replace(/\s+\S*$/,'')+'…';pri.push({t:f,s:rot(c),l:c.l});});
