@@ -947,3 +947,5 @@ create policy conectivos_funcoes_le on public.conectivos_funcoes for select to a
   using ((select public.meu_tipo()) in ('coordenacao','professor','corretor'));
 create policy conectivos_funcoes_coord on public.conectivos_funcoes for all to authenticated
   using ((select public.meu_tipo()) = 'coordenacao') with check ((select public.meu_tipo()) = 'coordenacao');
+-- Frase explícita sobre cada função de conectivo, usada no comentário gerado automaticamente (conteúdo só no banco).
+alter table public.conectivos_funcoes add column comentario text;

@@ -553,12 +553,13 @@ const ARENA = {
       if (ARENA._cn) return ARENA._cn
       const [res, des] = await Promise.all([
         supabase.from('conectivos').select('funcao, texto, ordem').order('ordem'),
-        supabase.from('conectivos_funcoes').select('funcao, descricao'),
+        supabase.from('conectivos_funcoes').select('funcao, descricao, comentario'),
       ])
       if (res.error) return {}
       const por = {}
       for (const r of res.data ?? []) (por[r.funcao] ??= []).push(r.texto)
       por.__desc = Object.fromEntries((des.data ?? []).map((x) => [x.funcao, x.descricao]))
+      por.__com = Object.fromEntries((des.data ?? []).map((x) => [x.funcao, x.comentario]))
       ARENA._cn = por
       return por
     } catch {

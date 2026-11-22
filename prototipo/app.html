@@ -1857,12 +1857,19 @@ function ssTxt(a){var L=[];(a.marks||[]).forEach(function(m){if(m.t==='o'&&m.cat
  return [(L.length>1?'Nas linhas ':'Na linha ')+(L.length<2?L[0]:L.slice(0,-1).join(', ')+' e '+L[L.length-1])+', a separação de sílabas precisa de ajuste. '+SS_TXT]}
 var CN_FR={adicao:'adição',conclusao:'conclusão',contexto:'continuidade',explicacao:'explicação',oposicao:'oposição',ordem:'ordem',causa:'causa',consequencia:'consequência',exemplo:'exemplificação',comparacao:'comparação',concessao:'concessão',finalidade:'finalidade',enfase:'ênfase',condicao:'condição',reformulacao:'reformulação',fala:'fala'};
 function conTxt(a){
+ var CNX=typeof CN==='undefined'?null:CN,FR=typeof CN_FR==='undefined'?{}:CN_FR;if(CNX&&!CNX.por)cnCarrega();
+ var COM=(CNX&&CNX.por&&CNX.por.__com)||{};
  var jl=function(x){return x.length<2?x.join(''):x.slice(0,-1).join(', ')+' ou '+x[x.length-1]},ex=function(x){return x.length?' Experimente: '+jl(x)+'.':''};
  var jn=function(x){x=x.slice().sort(function(p,q){return p-q});return (x.length>1?'Nas linhas ':'Na linha ')+(x.length<2?x.join(''):x.slice(0,-1).join(', ')+' e '+x[x.length-1])},out=[];
- // um grupo por função escolhida (marcas sem correção ficam no grupo genérico)
- var grupos=function(cat){var G={},ord=[];(a.marks||[]).forEach(function(m){if(m.t!=='o'||m.cat!==cat)return;var k=(m.sin&&m.sin.length&&m.fn)?m.fn:'',g=G[k];if(!g){g=G[k]={fn:k,lines:[],sin:[]};ord.push(k)}if(g.lines.indexOf(m.line)<0)g.lines.push(m.line);(m.sin||[]).forEach(function(z){if(g.sin.indexOf(z)<0)g.sin.push(z)})});return ord.map(function(k){return G[k]})};
- grupos('ce').forEach(function(g){var f=CN_FR[g.fn];out.push(jn(g.lines)+(f?', o conectivo usado não expressa bem a relação entre as ideias. Aqui cabe um conectivo de '+f+'.':', o conectivo usado não expressa bem a relação entre as ideias. Troque por outro mais adequado ao sentido que você quer dar.')+ex(g.sin))});
- grupos('ca').forEach(function(g){var f=CN_FR[g.fn];out.push(jn(g.lines)+(f?', falta um conectivo de '+f+' para ligar as ideias.':', falta um conectivo para ligar as ideias. Use um conectivo que mostre a relação entre as frases.')+ex(g.sin))});
+ // função da marca: a escolhida; em marcas antigas, deduzida do primeiro conectivo sugerido
+ var fnDe=function(m){if(!(m.sin&&m.sin.length))return '';if(m.fn)return m.fn;var r='';if(CNX&&CNX.por)CN_ORD.some(function(f){if((CNX.por[f]||[]).indexOf(m.sin[0])>=0){r=f;return true}return false});return r};
+ var grupos=function(cat){var G={},ord=[];(a.marks||[]).forEach(function(m){if(m.t!=='o'||m.cat!==cat)return;var k=fnDe(m),g=G[k];if(!g){g=G[k]={fn:k,lines:[],sin:[],pal:[]};ord.push(k)}if(g.lines.indexOf(m.line)<0)g.lines.push(m.line);(m.sin||[]).forEach(function(z){if(g.sin.indexOf(z)<0)g.sin.push(z)});var w=String(m.pal||'').trim();if(w&&g.pal.indexOf(w)<0)g.pal.push(w)});return ord.map(function(k){return G[k]})};
+ grupos('ce').forEach(function(g){var f=FR[g.fn],t;
+  if(f){var us=g.pal.length?(CNX&&CNX.por?cnFuncoesDe(g.pal[0]):[]):[],aspas=g.pal.map(function(w){return '“'+w+'”'}),uso=us.length&&FR[us[0]]&&us[0]!==g.fn?', que tem valor de '+FR[us[0]]:'';
+   t=jn(g.lines)+', '+(g.pal.length?(g.pal.length>1?'os conectivos usados ('+aspas.join(', ')+')':'o conectivo '+aspas[0]):'o conectivo usado')+(g.pal.length?uso+',':'')+' não expressa'+(g.pal.length>1?'m':'')+' a relação entre as ideias, que aqui é de '+f+'.'+(COM[g.fn]?' '+COM[g.fn]:'')
+  }else t=jn(g.lines)+', o conectivo usado não expressa bem a relação entre as ideias. Troque por outro mais adequado ao sentido que você quer dar.';
+  out.push(t+ex(g.sin))});
+ grupos('ca').forEach(function(g){var f=FR[g.fn];out.push(jn(g.lines)+(f?', falta um conectivo de '+f+' para ligar as ideias.'+(COM[g.fn]?' '+COM[g.fn]:''):', falta um conectivo para ligar as ideias. Use um conectivo que mostre a relação entre as frases.')+ex(g.sin))});
  return out}
 /* ao marcar uma lacuna, a caixa de comentário abre sozinha para o corretor registrar o que ficou em aberto */
 function lacComenta(m){catAtual=null;$('catp').classList.add('hide');drawMarks();abreLC(m.line,Math.min(181,m.cx+m.rx+4),m.cy,undefined,multi(m)?rg(m):null,m.par);
@@ -2818,7 +2825,7 @@ var CN_LBL={adicao:'Adição',conclusao:'Conclusão',contexto:'Continuidade',exp
 var CN_ORD=['adicao','conclusao','contexto','explicacao','oposicao','ordem','causa','consequencia','exemplo','comparacao','concessao','finalidade','enfase','condicao','reformulacao','fala'];
 var CN_CONF={oposicao:['adicao','consequencia'],adicao:['oposicao','consequencia'],explicacao:['consequencia','adicao'],causa:['consequencia','adicao'],consequencia:['causa','explicacao'],conclusao:['explicacao','adicao'],concessao:['oposicao','adicao'],comparacao:['oposicao','adicao'],ordem:['adicao','conclusao'],contexto:['adicao'],exemplo:['adicao'],enfase:['adicao'],finalidade:['consequencia'],condicao:['consequencia'],reformulacao:['adicao']};
 function cnNorm(t){return String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z ]/g,'').trim()}
-function cnCarrega(cb){if(CN.por){if(cb)cb();return}if(!(window.ARENA&&ARENA.conectivos)){CN.por={};if(cb)cb();return}ARENA.conectivos().then(function(d){CN.por=d||{};if(cb)cb()})}
+function cnCarrega(cb){if(CN.por){if(cb)cb();return}if(!(window.ARENA&&ARENA.conectivos)){CN.por={};if(cb)cb();return}ARENA.conectivos().then(function(d){if(d&&d.adicao)CN.por=d;if(cb)cb()})}
 function cnFuncoesDe(w){var n=cnNorm(w),o=[];if(!n||!CN.por)return o;CN_ORD.forEach(function(f){if((CN.por[f]||[]).some(function(t){return cnNorm(t)===n}))o.push(f)});return o}
 function cnSug(m){var u=cnFuncoesDe(m.pal);
  if(u.length){var c=(CN_CONF[u[0]]||['adicao'])[0];return {f:c,why:'O aluno usou “'+m.pal+'”, que expressa '+CN_LBL[u[0]].toLowerCase()+'. Costuma ser confundido com '+CN_LBL[c].toLowerCase()+'.'}}
