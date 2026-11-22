@@ -19,6 +19,11 @@ Conectivo errado/ausente no AC abre "Só marcar | Corrigir"; Corrigir abre o pai
 lista com as 5 mais prováveis + "Mais funções…", "por que essa sugestão?" e os conectivos (3 + Ver mais). As escolhas ficam em `m.sin` (e a palavra usada em `m.pal`), entram no comentário da Progressão ("Experimente: …")
 e aparecem ao aluno em "Palavras para treinar". Dicionário na tabela privada `conectivos` (16 funções, inclui verbos de fala); o conteúdo NÃO está no repositório.
 
+## AC · Título (critério I, implementado)
+Botão "Título" na seção Estética do AC (painel lateral): Ausente / Insuficiente; Insuficiente pergunta "Cópia do tema?" (Sim → comentário pede título próprio; Não → pede mais diálogo com o conteúdo do texto).
+Sem marcar = título bom. Segue a grade (arquivo: COMPS[0].niv): ausente → Estética nível 0 ou 1 (sugere 1); insuficiente → no máximo nível 2. Marca `cat:'ti'`, `m.ti` ('aus'|'ins'), `m.cop` (true|false); um por redação;
+entra em `contagens().tit`, `sugAuto(a,0)`, `titTxt(a)` (comentário) e no alerta de incoerência; não conta como desvio gramatical.
+
 ## Como trabalhar
 - Lint/testes/build: `npm run lint && npm test && npm run build`.
 - Ciclo de dados no banco real: `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node e2e/ciclo-real.mjs`.

@@ -1454,6 +1454,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 #catpS.catps{max-height:calc(100vh - 16px);overflow-y:auto}
 #catpS.catps[data-k="cnx"]{width:250px}
 .catps .cndesc{font-size:12px;line-height:1.4;color:#b8cccc;margin:6px 1px 2px}.catps .cndesc b{color:#fff}
+.catps .tihint{margin:8px 1px 2px;font-size:12px;line-height:1.4;color:#8fa5a5}
 </style>
 <!--PONTE--></head>
 <body>
@@ -1835,6 +1836,11 @@ function finalTxt(nivs){ // nota final abaixo de 6,0 e Linguagem abaixo de 1,0 (
  var out=[];if(nivs.every(function(v){return v!=null})&&nivs.reduce(function(x,y){return x+y},0)*.5<(window.__regras?window.__regras.corte:6))out.push(FIN_PLANTAO);
  if(nivs[1]!=null&&nivs[1]<2)out.push(FIN_NIVEL);return out}
 var RA_TXT='Errar é normal, mas na folha de redação você precisa fazer um traço simples sobre a palavra, jamais riscos, círculos ou usar parênteses.';
+function titTxt(a){var t=null,cop=null;(a.marks||[]).forEach(function(m){if(m.t==='o'&&m.cat==='ti'){if(m.ti==='aus'||!t)t=m.ti||'ins';if(m.cop===true)cop=true;else if(m.cop===false&&cop===null)cop=false}});
+ if(!t)return [];var sd=hash(a.m||'x')+5;
+ if(t==='aus')return [pick(['Seu texto está sem título. Dê um título ao texto, na linha destinada a ele, apresentando a ideia central do que você vai desenvolver.','Falta o título. Crie um título para a redação, na linha reservada a ele, que anuncie a ideia principal do texto.'],sd)];
+ if(cop===true)return [pick(['O título que você usou é uma cópia do tema da proposta. Crie um título próprio, que mostre o seu ponto de vista sobre o assunto.','Seu título repete o tema da proposta. Escreva um título próprio, que revele a ideia que você defende no texto.'],sd)];
+ return [pick(['O título ainda dialoga pouco com o conteúdo do texto. Escolha um título que anuncie a ideia central ou o ponto de vista que você desenvolve na redação.','Seu título pode se aproximar mais do que você escreveu. Procure um título que antecipe a ideia principal do texto.'],sd)]}
 function raTxt(a){var L=[];(a.marks||[]).forEach(function(m){if(m.t==='o'&&m.cat==='ra'&&L.indexOf(m.line)<0)L.push(m.line)});if(!L.length)return [];L.sort(function(p,q){return p-q});
  return [(L.length>1?'Nas linhas ':'Na linha ')+(L.length<2?L[0]:L.slice(0,-1).join(', ')+' e '+L[L.length-1])+', há rasura. '+RA_TXT]}
 var SINAIS_AC=[['´','acento agudo'],['`','acento grave (crase)'],['^','acento circunflexo'],['~','til'],['ç','cedilha']],SINAIS_P1=[[',','vírgula'],['.','ponto final'],[';','ponto e vírgula'],[':','dois-pontos'],['?','ponto de interrogação'],['!','ponto de exclamação'],['"','aspas']],SINAIS_P2=[['…','reticências'],['(','abre parênteses'],[')','fecha parênteses'],['–','travessão'],['-','hífen'],["'",'apóstrofo']];
@@ -2031,7 +2037,7 @@ function compoe(k,n,sents,a){
   }
  }
  if(k===0&&a.autoSet&&a.autoSet[0]&&!(sents&&sents.length))out.length=0; // nível sugerido só por rasuras e margens: o comentário fala só do que foi marcado (nada sobre título ou parágrafos)
- if(k===0){raTxt(a).forEach(function(s){out.push(s)});margemTxt(a).forEach(function(s){out.push(s)})} // recuo e avanço de margem: orientação sempre que houver marcação
+ if(k===0){titTxt(a).forEach(function(s){out.push(s)});raTxt(a).forEach(function(s){out.push(s)});margemTxt(a).forEach(function(s){out.push(s)})} // recuo e avanço de margem: orientação sempre que houver marcação
 
  if(k===1){desTxt(a).forEach(function(s){out.push(s)});prTxt(a).forEach(function(s){out.push(s)});ssTxt(a).forEach(function(s){out.push(s)});sinTxt(a).forEach(function(s){out.push(s)})}
  // elementos do gênero (IV) e lacunas (V) marcados: orientação com as linhas. Nível 3 ou 4 com marcação não leva a frase de elogio, que contradiria a marcação
@@ -2569,7 +2575,7 @@ $('anUndo').onclick=function(){
 // ===== Marcação: X (desvio ortográfico) + comentário por linha (pin ou número da linha) =====
 var verOrig=false,tool='pan',mid=1,linhaAtual2=null,linhaAtual=null,cmtAtual=null,catAtual=null,cmtCirc=null;
 var BANDA=function(c){return c<=3?'4':c<=10?'3':c<=20?'2':'1'};
-var CATS=[{k:'ac',l:'Acentuação',c:'AC'},{k:'pt',l:'Pontuação',c:'PT'},{k:'or',l:'Ortografia',c:'OR'},{k:'ss',l:'Translineação',c:'SS'},{k:'cj',l:'Conjugação verbal',c:'CJ'},{k:'cn',l:'Concordância verbal',c:'CN'},{k:'rg',l:'Regência verbal',c:'RG',hid:1},{k:'el',l:'Elogio',c:'EL',hid:1,tip:'Ponto forte: o que ficou muito bom'},{k:'cr',l:'Crase',c:'CR',hid:1},{k:'ol',l:'Oralidade',c:'OL'},{k:'pr',l:'Precisão',c:'PR',hid:1,tip:'Palavra correta, mas vaga ou genérica'},{k:'tr',l:'Truncamento',c:'TR'},{k:'il',l:'Ilegibilidade',c:'IL'},{k:'vi',l:'Vírgula',c:'VI',hid:1},{k:'mi',l:'Maiúscula',cl:'Uso de letra maiúscula',c:'MI'},{k:'ra',l:'Rasura',c:'RA',tip:'Riscos e correções que sujam o texto'},{k:'mr',l:'Linha curta',c:'MR',tip:'A escrita parou antes do fim da linha'},{k:'ma',l:'Passou da margem',c:'MA',tip:'A escrita passou da linha da margem'},{k:'pc',l:'Parágrafo curto',s:'Curto',c:'PC',tip:'Espaço curto demais no começo do parágrafo'},{k:'pe',l:'Parágrafo longo',s:'Longo',c:'PE',tip:'Espaço longo demais no começo do parágrafo'},{k:'pd',l:'Parágrafo desalinhado',s:'Desalinhado',c:'PD',tip:'Espaço do começo do parágrafo desalinhado com os demais'},{k:'rp',l:'Repetição de palavra',c:'RP'},{k:'ce',l:'Conectivo errado',c:'CE',tip:'Conectivo errado'},{k:'ca',l:'Conectivo ausente',c:'CA',tip:'Ausência de conectivo'},{k:'lac',l:'Lacuna',c:'LC',tip:'Ideia, parte ou explicação que ficou em aberto no desenvolvimento do tema'},{k:'ele',l:'Ausente',c:'EA',tip:'Elemento do gênero que não aparece no texto'},{k:'eli',l:'Insuficiente',c:'EI',tip:'Elemento do gênero que aparece, mas não foi desenvolvido o bastante'}];
+var CATS=[{k:'ac',l:'Acentuação',c:'AC'},{k:'pt',l:'Pontuação',c:'PT'},{k:'or',l:'Ortografia',c:'OR'},{k:'ss',l:'Translineação',c:'SS'},{k:'cj',l:'Conjugação verbal',c:'CJ'},{k:'cn',l:'Concordância verbal',c:'CN'},{k:'rg',l:'Regência verbal',c:'RG',hid:1},{k:'el',l:'Elogio',c:'EL',hid:1,tip:'Ponto forte: o que ficou muito bom'},{k:'ti',l:'Título',c:'TI',hid:1,tip:'Título ausente ou insuficiente'},{k:'cr',l:'Crase',c:'CR',hid:1},{k:'ol',l:'Oralidade',c:'OL'},{k:'pr',l:'Precisão',c:'PR',hid:1,tip:'Palavra correta, mas vaga ou genérica'},{k:'tr',l:'Truncamento',c:'TR'},{k:'il',l:'Ilegibilidade',c:'IL'},{k:'vi',l:'Vírgula',c:'VI',hid:1},{k:'mi',l:'Maiúscula',cl:'Uso de letra maiúscula',c:'MI'},{k:'ra',l:'Rasura',c:'RA',tip:'Riscos e correções que sujam o texto'},{k:'mr',l:'Linha curta',c:'MR',tip:'A escrita parou antes do fim da linha'},{k:'ma',l:'Passou da margem',c:'MA',tip:'A escrita passou da linha da margem'},{k:'pc',l:'Parágrafo curto',s:'Curto',c:'PC',tip:'Espaço curto demais no começo do parágrafo'},{k:'pe',l:'Parágrafo longo',s:'Longo',c:'PE',tip:'Espaço longo demais no começo do parágrafo'},{k:'pd',l:'Parágrafo desalinhado',s:'Desalinhado',c:'PD',tip:'Espaço do começo do parágrafo desalinhado com os demais'},{k:'rp',l:'Repetição de palavra',c:'RP'},{k:'ce',l:'Conectivo errado',c:'CE',tip:'Conectivo errado'},{k:'ca',l:'Conectivo ausente',c:'CA',tip:'Ausência de conectivo'},{k:'lac',l:'Lacuna',c:'LC',tip:'Ideia, parte ou explicação que ficou em aberto no desenvolvimento do tema'},{k:'ele',l:'Ausente',c:'EA',tip:'Elemento do gênero que não aparece no texto'},{k:'eli',l:'Insuficiente',c:'EI',tip:'Elemento do gênero que aparece, mas não foi desenvolvido o bastante'}];
 var VERBO={rg:'Regência',cn:'Concordância',cj:'Conjugação'};
 var PROG={rp:1,ce:1,ca:1},ABORD={lac:1,ele:1,eli:1}; // valem para a Progressão, não contam como desvio de linguagem
 var LETRA={rp:'P',ra:'R',mr:'M',ma:'A',vi:'V',mi:'U',lac:'L',ele:'E',eli:'I'};
@@ -2579,7 +2585,7 @@ function atalho(k){var d=DIGS.indexOf(VIS[k].k);return d>=0?String(d+1):LETRA[VI
 function isMg(c){return c==='mr'||c==='ma'||c==='pc'||c==='pe'||c==='pd'}
 function hasCat(a,c){return a.marks.some(function(m){return m.t==='o'&&m.cat===c})}
 function gcl(c){return c==='mr'||c==='ma'?' gmg':(c==='pc'||c==='pe'||c==='pd')?' gpg':''}
-var ESTET={ra:1,mr:1,ma:1,pc:1,pe:1,pd:1}; // valem para a Estética, não contam como desvio gramatical
+var ESTET={ra:1,mr:1,ma:1,pc:1,pe:1,pd:1,ti:1}; // valem para a Estética, não contam como desvio gramatical
 function crN(c){return c==='el'?'★':ESTET[c]?'I':PROG[c]?'III':(c==='ele'||c==='eli')?'IV':c==='lac'?'V':c==='cm'?'CM':'II'} // número do critério que aparece no círculo
 function catDe(k){return k==='cm'?{k:'cm',l:'Comentário',c:'CM'}:CATS.filter(function(c){return c.k===k})[0]}
 function desvios(){var vistos={};return ALUNOS[i].marks.filter(function(m){if(m.t!=='o'||ESTET[m.cat]||PROG[m.cat]||m.cat==='cm'||m.cat==='el'||m.cat==='lac'||m.cat==='ele'||m.cat==='eli')return false;if(m.cat==='pr'){var k=normP(m.pal);if(!k||vistos[k])return false;vistos[k]=1}return true}).length} // Precisão: a mesma palavra conta uma vez; sem a palavra, não conta // rasura e margem não contam como desvio gramatical
@@ -2588,16 +2594,16 @@ function margens(){return ALUNOS[i].marks.filter(function(m){return m.t==='o'&&i
 var BANDA_RAS=function(c){return c<=2?'3':c<=5?'2':'1'}; // sugestão: 1-2 raras, 3-5 pontuais, 6+ em excesso
 // resumo: por tipo e por linha
 function resumoDv(){
- var con=0,rep=0,por={},prV={},linhas={},sem=0,ras=0,rl={},mg=0,ml={},rngs={},pars={};
+ var con=0,rep=0,por={},prV={},linhas={},sem=0,ras=0,rl={},mg=0,ml={},rngs={},pars={},tit=null;
  ALUNOS[i].marks.forEach(function(m){
-  if(m.t!=='o'||m.cat==='cm'||m.cat==='el'||m.cat==='lac'||m.cat==='ele'||m.cat==='eli')return; // círculo só de comentário, lacuna ou elemento não conta como desvio
+  if(m.t!=='o'||m.cat==='cm'||m.cat==='el'||m.cat==='lac'||m.cat==='ele'||m.cat==='eli')return;if(m.cat==='ti'){tit=(tit==='aus'||m.ti==='aus')?'aus':'ins';return} // círculo só de comentário, lacuna ou elemento não conta como desvio
   if(PROG[m.cat]){if(m.cat==='rp')rep++;else con++;return;}
   if(m.cat==='ra'){ras++;rl[m.line]=1;return;}
   if(isMg(m.cat)){mg++;ml[m.line]=1;return;}
   if(m.cat==='pr'){var pk=normP(m.pal);if(pk&&!prV[pk]){prV[pk]=1;por.pr=(por.pr||0)+1}}else if(m.cat)por[m.cat]=(por[m.cat]||0)+1;else sem++;linhas[m.line]=(linhas[m.line]||0)+1;rngs[m.line]=Math.max(rngs[m.line]||0,rg(m)[1]);if(m.par)pars[m.par]=(pars[m.par]||0)+1;
  });
  var ord=function(o){return Object.keys(o).map(Number).sort(function(a,b){return a-b})};
- return {con:con,rep:rep,por:por,sem:sem,linhas:ord(linhas),porLinha:linhas,ras:ras,rasLinhas:ord(rl),mg:mg,mgLinhas:ord(ml),rngs:rngs,pars:pars};
+ return {tit:tit,con:con,rep:rep,por:por,sem:sem,linhas:ord(linhas),porLinha:linhas,ras:ras,rasLinhas:ord(rl),mg:mg,mgLinhas:ord(ml),rngs:rngs,pars:pars};
 }
 function textoResumo(){
  var r=resumoDv(),p=[];
@@ -2618,7 +2624,7 @@ function renderDv(){
    (Object.keys(r.pars).length?'<div class="dvp"><b>Por parágrafo:</b> '+Object.keys(r.pars).sort().map(function(k){return 'P'+k+' ('+r.pars[k]+')'}).join(' · ')+'</div>':'');
  }
  // Estética: rasuras e margens; Progressão: repetições (só aparecem quando há marcação)
- if($('dvEs'))$('dvEs').innerHTML=(r.ras||r.mg)?(r.ras?'<span class="chip est">'+r.ras+(r.ras===1?' rasura':' rasuras')+'</span>':'')+(r.mg?'<span class="chip est">'+r.mg+(r.mg===1?' margem':' margens')+'</span>':'')+'<span class="lnh">linhas '+fl(r.rasLinhas.concat(r.mgLinhas).filter(function(v,k,A){return A.indexOf(v)===k}).sort(function(x,y){return x-y}))+'</span>':'';
+ if($('dvEs'))$('dvEs').innerHTML=(r.ras||r.mg||r.tit)?(r.tit?'<span class="chip est">título '+(r.tit==='aus'?'ausente':'insuficiente')+'</span>':'')+(r.ras?'<span class="chip est">'+r.ras+(r.ras===1?' rasura':' rasuras')+'</span>':'')+(r.mg?'<span class="chip est">'+r.mg+(r.mg===1?' margem':' margens')+'</span>':'')+((r.ras||r.mg)?'<span class="lnh">linhas '+fl(r.rasLinhas.concat(r.mgLinhas).filter(function(v,k,A){return A.indexOf(v)===k}).sort(function(x,y){return x-y}))+'</span>':''):'';
  if($('dvPg'))$('dvPg').innerHTML=(r.rep||r.con)?(r.rep?'<span class="chip rpc">'+Object.keys(repGrupos(ALUNOS[i])).length+(Object.keys(repGrupos(ALUNOS[i])).length===1?' palavra repetida':' palavras repetidas')+'</span>':'')+(r.con?'<span class="chip cvc">'+r.con+(r.con===1?' conectivo':' conectivos')+'</span>':'')+'<span class="lnh">'+Object.keys(repGrupos(ALUNOS[i])).sort().map(function(w){return '“'+w+'” '+repGrupos(ALUNOS[i])[w].length+'×'}).join(' · ')+'</span>':'';
 }
 function coments(){return ALUNOS[i].marks.filter(function(m){return m.t==='c'})}
@@ -2711,6 +2717,7 @@ function abreCat(m,keep){
  var el=$('catp');var rpCompact=(m.cat==='rp'||m.cat==='pr')&&!m._trocar;
  var bt=function(c,k){return '<button type="button" role="menuitem" data-cat="'+c.k+'" title="'+(c.k==='ac'?'Acento errado: o círculo marca o que está inadequado':c.k==='pt'?'Sinal errado: o círculo marca o que está inadequado':(c.tip||''))+'" class="'+(m.cat===c.k?'cur':'')+(ESTET[c.k]?' est'+gcl(c.k):'')+'"><span>'+(c.s||c.l)+'</span> <small>'+atalho(k)+'</small></button>'};
  var g1=[],g2=[],g3=[],g4=[],g5=[];var VOCBTN='<button type="button" role="menuitem" class="vbtog'+(sideCur==='voc'?' on':'')+'" data-sidetog="voc" aria-expanded="'+(sideCur==='voc')+'" title="Oralidade e precisão (palavra vaga)"><span>Vocabulário</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>';
+ var TITBTN='<button type="button" role="menuitem" class="vbtog'+(sideCur==='tit'?' on':'')+'" data-sidetog="tit" aria-expanded="'+(sideCur==='tit')+'" title="Título ausente ou insuficiente (sem marcar, o título é considerado bom)"><span>Título</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>';
  VIS.forEach(function(c,k){if(VERBO[c.k]||c.k==='tr')return;if(c.k==='ol'){g1.push(VOCBTN);return}(c.s?g4:ABORD[c.k]?g5:PROG[c.k]?g3:ESTET[c.k]?g2:g1).push(bt(c,k))});
  var gv=['rg','cn','cj'].map(function(k){var c=catDe(k);return '<button type="button" role="menuitem" data-cat="'+k+'" title="'+c.l+'" class="'+(m.cat===k?'cur':'')+'"><span>'+VERBO[k]+'</span></button>'}).join('');
  g1.splice(5,0,'<button type="button" role="menuitem" class="vbtog'+(sideCur==='verbo'?' on':'')+'" data-sidetog="verbo" aria-expanded="'+(sideCur==='verbo')+'" title="Regência, concordância e conjugação"><span>Verbo</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>');
@@ -2720,15 +2727,15 @@ function abreCat(m,keep){
  var rpRow=(m.cat==='rp'||m.cat==='pr')?'<div class="rpw"><label for="rpW">Qual palavra?</label>'+(m.cat==='rp'&&m.line<=1?'<label class="rptit"><input type="checkbox" id="rpTit"'+(m.tit===false?'':' checked')+'> É o título? <small>(o título não conta como repetição)</small></label>':'')+'<div class="rpin"><input id="rpW" type="text" autocomplete="off" maxlength="24" placeholder="digite a palavra" value="'+(m.pal||'').replace(/"/g,'&quot;')+'"><button type="button" class="rpok" data-rpok>OK</button></div><div class="rpsug" id="rpSug"></div>'+(ws.length?'<div class="rpc2">'+ws.map(function(w){return '<button type="button" data-pal="'+w.replace(/"/g,'&quot;')+'" class="'+(normP(m.pal)===w?'on':'')+'">'+w+'</button>'}).join('')+'</div>':'')+'</div>':'';
  var subRow='';if(m._sub&&!m.sinal){var sn=m._sub==='ac'?'Acentuação':'Pontuação';subRow='<div class="subr"><div class="gl" style="margin:0 0 6px">'+sn+': o que há de errado?</div><div class="g2"><button type="button" data-cat="aus"><span>Ausente</span><small>falta o '+(m._sub==='ac'?'acento':'sinal')+'</small></button><button type="button" data-cat="ina"><span>Inadequado</span><small>está errado</small></button></div></div>'}
  var rr=rg(m),mu=rr[1]>rr[0];
- if(m.cat==='pc'||m.cat==='pe'||m.cat==='pd')sideCur='par';else if(m.cat==='rg'||m.cat==='cn'||m.cat==='cj')sideCur='verbo';else if(m.cat==='ele'||m.cat==='eli')sideCur='ele';else if(m.cat==='or'&&m.cor)sideCur='ort';else if(m.cat==='ol'||m.cat==='pr')sideCur='voc';else if((m.cat==='ce'||m.cat==='ca')&&m.sin&&m.sin.length)sideCur='cnx';
+ if(m.cat==='pc'||m.cat==='pe'||m.cat==='pd')sideCur='par';else if(m.cat==='rg'||m.cat==='cn'||m.cat==='cj')sideCur='verbo';else if(m.cat==='ele'||m.cat==='eli')sideCur='ele';else if(m.cat==='or'&&m.cor)sideCur='ort';else if(m.cat==='ol'||m.cat==='pr')sideCur='voc';else if((m.cat==='ce'||m.cat==='ca')&&m.sin&&m.sin.length)sideCur='cnx';else if(m.cat==='ti')sideCur='tit';
 var cnRow=(m.cat==='ce'||m.cat==='ca')?'<div class="cnq" role="group" aria-label="Conectivo: o que fazer?"><button type="button" class="cnq1" data-cnx="0">Só marcar</button><button type="button" class="cnq2 vbtog'+(sideCur==='cnx'?' on':'')+'" data-sidetog="cnx" aria-expanded="'+(sideCur==='cnx')+'" title="Escolher o conectivo certo"><span>Corrigir</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div>':'';
  var sinBar=(rpCompact||m.sinal)?'':'<div class="sinbar">'+sinLinha()+'</div>';
  el.innerHTML='<div class="topo"><div class="ttl">'+(mu?'<span class="lnst">Linhas <button type="button" class="ln" data-ld="1:-1" aria-label="Começar uma linha antes">−</button><b>'+rr[0]+'</b><button type="button" class="ln" data-ld="1:1" aria-label="Começar uma linha depois">+</button> a <button type="button" class="ln" data-ld="2:-1" aria-label="Terminar uma linha antes">−</button><b>'+rr[1]+'</b><button type="button" class="ln" data-ld="2:1" aria-label="Terminar uma linha depois">+</button></span>':'<span class="lnst"><button type="button" class="ln" data-ln="-1" aria-label="Linha anterior">−</button> Linha <b>'+m.line+'</b> <button type="button" class="ln" data-ln="1" aria-label="Próxima linha">+</button></span>')+'</div>'+parRow(m)+'</div>'+
   (rpCompact?'<div class="gl rpgl">'+(m.cat==='pr'?'Precisão (palavra vaga)':'Repetição de palavra')+' <button type="button" class="rptroca" data-trocar>trocar tipo</button></div>'+rpRow:
-  '<div class="pgp pg-e" role="group" aria-label="Estética, critério I"><div class="gl">Estética<em>I</em></div><div class="gl gl2 glt">Rasura e margem<button type="button" class="partog'+(sideCur==='par'?' on':'')+'" data-sidetog="par" aria-expanded="'+(sideCur==='par')+'" title="Parágrafo (curto, longo, desalinhado)">Parágrafo<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div><div class="g2 estg">'+g2.join('')+'</div></div>'+
+  '<div class="pgp pg-e" role="group" aria-label="Estética, critério I"><div class="gl">Estética<em>I</em></div><div class="gl gl2 glt">Rasura e margem<button type="button" class="partog'+(sideCur==='par'?' on':'')+'" data-sidetog="par" aria-expanded="'+(sideCur==='par')+'" title="Parágrafo (curto, longo, desalinhado)">Parágrafo<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div><div class="g2 estg">'+g2.join('')+TITBTN+'</div></div>'+
   '<div class="pgp pg-d" role="group" aria-label="Desvios de escrita, critério II"><div class="gl">Desvios de escrita<em>II</em></div>'+sinBar+'<div class="g2">'+g1.join('')+'</div></div>'+
   '<div class="pgp pg-p" role="group" aria-label="Progressão, critério III"><div class="gl">Progressão<em>III</em></div><div class="g2 prg">'+g3.join('')+'</div>'+cnRow+'</div>'+'<div class="pgp pg-a" role="group" aria-label="Proposta e Abordagem, critérios IV e V"><div class="gl">Proposta e Abordagem</div><div class="g2 abg"><button type="button" role="menuitem" class="vbtog'+(sideCur==='ele'?' on':'')+'" data-sidetog="ele" aria-expanded="'+(sideCur==='ele')+'" title="Elemento do gênero (critério IV): ausente ou insuficiente"><span>Elemento (IV)</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>'+g5.slice(2).join('').replace('<span>Lacuna</span>','<span>Lacuna (V)</span>')+'</div></div>'+(m.cat==='rp'?rpRow:''))+
-  '<div class="sidesrcs"><div class="sidesrc" data-for="par" data-t="Parágrafo"><div class="g2 parg">'+g4.join('')+'</div></div><div class="sidesrc" data-for="verbo" data-t="Verbo"><div class="g2 parg">'+gv+'</div></div><div class="sidesrc" data-for="ele" data-t="Elemento do gênero"><div class="g2 parg">'+g5.slice(0,2).join('')+'</div></div><div class="sidesrc" data-for="voc" data-t="Vocabulário"><div class="g2 parg"><button type="button" role="menuitem" data-cat="ol" title="Gíria, jeito de falar (tipo, né, a gente)" class="'+(m.cat==='ol'?'cur':'')+'"><span>Oralidade</span></button><button type="button" role="menuitem" data-cat="pr" title="Palavra correta, mas vaga ou genérica (ex.: coisa)" class="'+(m.cat==='pr'?'cur':'')+'"><span>Precisão</span></button></div></div><div class="sidesrc" data-for="cnx" data-t="Conectivo"></div><div class="sidesrc" data-for="ort" data-t="Ortografia"></div><div class="sidesrc" data-for="sin" data-t="Mais sinais"><div class="srow">'+SIN_RESTO.map(sinBtn).join('')+'</div></div></div>'+
+  '<div class="sidesrcs"><div class="sidesrc" data-for="par" data-t="Parágrafo"><div class="g2 parg">'+g4.join('')+'</div></div><div class="sidesrc" data-for="verbo" data-t="Verbo"><div class="g2 parg">'+gv+'</div></div><div class="sidesrc" data-for="ele" data-t="Elemento do gênero"><div class="g2 parg">'+g5.slice(0,2).join('')+'</div></div><div class="sidesrc" data-for="voc" data-t="Vocabulário"><div class="g2 parg"><button type="button" role="menuitem" data-cat="ol" title="Gíria, jeito de falar (tipo, né, a gente)" class="'+(m.cat==='ol'?'cur':'')+'"><span>Oralidade</span></button><button type="button" role="menuitem" data-cat="pr" title="Palavra correta, mas vaga ou genérica (ex.: coisa)" class="'+(m.cat==='pr'?'cur':'')+'"><span>Precisão</span></button></div></div><div class="sidesrc" data-for="cnx" data-t="Conectivo"></div><div class="sidesrc" data-for="tit" data-t="Título"></div><div class="sidesrc" data-for="ort" data-t="Ortografia"></div><div class="sidesrc" data-for="sin" data-t="Mais sinais"><div class="srow">'+SIN_RESTO.map(sinBtn).join('')+'</div></div></div>'+
   '<div class="g2 acts'+(m.cat==='rp'||m.cat==='pr'||ALUNOS[i].gancho?' so1':'')+'">'+(m.cat==='rp'||m.cat==='pr'||ALUNOS[i].gancho?'':'<button type="button" class="cmb" data-cat="cmt"><span>Comentar</span></button><button type="button" class="elb'+(m.cat==='el'?' cur':'')+'" data-cat="el" title="Elogio: marca com uma estrela um ponto forte da redação (não conta como desvio)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg><span>Elogio</span></button>')+'<button type="button" class="rm" data-cat="rm"><span>Remover</span></button></div><button type="button" class="fitb" data-cat="fit">Ajustar tamanho do círculo</button><div class="hint3">Arraste o círculo para mover e as alças para ajustar. Delete remove; Ctrl+Z desfaz.</div>';
  el.classList.remove('pal');el.classList.toggle('rpc',rpCompact);el.classList.remove('hide');if(rpCompact&&normP(m.pal).length>1)rpSug(m);
  var s=$('mk'),p=s.createSVGPoint();p.x=m.cx;p.y=m.cy+m.ry+1.5;var q=p.matrixTransform(s.getScreenCTM());
@@ -2845,6 +2852,10 @@ function cnBox(m){if(!CN.por)return '<small class="rpsm">carregando…</small>';
  h+='</div><div class="cndesc"><b>'+CN_LBL[fs]+'</b> · '+esc2((CN.por.__desc||{})[fs]||'')+'</div><div class="cnwhy">'+(CN.why?esc2(s.why)+' <button type="button" data-cnwhy="1">fechar</button>':'<button type="button" data-cnwhy="1">por que essa sugestão?</button>')+'</div>';
  h+='<div class="cnlist'+(sel.length?' has':'')+'">'+ver.map(function(t){return '<button type="button" class="cnt'+(sel.indexOf(t)>=0?' on':'')+'" data-cnt="'+esc2(t).replace(/"/g,'&quot;')+'" aria-pressed="'+(sel.indexOf(t)>=0)+'">'+esc2(t)+'</button>'}).join('')+'</div>'+(L.length>3?'<button type="button" class="cnmais" data-cnmais="1">'+(m._cnmais?'Ver menos':'Ver mais')+'</button>':'');
  return h+'<div class="g2 parg"><button type="button" class="orok" data-cnok="1"'+(sel.length?'':' disabled')+'>Aplicar</button><button type="button" data-cnx="0">Só marcar</button></div>'}
+function titHtml(m){var ins=m.cat==='ti'&&m.ti==='ins'||m._tiIns;return '<div class="gl gl2">Título</div><div class="g2 parg"><button type="button" data-ti="aus" class="'+(m.cat==='ti'&&m.ti==='aus'?'cur':'')+'">Ausente</button><button type="button" data-ti="ins" class="'+(ins?'cur':'')+'">Insuficiente</button></div>'+(ins?'<div class="gl gl2">Cópia do tema?</div><div class="g2 parg"><button type="button" data-tc="1" class="'+(m.cop===true?'cur':'')+'">Sim</button><button type="button" data-tc="0" class="'+(m.cop===false?'cur':'')+'">Não</button></div><p class="tihint">Sim: pede um título próprio. Não: orienta dialogar com o conteúdo do texto.</p>':'<p class="tihint">Sem marcar, o título é considerado bom.</p>')}
+function titFim(m){ // um título por redação: os outros círculos de título saem
+ ALUNOS[i].marks.slice().forEach(function(x){if(x!==m&&x.t==='o'&&x.cat==='ti'){var ix=ALUNOS[i].marks.indexOf(x);reg({t:'rem',m:x,idx:ix});ALUNOS[i].marks=ALUNOS[i].marks.filter(function(y){return y!==x})}});
+ m._tiIns=false;catAtual=null;$('catp').classList.add('hide');$('catpS').classList.add('hide');drawMarks();aplicaAuto()}
 function cnPos(){var sd=$('catpS'),c=$('catp'),tg=c.querySelector('[data-sidetog="cnx"]');if(!tg||sd.classList.contains('hide'))return;var r=c.getBoundingClientRect(),t=tg.getBoundingClientRect(),w=sd.offsetWidth,h=sd.offsetHeight,L=r.right+8,T=t.top-12;if(L+w>innerWidth-8){L=r.left-w-8;if(L<8){L=Math.max(8,Math.min(innerWidth-w-8,t.right-w));T=t.bottom+4}}sd.style.left=L+'px';sd.style.top=Math.max(8,Math.min(innerHeight-h-8,T))+'px'}
 function cnPaint(m){var b=$('cnBox');if(!b||!m)return;b.innerHTML=cnBox(m);cnPos()}
 function cnHtml(m){return '<div class="gl gl2">Corrigir conectivo</div>'+(m.cat==='ce'?'<input id="cnW" class="orw" type="text" maxlength="30" placeholder="Palavra que o aluno usou (opcional)" value="'+esc2(m.pal||'').replace(/"/g,'&quot;')+'" autocomplete="off" spellcheck="false" aria-label="Conectivo que o aluno usou">':'')+'<div id="cnBox">'+cnBox(m)+'</div>'}
@@ -2852,6 +2863,7 @@ function sideSync(){var c=$('catp'),sd=$('catpS'),tg=sideCur?c.querySelector('[d
  if(c.classList.contains('hide')||c.classList.contains('pal')||!tg||!src){sd.classList.add('hide');return}
  var fresh=sd.dataset.k!==sideCur||sd.classList.contains('hide'),pv=(sideCur==='ort'&&!fresh&&$('orW'))?$('orW').value:null;
  if(sideCur==='ort'){var cv=pv!=null?pv:((catAtual&&catAtual.cat==='or'&&catAtual.cor)||'');sd.innerHTML='<div class="gl gl2">Ortografia</div><input id="orW" class="orw" type="text" placeholder="Palavra correta" value="'+esc2(cv)+'" autocomplete="off" spellcheck="false" aria-label="Palavra escrita corretamente"><div id="orSug" class="orsug"></div><div class="g2 parg"><button type="button" class="orok" data-ortok="1">Corrigir</button><button type="button" data-ortok="0">Só marcar</button></div>'+(function(){var L=ortLista();return L.length?'<div class="gl gl2 orlt">Já corrigidas</div><div class="orl">'+L.map(function(w){return '<button type="button" class="orc" data-ortw="'+esc2(w)+'">'+esc2(w)+'</button>'}).join('')+'</div>':''})()}
+ else if(sideCur==='tit'){if(fresh||!$('catpS').querySelector('[data-ti]')){catAtual._tiIns=false;sd.innerHTML=titHtml(catAtual)}}
  else if(sideCur==='cnx'){if(fresh||!$('cnBox')){CN.dd=false;CN.ddAll=false;CN.why=false;sd.innerHTML=cnHtml(catAtual)}cnCarrega(function(){if(sideCur==='cnx')cnPaint(catAtual)})}
  else sd.innerHTML='<div class="gl gl2">'+src.dataset.t+'</div>'+src.innerHTML;
  sd.dataset.k=sideCur;sd.classList.remove('hide');if(sideCur==='ort'){ortFiltra();orSug()}if(fresh&&sideCur==='ort')setTimeout(function(){var w=$('orW');if(w){w.focus();w.select()}},40);
@@ -2861,7 +2873,13 @@ function sideSync(){var c=$('catp'),sd=$('catpS'),tg=sideCur?c.querySelector('[d
 $('catpS').addEventListener('keydown',function(e){if(e.target.id==='orW'&&e.key==='Enter'){e.preventDefault();var k=$('catpS').querySelector('[data-ortok="1"]');if(k)k.click()}});
 $('catpS').addEventListener('input',function(e){if(e.target.id==='orW'){ortFiltra();clearTimeout(orSug.t);orSug.t=setTimeout(orSug,200)}});
 $('catpS').addEventListener('input',function(e){if(e.target.id==='cnW'&&catAtual){catAtual.pal=e.target.value.trim()||undefined;cnPaint(catAtual)}});
-$('catpS').addEventListener('click',function(e){var cf=e.target.closest('[data-cnf]'),ct=e.target.closest('[data-cnt]'),cm=e.target.closest('[data-cnmais]'),ck=e.target.closest('[data-cnok]'),cx=e.target.closest('[data-cnx]');
+$('catpS').addEventListener('click',function(e){var tb=e.target.closest('[data-ti]'),tcb=e.target.closest('[data-tc]');
+ if(catAtual&&(tb||tcb)){var m1=catAtual;
+  if(tb){reg({t:'mod',m:m1,antes:{cat:m1.cat,inad:m1.inad,ti:m1.ti,cop:m1.cop}});m1.cat='ti';m1.inad=false;m1.cop=undefined;
+   if(tb.dataset.ti==='aus'){m1.ti='aus';m1._tiIns=false;titFim(m1);return}
+   m1.ti='ins';m1._tiIns=true;drawMarks();$('catpS').innerHTML=titHtml(m1);return}
+  if(tcb){reg({t:'mod',m:m1,antes:{cop:m1.cop}});m1.cop=tcb.dataset.tc==='1';titFim(m1);return}}
+ var cf=e.target.closest('[data-cnf]'),ct=e.target.closest('[data-cnt]'),cm=e.target.closest('[data-cnmais]'),ck=e.target.closest('[data-cnok]'),cx=e.target.closest('[data-cnx]');
  if(catAtual&&(cf||ct||cm||ck||cx||e.target.closest('[data-cnsel],[data-cnall],[data-cnwhy]'))){var m0=catAtual;
   if(cx){fechaCat();return}
   var cs=e.target.closest('[data-cnsel]'),ca2=e.target.closest('[data-cnall]'),cw=e.target.closest('[data-cnwhy]');
@@ -3140,13 +3158,13 @@ var IC_W='<svg class="ci" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-
     IC_I='<svg class="ci" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
     IC_K='<svg class="ci" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>';
 function contagens(a){
- var d=0,prV={},ras=0,ml={},rpn=0,rpw={},con=0,lac=0,ele=0;
- a.marks.forEach(function(m){if(m.t!=='o')return;if(m.cat==='el')return;if(m.cat==='lac'){lac++;return;}if(m.cat==='ele'||m.cat==='eli'){return;}if(m.cat==='ce'||m.cat==='ca'){con++;return;}if(m.cat==='rp'){if(conta1(m)){rpn++;if(normP(m.pal))rpw[normP(m.pal)]=1}return;}if(m.cat==='ra')ras++;else if(isMg(m.cat))ml[m.line]=1;else if(m.cat==='pr'){var pk=normP(m.pal);if(pk&&!prV[pk]){prV[pk]=1;d++}}else if(m.cat!=='cm'&&!PROG[m.cat])d++;});
+ var d=0,prV={},ras=0,ml={},rpn=0,rpw={},con=0,lac=0,ele=0,tit=null;
+ a.marks.forEach(function(m){if(m.t!=='o')return;if(m.cat==='el')return;if(m.cat==='ti'){tit=(tit==='aus'||m.ti==='aus')?'aus':'ins';return}if(m.cat==='lac'){lac++;return;}if(m.cat==='ele'||m.cat==='eli'){return;}if(m.cat==='ce'||m.cat==='ca'){con++;return;}if(m.cat==='rp'){if(conta1(m)){rpn++;if(normP(m.pal))rpw[normP(m.pal)]=1}return;}if(m.cat==='ra')ras++;else if(isMg(m.cat))ml[m.line]=1;else if(m.cat==='pr'){var pk=normP(m.pal);if(pk&&!prV[pk]){prV[pk]=1;d++}}else if(m.cat!=='cm'&&!PROG[m.cat])d++;});
  // repetições = círculos além do primeiro de cada palavra (círculo sem palavra conta 1)
  var sem=0;a.marks.forEach(function(m){if(m.t==='o'&&m.cat==='rp'&&!normP(m.pal))sem++});
  var pc={},sp=0;a.marks.forEach(function(m){if(m.t==='o'&&m.cat==='rp'&&conta1(m)){var w=normP(m.pal);if(w)pc[w]=(pc[w]||0)+1;else sp++}});
  var repW=Object.keys(pc).filter(function(k){return pc[k]>=2}).length+(sp>=2?1:0),repMax=Math.max(0,sp,Math.max.apply(null,Object.keys(pc).map(function(k){return pc[k]})));
- return {d:d,ras:ras,mg:Object.keys(ml).length,rep:Math.max(0,rpn-Object.keys(rpw).length),repW:repW,repMax:repMax,con:con,lac:lac,ele:eleStat(a).per};
+ return {tit:tit,d:d,ras:ras,mg:Object.keys(ml).length,rep:Math.max(0,rpn-Object.keys(rpw).length),repW:repW,repMax:repMax,con:con,lac:lac,ele:eleStat(a).per};
 }
 function alertasDe(a){
  if(a.anul)return [];
@@ -3171,6 +3189,8 @@ function alertasDe(a){
  if(n[0]!=null){
   var maxR=c.ras===0?4:c.ras<=2?3:c.ras<=5?2:1;
   if(n[0]>maxR)push('I-ras-'+c.ras+'-'+n[0],0,'warn','Estética no nível '+n[0]+', mas há '+pl(c.ras,'rasura marcada','rasuras marcadas')+'. Pelas rasuras, o máximo seria o nível '+maxR+'.',maxR);
+  if(c.tit==='aus'&&n[0]>1)push('I-tm-a-'+n[0],0,'warn','Título ausente marcado: pela grade, a Estética fica nos níveis 0 ou 1.',1);
+  else if(c.tit==='ins'&&n[0]>2)push('I-tm-i-'+n[0],0,'warn','Título insuficiente marcado: pela grade, a Estética fica no máximo no nível 2.',2);
   if(c.mg>=3&&n[0]>2)push('I-mg-'+c.mg+'-'+n[0],0,'warn','Margens desrespeitadas em '+c.mg+' linhas. A grade limita a Estética ao nível 2 a partir de 3 ocorrências.',2);
  }
 // Progressão x conectivos: nível 3 ou 4 pede confirmação do encadeamento
@@ -3398,9 +3418,11 @@ function sugAuto(a,k){
   return {n:n,why:c.d+(c.d===1?' desvio marcado':' desvios marcados')+' ('+linFaixa(c.d)+') → nível '+n};
  }
  if(k===0){
-  if(c.ras===0&&c.mg<3)return null; // sem rasura nem margem estourada não dá para inferir: título e paragrafação não têm marcação
+  if(c.ras===0&&c.mg<3&&!c.tit)return null; // sem rasura, margem estourada nem título marcado não dá para inferir: paragrafação não tem marcação
   var n2=c.ras===0?4:c.ras<=2?3:c.ras<=5?2:1;if(c.mg>=3)n2=Math.min(n2,2);
-  return {n:n2,why:(c.ras?c.ras+(c.ras===1?' rasura':' rasuras'):'')+(c.ras&&c.mg>=3?' e ':'')+(c.mg>=3?'margens em '+c.mg+' linhas':'')+' → no máximo nível '+n2};
+  if(c.tit)n2=Math.min(n2,c.tit==='aus'?1:2); // grade: título ausente = nível 0 ou 1; título insuficiente = no máximo nível 2
+  var pcs=[];if(c.tit)pcs.push('título '+(c.tit==='aus'?'ausente':'insuficiente'));if(c.ras)pcs.push(c.ras+(c.ras===1?' rasura':' rasuras'));if(c.mg>=3)pcs.push('margens em '+c.mg+' linhas');
+  return {n:n2,why:pcs.join(', ')+' → no máximo nível '+n2};
  }
  if(k===3){
   if(!(c.ele>0))return null; // sem elemento marcado não dá para inferir a Proposta
@@ -3425,7 +3447,7 @@ function sugAuto(a,k){
 function aplicaAuto(){
  var a=ALUNOS[i];if(!a||a.anul)return false;
  var mudou=false;
- var sig=raTxt(a).join('|')+'§'+margemTxt(a).join('|');
+ var sig=titTxt(a).join('|')+'§'+raTxt(a).join('|')+'§'+margemTxt(a).join('|');
  if(sig!==(a.mgSig||'')){a.mgSig=sig;if(a.niv[0]!=null&&!(a.edt&&a.edt[0])){a.det[0]=compoe(0,a.niv[0],a.base[0],a);mudou=true;}}
  var ssg=ssTxt(a).join('|')+'§'+sinTxt(a).join('|')+'§'+desTxt(a).join('|')+'§'+prTxt(a).join('|');
  if(ssg!==(a.ssSig||'')){a.ssSig=ssg;if(a.niv[1]!=null&&!(a.edt&&a.edt[1])){a.det[1]=compoe(1,a.niv[1],a.base[1],a);mudou=true;}}
@@ -3844,17 +3866,17 @@ function verCorrecao(k){
  var circ=P.circ||[{l:5,x:70,c:'or',w:'exceção'},{l:11,x:128,c:'ac'},{l:17,x:88,c:'pt'},{l:24,x:140,c:'cj'},{l:24,x:60,c:'or'},{l:14,x:100,c:'ra'},{l:19,x:80,c:'ss'},{l:28,x:176,c:'ma'},{l:21,x:60,c:'mr'},{l:7,x:90,c:'vi'},{l:15,x:60,c:'mi'},{l:30,x:110,c:'lac'},{l:12,x:90,c:'el'}];
  var cmts=P.cmts||[{l:9,x:176,j:2,t:'Este período está muito longo. Divida em duas frases e use um conectivo para ligar as ideias.'},{l:15,l2:18,par:2,x:176,j:2,t:'Este parágrafo repete a mesma ideia. Reorganize as frases para o raciocínio avançar.'},{l:20,x:176,j:4,t:'Explique em detalhes quais são esses impactos.'}];
  aluno.marks=circ.filter(function(c){return isMg(c.c)}).map(function(c){return {t:'o',cat:c.c,line:c.l}});
- var NV={ce:1,ca:1,lac:1,ele:1,eli:1,el:1};
+ var NV={ce:1,ca:1,lac:1,ele:1,eli:1,el:1,ti:1};
  var por={},est={},prSeen={};circ.forEach(function(c){if(NV[c.c])return;if(c.c==='ra'||isMg(c.c))est[isMg(c.c)?'mg':c.c]=(est[isMg(c.c)?'mg':c.c]||0)+1;else if(c.c==='pr'){var _pk=String(c.w||'').trim().toLowerCase();if(_pk&&!prSeen[_pk]){prSeen[_pk]=1;por.pr=(por.pr||0)+1}}else por[c.c]=(por[c.c]||0)+1});
  var linhas={};circ.forEach(function(c){if(!NV[c.c]&&c.c!=='ra'&&!isMg(c.c))linhas[c.l]=(linhas[c.l]||0)+1});
  var catN={ac:'Acentuação',pt:'Pontuação',or:'Ortografia',il:'Ilegibilidade',cj:'Conjugação verbal',cn:'Concordância verbal',rg:'Regência verbal',cr:'Crase',ol:'Oralidade',pr:'Precisão',tr:'Truncamento',vi:'Vírgula',mi:'Uso de letra maiúscula',ra:'Rasura',ce:'Conectivo (errado)',ca:'Conectivo (ausente)',mg:'Margens',mr:'Linha curta',ma:'Passou da margem',pc:'Parágrafo curto',pe:'Parágrafo longo',pd:'Parágrafo desalinhado',ss:'Translineação',el:'Elogio',lac:'Lacuna',ele:'Elemento ausente',eli:'Elemento insuficiente'},sig={rg:'RG',ce:'CE',ca:'C',lac:'LAC',ele:'EL',eli:'EI',ac:'AC',pt:'PT',or:'OR',il:'IL',cj:'CJ',cn:'CN',cr:'CR',ol:'OL',pr:'PR',tr:'TR',vi:'VI',mi:'MI',ra:'RA',mg:'MG',mr:'MR',ma:'MA',pc:'PC',pe:'PE',pd:'PD',ss:'SS'};
  var sel=null,zoom=80;
- var critDe=function(c){return c==='el'?-1:(c==='ra'||isMg(c))?0:(c==='ce'||c==='ca'||c==='rp')?2:(c==='ele'||c==='eli')?3:c==='lac'?4:1};
+ var critDe=function(c){return c==='el'?-1:(c==='ra'||isMg(c)||c==='ti')?0:(c==='ce'||c==='ca'||c==='rp')?2:(c==='ele'||c==='eli')?3:c==='lac'?4:1};
  var fj=null,FN=['Estética','Linguagem','Progressão','Proposta','Abordagem'];
  var okF=function(c){return fj===null||(fj==='cv'?(c==='ce'||c==='ca'):critDe(c)===fj)};
  var okC=function(c){return fj===null||(fj!=='cv'&&c.j===fj)};
  var NR=function(k,w){return w?w:k==='el'?'★':['I','II','III','IV','V'][critDe(k)]};
- var gX=function(c,cy){var k=c.c,cls=(k==='ra'||isMg(k)?' est'+(isMg(k)&&k!=='mr'&&k!=='ma'?' gpg':isMg(k)?' gmg':''):'')+(k==='ca'?' cv ca':k==='ce'?' cv':'')+(k==='el'?' elg':'')+(k==='or'&&c.w?' cor':'')+(k==='lac'?' lac':'')+(k==='ele'?' ele':k==='eli'?' eli':'');return '<g class="xm'+cls+'"><ellipse cx="'+c.x+'" cy="'+cy+'" rx="8" ry="2.9"/><text class="cl" x="'+((k==='or'&&c.w)?c.x:c.x+4.4)+'" y="'+(cy-3.4)+'">'+esc(NR(k,k==='or'?c.w:''))+'</text>'+(k==='ca'?'<text class="cg" x="'+c.x+'" y="'+(cy+2.1)+'">C</text>':'')+'</g>'};
+ var gX=function(c,cy){var k=c.c,cls=(k==='ra'||k==='ti'||isMg(k)?' est'+(isMg(k)&&k!=='mr'&&k!=='ma'?' gpg':isMg(k)?' gmg':''):'')+(k==='ca'?' cv ca':k==='ce'?' cv':'')+(k==='el'?' elg':'')+(k==='or'&&c.w?' cor':'')+(k==='lac'?' lac':'')+(k==='ele'?' ele':k==='eli'?' eli':'');return '<g class="xm'+cls+'"><ellipse cx="'+c.x+'" cy="'+cy+'" rx="8" ry="2.9"/><text class="cl" x="'+((k==='or'&&c.w)?c.x:c.x+4.4)+'" y="'+(cy-3.4)+'">'+esc(NR(k,k==='or'?c.w:''))+'</text>'+(k==='ca'?'<text class="cg" x="'+c.x+'" y="'+(cy+2.1)+'">C</text>':'')+'</g>'};
  var cntF=function(f){var n=0;circ.forEach(function(c){var o=fj;fj=f;if(okF(c.c))n++;fj=o});cmts.forEach(function(c){if(f!=='cv'&&c.j===f)n++});return n};
 
  var pad=function(l){return (l<10?'0':'')+l},sorted=function(a){return a.slice().sort(function(x,y){return x-y})};
