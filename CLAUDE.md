@@ -24,6 +24,11 @@ Botão "Título" na seção Estética do AC (painel lateral): Ausente / Insufici
 Sem marcar = título bom. Segue a grade (arquivo: COMPS[0].niv): ausente → Estética nível 0 ou 1 (sugere 1); insuficiente → no máximo nível 2. Marca `cat:'ti'`, `m.ti` ('aus'|'ins'), `m.cop` (true|false); um por redação;
 entra em `contagens().tit`, `sugAuto(a,0)`, `titTxt(a)` (comentário) e no alerta de incoerência; não conta como desvio gramatical.
 
+## Liberação das correções (regra do dono)
+A correção salva pelo corretor NÃO vai ao aluno. A coordenação clica em **Liberar pacote** (Corretores → Pacotes): `liberar_pacote(p_pacote)` libera as correções prontas do pacote.
+Notas 0 e 10, anuladas, AEE e dúvida pendente são OUTRO processo (aprovação do professor/coordenação, fila de liberação). Se o pacote já foi liberado, novas versões de correção
+não retidas continuam liberadas. O corretor não consegue liberar (o gatilho `trg_correcoes` força `liberada`). Teste: `node e2e/liberar-pacote-real.mjs`.
+
 ## Como trabalhar
 - Lint/testes/build: `npm run lint && npm test && npm run build`.
 - Ciclo de dados no banco real: `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node e2e/ciclo-real.mjs`.

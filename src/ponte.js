@@ -261,7 +261,7 @@ const ARENA = {
     // retida: anulada, nota 0 ou 10, suspeita de IA ou dúvida pendente -> o professor/coordenação decide
     const retida = !!a.anul || soma === 0 || soma === 20 || !!a.aee || !!a.ia || !!(a.duvida && a.duvida.st === 'pend')
     row.extras = { nCorr: a.nCorr || 0, retida, segundos: a._seg || 0, ...(a.duvida && a.duvida.st === 'pend' ? { duvida: { pergunta: a.duvida.txt, crit: a.duvida.crit ?? '', linha: a.duvida.linha ?? '' } } : {}), ...(a.ia ? { ia: { txt: a.ia.txt } } : {}) }
-    row.liberada = !retida
+    // a correção NÃO é liberada aqui: a coordenação libera o pacote (o banco também garante isso)
     const r1 = await supabase.from('correcoes').upsert(row)
     if (r1.error) return false
     await supabase.from('marcacoes').delete().eq('redacao_id', a._rid)
@@ -453,6 +453,11 @@ const ARENA = {
 
   // ===== Feed e destaques =====
   // Aluno: convites e destaques próprios, feed da série (sem nomes) e erros da série (agregado).
+  // Coordenação: libera o pacote (as correções prontas passam a aparecer para os alunos). Devolve quantas foram liberadas.
+  async liberarPacote(pid) {
+    const { data, error } = await supabase.rpc('liberar_pacote', { p_pacote: pid })
+    return error ? null : data
+  },
   async carregarFeed() {
     const al = ARENA.aluno
     const [meus, feed, erros, serie] = await Promise.all([
@@ -748,7 +753,10 @@ const ARENA = {
     fill(C.PACS, pacs.data.map((x) => {
       const rs = nPac[x.id]
       const feitas = rs.filter((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && (c.n1 != null || c.anulacao) }).length
-      const o = { id: x.numero, turma: x.serie, prop: x.rotulo, ver: x.reescrita ? '2ª' : '1ª', n: rs.length, prazo: dm(x.prazo) || '', c: x.corretor_id, ok: feitas, _pid: x.id, aee: !!x.aee }
+      const corr = (r) => (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes)
+      const pend = rs.filter((r) => r.etapa === 'corrigida' && corr(r) && !corr(r).liberada).length
+      const lib = rs.filter((r) => corr(r)?.liberada).length
+      const o = { id: x.numero, turma: x.serie, prop: x.rotulo, ver: x.reescrita ? '2ª' : '1ª', n: rs.length, prazo: dm(x.prazo) || '', c: x.corretor_id, ok: feitas, _pid: x.id, aee: !!x.aee, pend, lib, liberado: !!x.liberado_em }
       o.g = C.genero(x.rotulo); o.sg = x.reescrita; o.gan = { aluno: null, prof: null, cor: null }
       return o
     }))
