@@ -7,7 +7,7 @@ let falhas = 0
 const ok = (c, m) => { console.log(c ? 'ok   ' : 'FALHA', m); if (!c) falhas++ }
 const corretor = await entrar('corretor@arena.com')
 const coord = await entrar('teste@arena.com')
-const maria = await entrar('20269999@aluno.arena.com', 'nova-senha-123')
+const alunoCli = await entrar('20260187@aluno.arena.com', 'teste')
 
 // uma redação de pacote ainda não liberado, que o corretor enxerga
 const { data: pacs } = await coord.from('pacotes').select('id, numero, liberado_em').is('liberado_em', null)
@@ -31,7 +31,7 @@ const { data: c2 } = await coord.from('correcoes').select('liberada').eq('redaca
 ok(c2 && c2.liberada === false, 'o corretor não libera por update')
 // 3) corretor e aluno não chamam liberar_pacote
 const rc = await corretor.rpc('liberar_pacote', { p_pacote: pac.id }); ok(!!rc.error, 'o corretor não executa liberar_pacote')
-const ra = await maria.rpc('liberar_pacote', { p_pacote: pac.id }); ok(!!ra.error, 'o aluno não executa liberar_pacote')
+const ra = await alunoCli.rpc('liberar_pacote', { p_pacote: pac.id }); ok(!!ra.error, 'o aluno não executa liberar_pacote')
 // 4) o aluno ainda não vê a nota
 if (aluno.perfil_id) { /* a visão do aluno é conferida pela RLS: sem liberada, ele não lê a correção */ }
 // 5) a coordenação libera o pacote

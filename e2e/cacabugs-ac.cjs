@@ -14,8 +14,13 @@ await p.goto('http://localhost:4173');await p.waitForTimeout(500);await p.click(
 await p.waitForSelector('#phCards',{timeout:20000});await p.waitForTimeout(800);
 const cards=await p.locator('.pcd').allInnerTexts();const idx=cards.findIndex(t=>/1ª versão ·/.test(t));await p.locator('.pcd').nth(Math.max(idx,0)).click();await p.waitForTimeout(600);
 await p.locator('#plGo').click();await p.waitForTimeout(2000);await p.mouse.click(158,136);await p.waitForTimeout(300);
-let Y=250;
-const marca=async(w=46,h=18)=>{Y+=45;if(Y>780)Y=290;const x=380+((Y*7)%140);await p.mouse.move(x,Y);await p.mouse.down();await p.mouse.move(x+w/2,Y+h/2,{steps:4});await p.mouse.move(x+w,Y+h,{steps:4});await p.mouse.up();await p.waitForTimeout(350);return {x,Y}};
+let Y=250,tent=0;
+// arrasta sobre o texto; se o AC não abrir (o arrasto caiu sobre uma marca antiga), tenta outra posição
+const marca=async(w=46,h=18)=>{if((await p.getAttribute('[data-tool="o"]','aria-checked'))!=='true'){await p.click('[data-tool="o"]');await p.waitForTimeout(150)} // Esc com o AC fechado sai da ferramenta; o teste a religa
+  for(let k=0;k<14;k++){Y+=45;if(Y>780)Y=290;tent++;const x=300+((tent*53)%380);
+  await p.mouse.move(x,Y);await p.mouse.down();await p.mouse.move(x+w/2,Y+h/2,{steps:4});await p.mouse.move(x+w,Y+h,{steps:4});await p.mouse.up();await p.waitForTimeout(350);
+  if(await p.locator('#catp:not(.hide)').count())return {x,Y};await fecha()}
+  return {x:0,Y}};
 const fecha=async()=>{await p.keyboard.press('Escape').catch(()=>{});await p.mouse.click(640,70);await p.waitForTimeout(200)};
 const passo=async(nome,fn)=>{try{await fn();await txtRuim(nome);ok(nome)}catch(e){falha(nome+' → '+String(e.message).split('\n')[0].slice(0,140))}await fecha();};
 const mc=async()=>parseInt((await T('#mkc')))||0;
