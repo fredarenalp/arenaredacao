@@ -2051,6 +2051,7 @@ function desTxt(a){ // desvios de escrita circulados (os de sinal inserido e os 
  var out=[];DES_ORD.forEach(function(c){if(c==='or'&&W.length){var q=W.map(function(x){return '“'+x+'”'});out.push('Atenção à grafia '+(W.length>1?'das palavras ':'da palavra ')+(q.length<2?q[0]:q.slice(0,-1).join(', ')+' e '+q[q.length-1])+'.')}var L=P[c];if(!L)return;L=ord(L);var lst=L.length<2?L.join(''):L.slice(0,-1).join(', ')+' e '+L[L.length-1];
   out.push('Há desvio de '+DES_TX[c][0]+' '+(L.length>1?'nas linhas ':'na linha ')+lst+'. '+DES_TX[c][1])});
  return out}
+window.PROG_SR=['Ligue as ideias com conectivos, entre os parágrafos e dentro deles.','Fortaleça a ligação entre as ideias com conectivos variados.','Diversifique os conectivos para ligar melhor as ideias, entre os parágrafos e dentro deles.','Amplie a variedade de conectivos para ligar ainda melhor as ideias.']; // Progressão sem repetição marcada: nada sobre sinônimos ou repetições
 function compoe(k,n,sents,a){
  var seed=hash(a.m)+k*13+n*7+(a.salt||0)*5,out=[];
  var mgOn=k===0&&margemTxt(a).length>0; // com margem marcada, o elogio da Estética é mais comedido
@@ -2066,7 +2067,8 @@ function compoe(k,n,sents,a){
    else{out.length=0;out.push(vpick(a,k,'pr4',V.pr[4],sa));var f=vpick(a,k,'fe4',V.fe4,sc);if(f)out.push(f)}
   }else{
   var v=[COMPS[k].ori[n]].concat(n<4?[ALT[k][n]]:[]);
-  if(!(n>=3&&v.length>1&&pick([0,1],seed)===0))out.push(pick(v,seed+1));else out.push(v[1]);
+  if(k===2&&n<4&&!(a.marks||[]).some(function(m){return m.t==='o'&&m.cat==='rp'}))v=[PROG_SR[n]];
+  if(!(n>=3&&v.length>1&&pick([0,1],seed)===0))out.push(pick(v,seed+1));else out.push(v[v.length>1?1:0]);
   if(n===4)out.pop(); // nível 4 sem orientação: só o elogio
   }
  }
@@ -2743,7 +2745,7 @@ $('lcdel').onclick=function(){var a=ALUNOS[i],id=cmtAtual.id;reg({t:'rem',m:cmtA
 $('mk').addEventListener('click',function(e){
  if(verOrig)return;
  var nh=e.target.closest('.nh');
- if(nh&&tool!=='x'){abreLC(+nh.closest('.nhg').dataset.line);return;}
+ if(nh&&tool!=='x'){var pc0=pt(e);if(pc0&&(tool==='o'||tool==='h')&&hitCirc(pc0))return;abreLC(+nh.closest('.nhg').dataset.line);return;}
  var pn=e.target.closest('.pin');
  if(pn&&tool!=='x'){var m=coments().filter(function(c){return String(c.id)===pn.dataset.id})[0];if(m)abreLC(m.line,m.x,m.y,m.id);}
 });
@@ -2964,7 +2966,8 @@ $('mk').addEventListener('pointerdown',function(e){
  if(verOrig)return;
  if(upMode){upClick(e);return;}
  if(tool==='pan')return;
- if(e.target.closest('.nh')||e.target.closest('.pin'))return; // tratado no click
+ if(e.target.closest('.pin'))return; // tratado no click
+ if(e.target.closest('.nh')){var pn0=pt(e);if(!(pn0&&(tool==='o'||tool==='h')&&hitCirc(pn0)))return;} // número da linha: abre o comentário no click, mas um círculo que está em cima dele tem prioridade (dá para selecionar e editar)
  var p=pt(e);if(!p)return;e.preventDefault();
  var a=ALUNOS[i];
  if(tool==='o'||tool==='h'){
@@ -3989,7 +3992,7 @@ function verCorrecao(k){
    mel.push({t:(n===4?'Na apresentação, só um detalhe':n===3?'Na apresentação, falta pouco':n===2?'A apresentação precisa de mais cuidado':'A apresentação precisa de bastante atenção')+(d.length?': há '+d.join(' e ')+'.':'.')+(porLin.ra?' '+A.RA_TXT:'')+(porLin.mg?' '+A.margemTxt(aluno).join(' '):''),imp:false});
   }else if(j===1&&nD){
    mel.push({t:(n===4?'Na linguagem, só alguns ajustes.':n===3?'Na linguagem, o texto está bem cuidado, mas ainda há alguns desvios.':n===2?'A linguagem merece uma revisão com calma.':'A linguagem precisa de uma revisão cuidadosa, parágrafo por parágrafo.')+' Marquei '+nD+' na sua folha, '+lnT(todasL)+': '+jn(tipos)+'. Releia as linhas assinaladas e identifique o que precisa ser ajustado em cada uma.'+ortS+prS+(porLin.ss?' '+A.SS_TXT:''),imp:false});
-  }else if(n<4){mel.push({t:c.ori[n],imp:true});}
+  }else if(n<4){mel.push({t:(j===2&&n<4&&window.PROG_SR&&!circ.some(function(x){return x.c==='rp'})?window.PROG_SR[n]:c.ori[n]),imp:true});}
  });
  var CON=['Além disso, ','Também ','Por fim, '];
  mel.forEach(function(m,k){if(k>0&&m.imp){var pref=(k===mel.length-1&&k>1)?'Por fim, ':CON[(k-1)%2];m.t=pref+lc(m.t);}});
