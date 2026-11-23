@@ -61,3 +61,7 @@ No fim de cada bimestre os alunos salvam as correções em PDF (tela do aluno �
 (Propostas → "Apagar imagens…", escolhe o bimestre, "Ver o que será apagado", digita APAGAR). Fica no banco só nota, comentários e marcações. Sem protocolo no sistema: a combinação é oral.
 Função `apagar-imagens` (só coordenação; só redações corrigidas e com correção liberada; redação em correção não é tocada; arquivo comum a outras redações não é apagado). Sem foto, o aluno vê o aviso "A foto desta redação foi arquivada" e o PDF sai sem a folha; `foto()` sintética do protótipo nunca aparece com dados reais.
 Testes: `node e2e/apagar-imagens-real.mjs` (só apaga as redações que ele cria) e `node e2e/pdf-bimestre.cjs`. O link assinado de uma foto já apagada pode continuar abrindo por um tempo (cache do storage).
+
+## AC · Parágrafo desalinhado (decisão do dono: versão A, IMPLEMENTADO)
+Os círculos de Parágrafo → Desalinhado se ligam sozinhos por uma linha reta e grossa roxa, de cima para baixo (a partir de dois círculos), e o número de cada linha marcada ganha um ponto cheio com o número dentro. Vale no AC, na correção do aluno e na impressão (`window.pdLinhaSvg`).
+O círculo que fica em cima do número da linha agora é selecionável (antes o clique abria o comentário da linha). Testes: `node e2e/paragrafo-desalinhado.cjs` e `node e2e/circulo-margem.cjs`.

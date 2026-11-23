@@ -1489,6 +1489,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .vbody{padding:12px 18px 16px}.vcard .vsum{font-size:15px;margin:2px 0 10px}.vcard .vsum b{font-size:26px;color:#2f5f61;margin-right:4px}.vcard .vsum small{color:#6b7280}.vleg{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:#5d584a;margin-bottom:10px}.vleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .vrow{display:grid;grid-template-columns:92px 1fr 130px;gap:12px;align-items:center;padding:5px 0;font-size:13.5px}.vrow>span{color:#3a3a32;text-align:right}.vrow small{color:#8a8578}.vbar{display:flex;height:16px;border-radius:5px;overflow:hidden;background:#ece7da}.vbar i,.vleg i.t,.vbar i.t{background:#2f855a}.vbar i.p,.vleg i.p{background:#d9a441}.vbar i.n,.vleg i.n{background:#d9d3c3}
 @media(max-width:640px){.vrow{grid-template-columns:70px 1fr}.vrow>span{grid-column:1/-1;text-align:left}}
+.mk .pdl,.crk .pdl,.pr-pg .pdl{fill:none;stroke:#b0307a;stroke-width:1.3;stroke-linecap:round;opacity:.85;pointer-events:none}
+.mk .pdn,.crk .pdn,.pr-pg .pdn{pointer-events:none}.mk .pdn circle,.crk .pdn circle,.pr-pg .pdn circle{fill:#b0307a;stroke:none}.mk .pdn text,.crk .pdn text,.pr-pg .pdn text{fill:#fff;stroke:none;font:700 3px 'DM Sans',sans-serif;text-anchor:middle}
 </style>
 <!--PONTE--></head>
 <body>
@@ -2671,6 +2673,11 @@ function renderDv(){
 function coments(){return ALUNOS[i].marks.filter(function(m){return m.t==='c'})}
 function linhaDe(y){return Math.max(1,Math.min(35,Math.ceil((y-(46-6.8))/6.8)))}
 function rpLabel(m,src){var k=normP(m.pal),g=repGrupos(null,src)[k]||[],w=m.pal.trim();if(w.length>12)w=w.slice(0,11)+'…';return (!g.length||g[0]===m)?crN('rp'):w} // a 1ª marcação da palavra mostra o critério (III); as repetições seguintes mostram a própria palavra
+/* Parágrafo desalinhado: os círculos se ligam por uma linha reta e grossa, de cima para baixo, e o número da linha ganha um ponto cheio (usado no AC, na correção do aluno e na impressão) */
+window.pdLinhaSvg=function(pts){if(!pts||!pts.length)return '';var P=pts.slice().sort(function(a,b){return a.y-b.y}),o='';
+ for(var k=1;k<P.length;k++)o+='<line class="pdl" x1="'+P[k-1].x+'" y1="'+P[k-1].y+'" x2="'+P[k].x+'" y2="'+P[k].y+'"/>';
+ P.forEach(function(q){o+='<g class="pdn"><circle cx="18.2" cy="'+q.yn+'" r="3.1"/><text x="18.2" y="'+(q.yn+1.1)+'">'+q.l+'</text></g>'});
+ return o};
 function rpSetas(src){
  var g=repGrupos(null,src,true),o=''; // as setas ligam também o círculo do título; ele só não entra na contagem
  Object.keys(g).forEach(function(k){var ms=g[k];for(var q=1;q<ms.length;q++){var A=ms[q-1],B=ms[q],dx=B.cx-A.cx,dy=B.cy-A.cy,d=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/d,uy=dy/d;
@@ -2685,6 +2692,7 @@ function drawMarks(tmp){
  for(var k=1;k<=35;k++){var y=lineY(k);h+='<g class="nhg" data-line="'+k+'"><title>Clique para comentar a linha '+k+'</title><rect class="bd" x="26.6" y="'+(y-6.8)+'" width="156.8" height="6.8"/><rect class="nh" x="12" y="'+(y-6.8)+'" width="12.5" height="6.8"/><rect class="nh" x="185.5" y="'+(y-6.8)+'" width="12.5" height="6.8"/></g>';}
  var cont=verOrig?{}:resumoDv().porLinha;
  Object.keys(cont).forEach(function(l){var y=lineY(+l)-2.4,q=cont[l];h+='<g class="ld"><circle cx="14.6" cy="'+y+'" r="'+(q>1?1.9:1.4)+'"/><circle cx="196.4" cy="'+y+'" r="'+(q>1?1.9:1.4)+'"/>'+(q>1?'<text x="14.6" y="'+(y+.75)+'">'+q+'</text><text x="196.4" y="'+(y+.75)+'">'+q+'</text>':'')+'</g>';});
+ h+=pdLinhaSvg(srcM.filter(function(m){return m.t==='o'&&m.cat==='pd'&&!m.sinal}).map(function(m){var l=rg(m)[0];return {x:m.cx,y:m.cy,l:l,yn:lineY(l)-3.4}}));
  srcM.forEach(function(m){
   if(m.t==='o'&&multi(m)){var rr2=rg(m),y0=lineY(rr2[0])-6.8+.8,hh=6.8*(rr2[1]-rr2[0]+1)-1.6;h+='<g class="rgb'+(ESTET[m.cat]?' est'+gcl(m.cat):'')+(m.cat==='cm'?' cmc':'')+'"><rect x="13.2" y="'+y0+'" width="1.3" height="'+hh+'"/><rect x="196" y="'+y0+'" width="1.3" height="'+hh+'"/></g>';}
   if(m.t==='o'&&m.sinal)h+='<g class="sg'+((catAtual&&catAtual.id===m.id)||selC===m?' sel':'')+'" data-id="'+m.id+'"><circle class="sgh" cx="'+m.cx+'" cy="'+m.cy+'" r="4"/><text x="'+m.cx+'" y="'+m.cy+'" font-size="'+(m.sym==='`'||m.sym==='´'||m.sym==='^'||m.sym==='~'?5.2:5.6)+'">'+String(m.sym).replace('&','&amp;')+'</text></g>';
@@ -4010,7 +4018,7 @@ function verCorrecao(k){
  function montaImpressao(){
   var el=document.getElementById('printArea');if(!el){el=document.createElement('div');el.id='printArea';document.body.appendChild(el);}
   var logo=(document.querySelector('.al .ph img')||{}).src||'';
-  var marks='';circ.forEach(function(c){var cy=A.lineY(c.l)-2.4,est2=c.c==='ra'||isMg(c.c);marks+=gX(c,cy);});
+  var marks=pdLinhaSvg(circ.filter(function(c){return c.c==='pd'}).map(function(c){return {x:c.x,y:A.lineY(c.l)-2.4,l:c.l,yn:A.lineY(c.l)-3.4}}));circ.forEach(function(c){var cy=A.lineY(c.l)-2.4,est2=c.c==='ra'||isMg(c.c);marks+=gX(c,cy);});
   cmts.forEach(function(c){var y=A.lineY(c.l)-3.4;marks+='<g class="pin"><circle cx="'+c.x+'" cy="'+y+'" r="3.7"/><text x="'+c.x+'" y="'+(y+1.25)+'">'+c.l+'</text></g>';});
   var tab=A.COMPS.map(function(c,j){return '<tr><td><b>'+c.id+' · '+c.nome+'</b></td><td>'+A.NIVEIS[NIV[j]]+' (nível '+NIV[j]+' de 4)</td><td>'+A.fmt(NIV[j]*.5)+' de 2,0</td></tr>'}).join('');
   el.innerHTML='<div class="pr-page"><div class="pr-head">'+(logo?'<img src="'+logo+'" alt="">':'')+'<div><div class="pr-t">Correção da redação</div><div class="pr-s">Arena Redação · Colégio Arena</div></div></div>'+
@@ -4041,6 +4049,7 @@ function verCorrecao(k){
  function desenha(){
   var h='';if(sel){var cs=cmts.filter(function(c){return c.l===sel})[0],ext=(cs&&cs.l2)?cs.l2-sel+1:1;h+='<rect class="hl" x="26.6" y="'+(A.lineY(sel)-6.8)+'" width="156.8" height="'+(6.8*ext)+'"/>';}
   cmts.forEach(function(c){if(c.l2&&okC(c)){var y0=A.lineY(c.l)-6.8+.8,hh=6.8*(c.l2-c.l+1)-1.6;h+='<g class="rgb"><rect x="13.2" y="'+y0+'" width="1.3" height="'+hh+'"/><rect x="196" y="'+y0+'" width="1.3" height="'+hh+'"/></g>';}});
+  h+=pdLinhaSvg(circ.filter(function(c){return c.c==='pd'&&okF('pd')}).map(function(c){return {x:c.x,y:A.lineY(c.l)-2.4,l:c.l,yn:A.lineY(c.l)-3.4}}));
   circ.forEach(function(c){if(!okF(c.c))return;h+=gX(c,A.lineY(c.l)-2.4)});
   cmts.forEach(function(c){if(!okC(c))return;var y=A.lineY(c.l)-3.4;h+='<g class="pin" data-l="'+c.l+'" tabindex="0" role="button" aria-label="Ver comentário: '+rot(c)+'"><circle cx="'+c.x+'" cy="'+y+'" r="3.7"/><text x="'+c.x+'" y="'+(y+1.25)+'">'+(c.par?'¶'+c.par:c.l)+'</text></g>';});
   var po=$('crPop'),cc=sel?cmts.filter(function(c){return c.l===sel})[0]:null;
