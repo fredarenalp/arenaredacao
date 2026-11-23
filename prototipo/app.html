@@ -982,7 +982,7 @@ table.bt{border-collapse:collapse;width:100%;font-size:13px}.bt th{font:700 11px
  #pkM,.pk .pill,.prog .bar{display:none}.prog{font-size:12px;flex-shrink:0}#progT{display:none}.pk>div:has(#pkT){min-width:0;flex:1}.pk h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.prog .aln2{margin-left:0}.prog .alb{width:34px;height:34px}
  .tb{flex-wrap:nowrap;overflow-x:auto;padding:6px 8px;gap:5px;scrollbar-width:none}.tb::-webkit-scrollbar{display:none}.tb #foto,.tb .sp{display:none}.tb>*{flex-shrink:0}
  .sbar{display:none}
- .zbar{top:6px;left:6px;padding:4px;gap:4px}.zbar button{width:32px;height:30px}
+ .zbar{top:60px;left:6px;padding:4px;gap:4px} /* abaixo da barra de ferramentas (52px), que antes ficava coberta pelo botão de diminuir zoom */.zbar button{width:32px;height:30px}
  .pb,.pb:has(.md:not(.hide)){grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;overflow:hidden}
  .vw{min-height:0}
  .rc,.rc .fm{overflow:hidden}.rc{display:flex;flex-direction:column}
@@ -1566,7 +1566,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   <div class="pk">
     <button type="button" class="crumb" id="voltaHome" style="margin:0">← Meus pacotes</button><button type="button" class="crumb" id="voltaLista" style="margin:0">← Lista do pacote</button>
     <div><h3 id="pkT">Pacote 12 · 8º ano A</h3><div class="meta" id="pkM">Proposta 2 · Dissertativo-argumentativo · entregue em 03/11</div></div>
-    <span class="pill">Em correção</span>
+    <span class="pill" id="pkSt">Em correção</span>
     <div class="prog"><span id="progT">0 de 0 corrigidas</span><div class="bar"><i id="progB"></i></div><div class="aln2"><button type="button" class="alb" id="alAnt" aria-label="Aluno anterior">‹</button><button type="button" class="alb" id="alPro" aria-label="Próximo aluno">›</button></div></div>
   </div>
   <section class="pkl" id="pkList" aria-label="Redações do pacote"><div class="pkli">
@@ -2184,13 +2184,15 @@ function chip0(a){
  if(t==null){var f=a.niv.filter(function(v){return v!=null}).length;return '<span class="chip p">'+(f?f+'/5':'—')+'</span>';}
  return '<span class="chip '+cls(t)+'">'+fmt(t)+'</span>'+(a.fila==='pend'?'<span class="chip n" title="Aguardando o professor liberar">prof.</span>':a.fila==='zer'?'<span class="chip n">zerada</span>':'')+iaB;
 }
-function feito(a){if(a.reesc)return !!a.anul||!!a.salvo;return !!a.anul||total(a)!=null}
+function feito(a){if(window.__real&&a._rid)return !!a.salvo; // com dados reais, só conta como corrigida a redação que foi SALVA (escolher os níveis não basta)
+ if(a.reesc)return !!a.anul||!!a.salvo;return !!a.anul||total(a)!=null}
 function lista(){
  if($('lst'))$('lst').innerHTML='<h4>Alunos ('+ALUNOS.length+')</h4>'+ALUNOS.map(function(a,k){
   return '<button type="button" class="it'+(k===i?' on':'')+'" data-i="'+k+'"><span class="nm">'+a.n+'</span>'+chip(a)+'</button>';
  }).join('');
  var f=ALUNOS.filter(feito).length;
  $('progT').textContent=f+' de '+ALUNOS.length+' corrigidas';
+ var pkSt=$('pkSt');if(pkSt)pkSt.textContent=(f&&f===ALUNOS.length)?'Corrigido':'Em correção'; // pacote todo corrigido não fica como "Em correção"
  $('progB').style.width=(f/ALUNOS.length*100)+'%';
 }
 function view(){$('pg').style.width=zoom+'%';$('pg').style.transform='rotate('+rot+'deg)';$('zl').textContent=zoom+'%';if($('sbZ'))$('sbZ').textContent=zoom+'%';}
@@ -2586,6 +2588,8 @@ $('mq').addEventListener('input',function(e){if(e.target.classList.contains('gt'
 $('mcancel').onclick=fechaGuia;$('mx').onclick=fechaGuia;
 $('md').addEventListener('click',function(e){if(e.target===$('md'))fechaGuia();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('md').classList.contains('hide'))fechaGuia();});
+/* Esc fecha também "Falar com o professor" e "Suspeita de IA" (usa o botão de fechar da própria janela) */
+document.addEventListener('keydown',function(e){if(e.key!=='Escape')return;['dq','ia'].forEach(function(id){var m=document.getElementById(id);if(!m||m.classList.contains('hide'))return;var c=m.querySelector('[aria-label="Fechar"],.mb .sec');if(c)c.click();else m.classList.add('hide')})});
 $('mr').addEventListener('input',function(e){if(e.target.id!=='mrT')return;gEd=true;gTxt=e.target.value;$('mrRst').classList.remove('hide');});
 $('mr').addEventListener('click',function(e){if(e.target.id==='mrRest'){gEd=false;gTxt='';resultado();}});
 $('mok').onclick=function(){

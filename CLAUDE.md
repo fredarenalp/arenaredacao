@@ -33,7 +33,7 @@ não retidas continuam liberadas. O corretor não consegue liberar (o gatilho `t
 - Lint/testes/build: `npm run lint && npm test && npm run build`.
 - Ciclo de dados no banco real: `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt node e2e/ciclo-real.mjs`.
 - Estado da ligação protótipo ↔ banco: ver o final do `README.md`.
-- Caça-bugs (não gravam nada no banco): `node e2e/cacabugs-ac.cjs` (todas as categorias/painéis/atalhos do AC) `node e2e/cacabugs-aluno.cjs` (aluno, desktop e celular, com marcas de todos os tipos injetadas) e `node e2e/cacabugs-coord.cjs` (todas as abas da coordenação e do professor). Preview em `localhost:4173`.
+- Caça-bugs (não gravam nada no banco): `node e2e/cacabugs-ac.cjs` (todas as categorias/painéis/atalhos do AC) `node e2e/cacabugs-aluno.cjs` (aluno, desktop e celular, com marcas de todos os tipos injetadas) e `node e2e/cacabugs-coord.cjs` (todas as abas da coordenação e do professor). `node e2e/cacabugs-corretor.cjs` (tela do corretor fora do AC: lista de pacotes, abas, painel financeiro, lista de redações, barras, níveis, atalhos, pacote já corrigido; desktop e celular). Preview em `localhost:4173`.
 
 ## Decisões de produto (aluno, feed, destaques) — IMPLEMENTADAS (etapas 1 a 5), exceto o que está em "Pendente"
 Tudo abaixo foi construído (primeira tela, cartões, Ver proposta/Dúvida, estrelas/anotação/Opinião, plantão com agenda seg–qui 14h–16h de 20 em 20 min em Demandas → Plantão, aba Destaques do aluno, tela Destaques da coordenação com autorização da família, tabelas `destaques`/`plantoes`, funções `feed_destaques`/`feed_erros_serie`/`responder_destaque`). Pendente: aviso no celular (sem push), botão "Salvar" dos desenhos, quiz (guardado); "Trechos que brilharam" foi retirado (decisão do dono), aluno ainda não vê o horário do plantão agendado.
@@ -71,3 +71,6 @@ A correção só vai ao banco no botão **Salvar**. Até lá, o que o corretor f
 
 ## AC · Linha curta e Parágrafo curto viram linha reta; comentário da linha (IMPLEMENTADO)
 Ao escolher Linha curta (`mr`) ou Parágrafo curto (`pc`), o círculo vira uma linha reta (como Acentuação/Pontuação viram X), na cor da categoria (`window.lnIs`/`lnSvg`; no aluno e na impressão pelo flag `ln` de `circ`). Um clique no número da linha NÃO abre mais a caixa de comentário (decisão do dono: abria sem querer); o comentário da linha abre com dois cliques no número ou pelo botão Comentar do AC. Teste: `node e2e/linha-curta.cjs`.
+
+## Tela do corretor: regras confirmadas na varredura
+Com dados reais, uma redação só conta como "corrigida" (progresso, aba Corrigidos, rótulo do pacote) depois de **Salvar**; escolher os 5 níveis não basta (`feito(a)` usa `a.salvo`). O cabeçalho do pacote mostra "Corrigido" quando todas foram salvas. Esc fecha todas as janelas, inclusive "Falar com o professor". No celular a coluna de giro/centralizar fica abaixo da barra de ferramentas (a barra rola na horizontal: imprimir e dúvida ficam à direita).
