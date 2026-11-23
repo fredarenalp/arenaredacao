@@ -458,6 +458,17 @@ const ARENA = {
     const { data, error } = await supabase.rpc('liberar_pacote', { p_pacote: pid })
     return error ? null : data
   },
+  // Coordenação: apaga as fotos das redações já corrigidas e liberadas de um bimestre (notas e comentários ficam).
+  // confirmar=false só conta o que seria apagado.
+  async apagarImagens(bimestre, confirmar) {
+    const { data, error } = await supabase.functions.invoke('apagar-imagens', { body: { bimestre, confirmar: !!confirmar } })
+    if (error) {
+      let msg = error.message
+      try { msg = (await error.context.json()).erro || msg } catch { /* corpo sem JSON */ }
+      return { erro: msg }
+    }
+    return data
+  },
   async carregarFeed() {
     const al = ARENA.aluno
     const [meus, feed, erros, serie] = await Promise.all([

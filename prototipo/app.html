@@ -1482,6 +1482,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .pc2 .cxa{color:#2f855a;display:flex;flex:none}.pc2 .cxa svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .pc2 .cxnova{position:absolute;top:-9px;right:12px;background:#d9806f;color:#fff;font:700 10.5px 'DM Sans',sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
 .pc2 .rwl{display:flex;align-items:center;gap:8px;margin-top:12px;font:600 13px 'DM Sans',sans-serif;color:#6a6a60}.pc2 .rwl i{width:9px;height:9px;border-radius:50%;border:2px solid #b9b6aa;box-sizing:border-box}.pc2 .rwl i.on{border-color:#3c7678}
+.cr-left.semfoto .cr-photo,.cr-left.semfoto .cr-tb,.cr-left.semfoto .crf,.cr-left.semfoto .crfn,.cr-left.semfoto .crnum{display:none}
+.crsf{background:#f3f0e6;border:1px solid #e3ddcc;border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:4px;color:#5d584a;font-size:14px}.crsf b{color:#2f5f61;font-size:15px}
+.pdfbim{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px}.pdfbim .pbtn{width:auto;margin:0}.pdfbim small{color:#6b7280;font-size:12.5px}
+.apgb{display:flex;gap:8px;flex-wrap:wrap}.apgr p{margin:6px 0}.apgr input{max-width:200px}
 </style>
 <!--PONTE--></head>
 <body>
@@ -2141,6 +2145,7 @@ var i=0,zoom=60,rot=0,cur;
 function rng(s){return function(){s=(s*1664525+1013904223)%4294967296;return s/4294967296}}
 function lineY(k){return 46+(k-1)*6.8}
 function foto(seed){
+ if(window.__real)return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297"><rect width="210" height="297" fill="#f3f0e6"/><text x="105" y="146" font-size="9" text-anchor="middle" fill="#8a8578" font-family="Arial">Foto arquivada</text><text x="105" y="158" font-size="5" text-anchor="middle" fill="#a39e90" font-family="Arial">Notas e comentários foram mantidos</text></svg>');
  var r=rng(seed*7919+13),p='';
  p+='<defs><radialGradient id="v" cx="50%" cy="45%" r="75%"><stop offset="60%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".14"/></radialGradient></defs><rect width="210" height="297" fill="#faf7ef"/>';
  [[7,7],[196,7],[7,283],[196,283]].forEach(function(c){p+='<rect x="'+c[0]+'" y="'+c[1]+'" width="7" height="7" fill="#111"/>'});
@@ -3705,12 +3710,13 @@ function feedAbre(){
 function lista(){
  var chips=[1,2,3,4].map(function(b){var c=b<BATU?'ps':b===BATU?'at':'fu',sub=b<BATU?'Encerrado':b===BATU?'Em andamento':(BINI[b]?'Em '+BINI[b]:'Ainda não começou');return '<button type="button" class="bimc '+c+(b===BSEL?' sel':'')+'" data-bim="'+b+'" aria-pressed="'+(b===BSEL)+'"><b>'+b+'º</b>'+sub+'</button>'}).join('');
  var corpo;
- if(BSEL===BATU)corpo='<p class="lead">Cada proposta tem duas versões: a 1ª e a 2ª (reescrita).</p><div class="pcards">'+ESSAYS.map(cartao2).join('')+'</div>';
+ if(BSEL===BATU)corpo='<p class="lead">Cada proposta tem duas versões: a 1ª e a 2ª (reescrita).</p>'+(PROPS.some(function(q){return q.kind==='corr'})?'<div class="pdfbim"><button type="button" class="pbtn" id="alPdfBim">Salvar todas as correções do bimestre (PDF)</button><small>Abre a janela de impressão do aparelho. Escolha “Salvar como PDF”.</small></div>':'')+'<div class="pcards">'+ESSAYS.map(cartao2).join('')+'</div>';
  else if(BSEL<BATU)corpo='<p class="lead">Encerrado'+(BFIM[BSEL]?' em '+BFIM[BSEL]:'')+'. Aqui você só consulta as correções.</p><div class="pcards">'+BIMS[BSEL].ess.map(function(E,i){return cartaoPas(E,BIMS[BSEL].notas[i],BSEL,i)}).join('')+'</div>';
  else corpo='<div class="bimvz"><div class="lk">🔒</div><b>Este bimestre ainda não começou</b><p>As propostas do '+BSEL+'º bimestre aparecem aqui'+(BINI[BSEL]?' a partir de '+BINI[BSEL]:' quando o bimestre começar')+'.</p></div>';
  var nov=BSEL===BATU?PROPS.map(function(q,k){return [q,k]}).filter(function(x){return x[0].kind==='corr'&&x[0].nova}):[],banner=nov.map(function(x){return '<div class="alnov" role="status"><div><b>Nova correção</b><span>'+x[0].t+' · '+x[0].l.replace('Corrigida · ','')+'</span></div><button type="button" class="pbtn" data-k="'+x[1]+'">Ver correção →</button></div>'}).join('');
  $('alMain').innerHTML=abasAl('lista')+'<div class="bimq" role="group" aria-label="Bimestre">'+chips+'</div>'+banner+'<h2>'+BSEL+'º bimestre</h2>'+corpo;
  document.querySelectorAll('[data-bim]').forEach(function(b){b.onclick=function(){BSEL=+b.dataset.bim;lista()}});
+ if($('alPdfBim'))$('alPdfBim').onclick=function(){window.__imprimeBimestre&&window.__imprimeBimestre()};
  document.querySelectorAll('[data-vz]').forEach(function(b){b.onclick=function(){var q=b.dataset.vz.split(',');verZero(+q[0],+q[1])}});
 }
 function conhecer(){
@@ -3805,6 +3811,25 @@ function boletim(){
 }
 var BOLT='at';
 var _vcOrig=verCorrecao;verCorrecao=function(k){_vcOrig(k);var Pv=PROPS[k];if(Pv&&Pv.vista===false&&Pv.rid&&window.ARENA&&ARENA.marcarVista){Pv.vista=true;ARENA.marcarVista([Pv.rid])};var P=PROPS[k];if(!P||!P.prop||!window.__real)return;var z=$('alVolta');if(!z)return;var b=document.createElement('button');b.type='button';b.className='link';b.style.cssText='margin-left:14px';b.textContent='Ver análise em cartões';b.onclick=function(){aiMostra(aiSlides(k),k,P.vista===false?[{P:P,k:k}]:[])};z.parentNode.insertBefore(b,z.nextSibling)};
+
+/* ===== Salvar todas as correções do bimestre em PDF (boletim + cada correção com folha, marcações e comentários) ===== */
+window.__aguardaImgs=function(el,cb){var im=[].slice.call(el.querySelectorAll('img')).filter(function(x){return !x.complete}),n=im.length,feito=false,fim=function(){if(feito)return;feito=true;cb()};if(!n){setTimeout(fim,60);return}im.forEach(function(x){var f=function(){if(--n<=0)fim()};x.addEventListener('load',f);x.addEventListener('error',f)});setTimeout(fim,10000)};
+window.__imprimeBimestre=function(){
+ var ks=[];PROPS.forEach(function(q,k){if(q.kind==='corr')ks.push(k)});
+ if(!ks.length){alert('Ainda não há correções liberadas neste bimestre.');return}
+ var el=document.getElementById('printArea');if(!el){el=document.createElement('div');el.id='printArea';document.body.appendChild(el)}
+ var esc=function(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;')},partes=[];
+ ks.forEach(function(k){_vcOrig(k);if(window.__arenaImp){window.__arenaImp();partes.push('<div class="pr-doc" style="page-break-before:always;break-before:page">'+el.innerHTML+'</div>')}});
+ var A0=(window.__real&&window.ARENA&&ARENA.aluno)||null,logo=(document.querySelector('.al .ph img')||{}).src||'',rows='';
+ ESSAYS.forEach(function(E){[E.o,E.r].forEach(function(k){var q=PROPS[k];if(!q||q.kind!=='corr')return;rows+='<tr><td><b>Proposta '+E.n+'</b> · '+esc(E.g)+'<br><small>'+esc(E.tema)+'</small></td><td>'+(k===E.o?'1ª versão':'2ª versão (reescrita)')+'</td><td>'+esc(String(q.l||'').replace('Corrigida · ',''))+'</td></tr>'})});
+ var capa='<div class="pr-page"><div class="pr-head">'+(logo?'<img src="'+logo+'" alt="">':'')+'<div><div class="pr-t">Correções do '+BATU+'º bimestre</div><div class="pr-s">Arena Redação · Colégio Arena</div></div></div>'+
+  '<table class="pr-meta"><tr><td><b>Aluno</b> '+esc(A0?A0.nome:'')+'</td><td><b>Turma</b> '+(A0&&A0.turmas?A0.turmas.serie+'º ano '+A0.turmas.nome:'')+'</td><td><b>Matrícula</b> '+esc(A0?A0.matricula:'')+'</td></tr></table>'+
+  '<div class="pr-h2">Resumo</div><table class="pr-tab"><tr><th>Proposta</th><th>Versão</th><th>Nota</th></tr>'+rows+'</table></div>';
+ el.innerHTML=capa+partes.join('');
+ lista();
+ document.body.classList.add('printing');window.addEventListener('afterprint',function(){document.body.classList.remove('printing')},{once:true});
+ window.__aguardaImgs(el,function(){window.print()});
+};
 
 // ilustrações
 function fr(o){
@@ -3910,7 +3935,7 @@ function verCorrecao(k){
  var por={},est={},prSeen={};circ.forEach(function(c){if(NV[c.c])return;if(c.c==='ra'||isMg(c.c))est[isMg(c.c)?'mg':c.c]=(est[isMg(c.c)?'mg':c.c]||0)+1;else if(c.c==='pr'){var _pk=String(c.w||'').trim().toLowerCase();if(_pk&&!prSeen[_pk]){prSeen[_pk]=1;por.pr=(por.pr||0)+1}}else por[c.c]=(por[c.c]||0)+1});
  var linhas={};circ.forEach(function(c){if(!NV[c.c]&&c.c!=='ra'&&!isMg(c.c))linhas[c.l]=(linhas[c.l]||0)+1});
  var catN={ac:'Acentuação',pt:'Pontuação',or:'Ortografia',il:'Ilegibilidade',cj:'Conjugação verbal',cn:'Concordância verbal',rg:'Regência verbal',cr:'Crase',ol:'Oralidade',pr:'Precisão',tr:'Truncamento',vi:'Vírgula',mi:'Uso de letra maiúscula',ra:'Rasura',ce:'Conectivo (errado)',ca:'Conectivo (ausente)',mg:'Margens',mr:'Linha curta',ma:'Passou da margem',pc:'Parágrafo curto',pe:'Parágrafo longo',pd:'Parágrafo desalinhado',ss:'Translineação',el:'Elogio',lac:'Lacuna',ele:'Elemento ausente',eli:'Elemento insuficiente',rp:'Repetição de palavra',ti:'Título'},sig={rg:'RG',ce:'CE',ca:'C',lac:'LAC',ele:'EL',eli:'EI',ac:'AC',pt:'PT',or:'OR',il:'IL',cj:'CJ',cn:'CN',cr:'CR',ol:'OL',pr:'PR',tr:'TR',vi:'VI',mi:'MI',ra:'RA',mg:'MG',mr:'MR',ma:'MA',pc:'PC',pe:'PE',pd:'PD',ss:'SS'};
- var sel=null,zoom=80;
+ var sel=null,zoom=80,semFoto=!!(window.__real&&!P.fotoUrl);
  var critDe=function(c){return c==='el'?-1:(c==='ra'||isMg(c)||c==='ti')?0:(c==='ce'||c==='ca'||c==='rp')?2:(c==='ele'||c==='eli')?3:c==='lac'?4:1};
  var fj=null,FN=['Estética','Linguagem','Progressão','Proposta','Abordagem'];
  var okF=function(c){return fj===null||(fj==='cv'?(c==='ce'||c==='ca'):critDe(c)===fj)};
@@ -3944,7 +3969,7 @@ function verCorrecao(k){
   var comps=A.COMPS.map(function(c,j){var n=NIV[j],tx=(P.obsCrit&&P.obsCrit[j])?P.obsCrit[j]:A.compoe(j,n,null,aluno).join(' ');return '<div class="crc'+(n<ESPERADO?' abx':'')+'"><div class="crh"><b>'+c.id+' · '+c.nome+'</b><span>'+(n<ESPERADO?'<em class="abt">Abaixo do esperado</em> ':'')+A.NIVEIS[n]+' · '+A.fmt(n*.5)+' pt</span></div><p>'+tx+'</p>'+(j===0&&detEst?'<p class="crd">'+detEst+'</p>':'')+(j===1&&detLing?'<p class="crd">'+detLing+(porLin.ss?' '+A.SS_TXT:'')+'</p>':'')+(j===0?dvEst:j===1?dvLing:'')+'</div>'}).join('');
 
  // ----- correção em forma de texto: "o que ficou muito bom" / "o que vale melhorar" -----
- var nome='Lucas',esc=function(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')};
+ var A0=(window.__real&&window.ARENA&&ARENA.aluno)||null,nome=A0?String(A0.nome||'').trim().split(/\s+/)[0]:'Lucas',esc=function(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')};
  var lc=function(s){return s.charAt(0).toLowerCase()+s.slice(1)},jn=function(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' e '+a[a.length-1]};
  var sn=function(a){return a.slice().sort(function(x,y){return x-y})};
  var lnT=function(a,curto){a=sn(a);return (a.length>1?'nas ':'na ')+(curto?'':(a.length>1?'linhas ':'linha '))+jn(a)};
@@ -3983,14 +4008,14 @@ function verCorrecao(k){
   cmts.forEach(function(c){var y=A.lineY(c.l)-3.4;marks+='<g class="pin"><circle cx="'+c.x+'" cy="'+y+'" r="3.7"/><text x="'+c.x+'" y="'+(y+1.25)+'">'+c.l+'</text></g>';});
   var tab=A.COMPS.map(function(c,j){return '<tr><td><b>'+c.id+' · '+c.nome+'</b></td><td>'+A.NIVEIS[NIV[j]]+' (nível '+NIV[j]+' de 4)</td><td>'+A.fmt(NIV[j]*.5)+' de 2,0</td></tr>'}).join('');
   el.innerHTML='<div class="pr-page"><div class="pr-head">'+(logo?'<img src="'+logo+'" alt="">':'')+'<div><div class="pr-t">Correção da redação</div><div class="pr-s">Arena Redação · Colégio Arena</div></div></div>'+
-   '<table class="pr-meta"><tr><td><b>Aluno</b> '+nome+' Prado</td><td><b>Turma</b> 2ª série A</td><td><b>Matrícula</b> 20260187</td></tr><tr><td colspan="2"><b>Proposta</b> '+esc(P.t)+'</td><td><b>Nota final</b> '+A.fmt(total)+' / 10</td></tr></table>'+
+   '<table class="pr-meta"><tr><td><b>Aluno</b> '+esc(A0?A0.nome:nome+' Prado')+'</td><td><b>Turma</b> '+(A0?(A0.turmas?A0.turmas.serie+'º ano '+A0.turmas.nome:''):'2ª série A')+'</td><td><b>Matrícula</b> '+(A0?A0.matricula:'20260187')+'</td></tr><tr><td colspan="2"><b>Proposta</b> '+esc(P.t)+'</td><td><b>Nota final</b> '+A.fmt(total)+' / 10</td></tr></table>'+
    cartaHtml.replace('crt2h','pr-h2').replace('class="crt2"','class="crt2 pr-c"')+
    '<div class="pr-h2">Correção por critérios</div><table class="pr-tab"><tr><th>Competência</th><th>Nível</th><th>Pontos</th></tr>'+tab+'</table></div>'+
-   '<div class="pr-page"><div class="pr-h2">Sua redação com as marcações</div><div class="pr-pg"><img src="'+(P.fotoUrl||A.foto(P.fseed||11))+'" alt=""><svg class="crk" viewBox="0 0 210 297" preserveAspectRatio="none">'+marks+'</svg></div><div class="pr-leg">Círculo vermelho: desvio de escrita (sigla = tipo). Círculo marrom: rasura (RA) ou margem (MG). Número vermelho: comentário na linha correspondente.</div></div>';
+   (semFoto?'':'<div class="pr-page"><div class="pr-h2">Sua redação com as marcações</div><div class="pr-pg"><img src="'+(P.fotoUrl||A.foto(P.fseed||11))+'" alt=""><svg class="crk" viewBox="0 0 210 297" preserveAspectRatio="none">'+marks+'</svg></div><div class="pr-leg">Círculo vermelho: desvio de escrita (sigla = tipo). Círculo marrom: rasura (RA) ou margem (MG). Número vermelho: comentário na linha correspondente.</div></div>');
   return el;
  }
  window.__arenaImp=montaImpressao;
- function imprime(){montaImpressao();document.body.classList.add('printing');window.addEventListener('afterprint',function(){document.body.classList.remove('printing')},{once:true});setTimeout(function(){window.print()},60);}
+ function imprime(){var pa=montaImpressao();document.body.classList.add('printing');window.addEventListener('afterprint',function(){document.body.classList.remove('printing')},{once:true});(window.__aguardaImgs||function(e,cb){setTimeout(cb,60)})(pa,function(){window.print()});}
  var pri=[];
  var ls=function(a){a=sn(a);return (a.length>1?'Linhas ':'Linha ')+jn(a)};
  if(nD)pri.push({t:'Revise '+jn(Object.keys(por).map(function(c){return (catN[c]||c).toLowerCase()})),s:ls(todasL),l:sn(todasL)[0]});
@@ -4006,6 +4031,7 @@ function verCorrecao(k){
  '<div class="crtabs" role="tablist"><button type="button" data-tab="1" role="tab">Por critérios</button><button type="button" class="on" data-tab="2" role="tab">Em texto</button></div><div id="crT1" class="hide">'+cmpHtml+(abaixo(P).length?'<div class="crwarn"><b>Atenção:</b> '+abaixo(P).map(function(j){return CRIT[j]}).join(' e ')+' ficou abaixo do esperado. Leia os comentários e use a reescrita para melhorar.</div>':'')+'<h3>Competências</h3>'+comps+(finA.length?'<div class="crwarn finw">'+finA.map(function(t){return '<p>'+esc(t)+'</p>'}).join('')+'</div>':'')+
  '<h3>Comentários por linha</h3><div id="crC">'+cmts.map(function(c){return '<button type="button" class="crcm" data-l="'+c.l+'"><b>'+(c.par?'Parágrafo '+c.par:c.l2?'Parágrafo (linhas '+c.l+' a '+c.l2+')':'Linha '+c.l)+'</b><span>'+c.t+'</span></button>'}).join('')+'</div></div><div id="crT2">'+cartaHtml+'</div><div class="cract"><button type="button" id="crPrint">Imprimir correção</button>'+'</div></aside></div>';
  $('crImg').src=(P.fotoUrl||A.foto(P.fseed||11));
+ if(semFoto){var cl=document.querySelector('.cr-left');if(cl){cl.classList.add('semfoto');cl.insertAdjacentHTML('afterbegin','<div class="crsf"><b>A foto desta redação foi arquivada.</b><span>A escola guarda só a nota e os comentários. Eles continuam aqui ao lado.</span></div>')}}
  document.querySelectorAll('.crtabs button').forEach(function(b){b.onclick=function(){document.querySelectorAll('.crtabs button').forEach(function(x){x.classList.toggle('on',x===b)});$('crT1').classList.toggle('hide',b.dataset.tab!=='1');$('crT2').classList.toggle('hide',b.dataset.tab!=='2');};});
  $('crPrint').onclick=imprime;
  function desenha(){
@@ -4501,7 +4527,10 @@ function estPill(s){var m={rascunho:['d','Rascunho'],aberta:['g','Aberta para en
 function renderPropostas(){
  var h='<h2>Propostas</h2><p class="lead">Abra, feche, prorrogue e encerre as propostas de cada bimestre. O aluno vê a mudança na hora.</p>';
  h+='<div class="bimc2">'+BIMC.map(function(b){return '<div class="bc '+b.st+'"><b>'+b.n+'º bimestre</b><span>'+b.d+'</span></div>'}).join('')+'<span class="sp"></span>'+
-  (BIMC[bimAtual()-1]&&BIMC[bimAtual()-1].st==='and'?'<button type="button" class="cobtn" data-x-bim="enc">Encerrar o '+bimAtual()+'º bimestre</button>':(BIMC[bimAtual()]&&BIMC[bimAtual()].st==='fut')?'<button type="button" class="cobtn pri" data-x-bim="abre">Abrir o '+(bimAtual()+1)+'º bimestre</button>':'')+'</div>';
+  (window.ARENA&&ARENA.apagarImagens?'<button type="button" class="cobtn" data-x-apg="abre">Apagar imagens…</button>':'')+(BIMC[bimAtual()-1]&&BIMC[bimAtual()-1].st==='and'?'<button type="button" class="cobtn" data-x-bim="enc">Encerrar o '+bimAtual()+'º bimestre</button>':(BIMC[bimAtual()]&&BIMC[bimAtual()].st==='fut')?'<button type="button" class="cobtn pri" data-x-bim="abre">Abrir o '+(bimAtual()+1)+'º bimestre</button>':'')+'</div>';
+ if(S.x.apg){var ag=S.x.apg,mb=function(n){return (n/1048576).toFixed(1).replace('.',',')};
+  h+='<div class="card pnl"><h3>Apagar imagens de um bimestre <small>As fotos saem do sistema. Notas, comentários e marcações ficam.</small></h3><div class="frm"><div class="wd"><div class="apgb">'+[1,2,3,4].map(function(n){return '<button type="button" class="cobtn'+(ag.b===n?' pri':'')+'" data-x-apg="b'+n+'">'+n+'º bimestre</button>'}).join('')+'</div></div>'+
+   (ag.res&&!ag.res.erro?'<div class="wd apgr"><p><b>'+ag.res.fotos+' foto'+(ag.res.fotos===1?'':'s')+'</b>'+(ag.res.bytes?' (cerca de '+mb(ag.res.bytes)+' MB)':'')+' de '+ag.res.redacoes+' redaç'+(ag.res.redacoes===1?'ão':'ões')+' já corrigida'+(ag.res.redacoes===1?'':'s')+' e liberada'+(ag.res.redacoes===1?'':'s')+' serão apagadas.'+(ag.res.pendentes?' '+ag.res.pendentes+' redaç'+(ag.res.pendentes===1?'ão ainda sem correção liberada não será':'ões ainda sem correção liberada não serão')+' tocada'+(ag.res.pendentes===1?'':'s')+'.':'')+'</p><p class="note">Não tem volta. Antes, guarde o que quiser (Imprimir correções) e confirme que os alunos já baixaram o PDF.</p>'+(ag.res.fotos?'<label>Digite APAGAR para confirmar<input type="text" id="apgT" autocomplete="off" placeholder="APAGAR"></label>':'')+'</div>':'')+(ag.res&&ag.res.erro?'<div class="wd"><p class="note">'+esc(ag.res.erro)+'</p></div>':'')+'</div><div class="cbb"><button type="button" class="cobtn" data-x-apg="x">Cancelar</button><button type="button" class="cobtn" data-x-apg="ver"'+(ag.busy?' disabled':'')+'>'+(ag.busy?'Aguarde…':'Ver o que será apagado')+'</button>'+(ag.res&&ag.res.fotos?'<button type="button" class="cobtn pri" data-x-apg="ok"'+(ag.busy?' disabled':'')+'>Apagar imagens</button>':'')+'</div></div>'}
  if(S.x.prr){var p=PRP.filter(function(x){return x.id===S.x.prr.id})[0],q=S.x.prr;
   h+='<div class="card pnl"><h3>'+(p.st==='aberta'?'Prorrogar prazo':'Reabrir com novo prazo')+' <small>Proposta '+p.n+' · '+p.g+' ('+p.bim+'º bimestre)</small></h3><div class="frm"><label>Novo prazo<input type="date" id="xpD" value="'+esc(q.dt)+'"></label><label>Para quem<select id="xpE"><option value="todas"'+(q.esc==='todas'?' selected':'')+'>Todas as turmas</option><option value="aluno"'+(q.esc==='aluno'?' selected':'')+'>Só um aluno</option></select></label>'+(q.esc==='aluno'?'<label>Aluno<input type="text" id="xpA" value="'+esc(q.al)+'" placeholder="Digite o nome ou a matrícula" autocomplete="off"></label><label>Essa entrega<select id="xpV"><option value="nota"'+(q.vn!=='sem'?' selected':'')+'>Vale nota</option><option value="sem"'+(q.vn==='sem'?' selected':'')+'>Não vale nota</option></select></label><div class="wd"><div id="xpR" class="xpr">'+xpRes()+'</div></div>':'')+'<label class="wd">Motivo (fica no histórico)<input type="text" id="xpM" value="'+esc(q.mot)+'" placeholder="Ex.: instabilidade no sistema, aluno com atestado"></label></div><div class="cbb"><button type="button" class="cobtn" data-x-pr="x">Cancelar</button><button type="button" class="cobtn pri" data-x-pr="ok">Confirmar</button></div></div>'}
  if(S.x.pel){var pe=S.x.pel,pq=PRP.filter(function(x){return x.id===pe.id})[0];h+='<div class="card pnl"><h3>Orientação e elementos <small>Proposta '+pq.n+' · '+esc(pq.g)+'</small></h3><div class="frm"><label class="wd">Orientações para o aluno: o que fazer<textarea id="xpOr" rows="4">'+esc(pe.or||'')+'</textarea><small>Aparece quando o aluno toca em “Ver proposta”. Diga, em poucas linhas, o que a proposta pede.</small></label><label class="wd">Explicação do gênero<textarea id="xpGd" rows="4">'+esc(pe.gd||'')+'</textarea><small>Vale para todas as propostas de “'+esc(pq.g)+'”. Aparece no botão “Dúvida” da correção.</small></label><label class="wd">Um elemento por linha (de 3 a 5; vazio usa a lista padrão do gênero)<textarea id="xpEl" rows="5">'+esc(pe.txt)+'</textarea><small>A correção usa esta lista para o corretor dizer qual elemento está ausente ou insuficiente. Com 5 elementos, 1 ausente leva a Proposta ao nível máximo 3, 2 ao 2 e 3 ou 4 ao 1. Os limites ficam em Regras.</small></label></div><div class="cbb"><button type="button" class="cobtn" data-x-pel="x">Cancelar</button><button type="button" class="cobtn pri" data-x-pel="ok">Salvar</button></div></div>'}
@@ -4720,6 +4749,17 @@ function pendStrip(skipAv){var it=[],fp=FILA.filter(function(f){return f.st==='p
 /* ---- eventos novos ---- */
 $('coMain').addEventListener('click',function(e){var t,v;
  if(t=e.target.closest('[data-x-go]')){S.top=t.dataset.xGo;render();return}
+ if(t=e.target.closest('[data-x-apg]')){var ac=t.dataset.xApg,ag2=S.x.apg;
+  if(ac==='abre'){S.x.apg={b:bimAtual(),res:null,busy:false};render();return}
+  if(ac==='x'){S.x.apg=null;render();return}
+  if(!ag2)return;
+  if(/^b[1-4]$/.test(ac)){ag2.b=+ac.slice(1);ag2.res=null;render();return}
+  if(ac==='ver'){ag2.busy=true;render();ARENA.apagarImagens(ag2.b,false).then(function(r){ag2.busy=false;ag2.res=r||{erro:'Não foi possível consultar.'};render()});return}
+  if(ac==='ok'){var tx=document.getElementById('apgT');if(!tx||tx.value.trim().toUpperCase()!=='APAGAR'){toast('Digite APAGAR para confirmar');return}
+   ag2.busy=true;render();ARENA.apagarImagens(ag2.b,true).then(function(r){ag2.busy=false;
+    if(!r||r.erro){ag2.res={erro:(r&&r.erro)||'Não foi possível apagar.'};render();return}
+    reg('Apagou as imagens do '+ag2.b+'º bimestre: '+r.fotos+' foto'+(r.fotos===1?'':'s')+' de '+r.redacoes+' redações'+(r.falhas?' ('+r.falhas+' arquivo(s) não puderam ser apagados)':''),'outro');
+    S.x.apg=null;toast(r.fotos+' foto'+(r.fotos===1?' apagada':'s apagadas')+'. Notas e comentários foram mantidos.'+(r.falhas?' Atenção: '+r.falhas+' arquivo(s) ficaram.':''));render()});return}}
  if(t=e.target.closest('[data-x-bim]')){if(t.dataset.xBim==='enc')ask('Encerrar o '+bimAtual()+'º bimestre?','As propostas abertas ou fechadas deste bimestre passam a “encerradas” e as médias do Boletim ficam definitivas.','Encerrar bimestre',function(){var bn=bimAtual();BIMC[bn-1].st='enc';BIMC[bn-1].d='encerrado em '+agora().slice(0,5);PRP.forEach(function(p){if(p.bim===bn&&p.st!=='rascunho')p.st='encerrada'});reg('Encerrou o '+bn+'º bimestre','prop');toast(bn+'º bimestre encerrado');render()});else ask('Abrir o '+(bimAtual()+1)+'º bimestre?','O bimestre passa a “em andamento” e você já pode abrir as propostas dele.','Abrir bimestre',function(){var nx=bimAtual()+1;BIMC[nx-1].st='and';BIMC[nx-1].d='em andamento';reg('Abriu o '+nx+'º bimestre','prop');render()});return}
  if(t=e.target.closest('[data-x-pa]')){v=t.dataset.xPa.split(':');paAct(v[0],+v[1]);return}
  if(t=e.target.closest('[data-x-pr]')){if(t.dataset.xPr==='x'){S.x.prr=null;render();return}

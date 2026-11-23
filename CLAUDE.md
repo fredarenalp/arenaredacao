@@ -55,3 +55,9 @@ Tudo abaixo foi construído (primeira tela, cartões, Ver proposta/Dúvida, estr
 - **Botão "Dúvida"** nos cartões da correção NÃO fala com o professor: abre uma folha com duas abas, **Gênero** (explicação + elementos) e **Proposta** (tema e o que fazer), com link "Ver a proposta completa". O único caminho até o professor é o plantão de redação ("Pedir uma conversa").
 - **Redação anulada:** botão "Pedir uma conversa" (plantão), no lugar de "Falar com o professor".
 - Dados novos necessários: texto da proposta ("o que fazer"/orientações) por proposta, preenchido pela coordenação ao criar a proposta; explicação do gênero (texto) por gênero, editável pela coordenação.
+
+## Fotos das redações: baixar e apagar (decisão do dono, IMPLEMENTADO)
+No fim de cada bimestre os alunos salvam as correções em PDF (tela do aluno → "Salvar todas as correções do bimestre (PDF)", que usa a janela de impressão; há também "Imprimir correção" de uma só) e a coordenação guarda o que quiser (Relatórios → Imprimir correções). Depois a coordenação apaga as FOTOS
+(Propostas → "Apagar imagens…", escolhe o bimestre, "Ver o que será apagado", digita APAGAR). Fica no banco só nota, comentários e marcações. Sem protocolo no sistema: a combinação é oral.
+Função `apagar-imagens` (só coordenação; só redações corrigidas e com correção liberada; redação em correção não é tocada; arquivo comum a outras redações não é apagado). Sem foto, o aluno vê o aviso "A foto desta redação foi arquivada" e o PDF sai sem a folha; `foto()` sintética do protótipo nunca aparece com dados reais.
+Testes: `node e2e/apagar-imagens-real.mjs` (só apaga as redações que ele cria) e `node e2e/pdf-bimestre.cjs`. O link assinado de uma foto já apagada pode continuar abrindo por um tempo (cache do storage).
