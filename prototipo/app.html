@@ -2219,7 +2219,7 @@ function atualiza0(){
 }
 function abre(k,foco){
  document.body.classList.remove('pk-list');i=Math.max(0,Math.min(ALUNOS.length-1,k));if(ALUNOS[i])ALUNOS[i]._t0=Date.now();if(window.__aeeAplica)window.__aeeAplica(!!(ALUNOS[i]&&ALUNOS[i].aee));
- var a=ALUNOS[i];
+ var a=ALUNOS[i];rascRestaura(a);
  upMode=false;$('up').classList.add('hide');$('mk').setAttribute('viewBox','0 0 210 297');$('img').src=a.foto||foto(i+1+pacIdx*7);zoom=innerWidth<=640?105:60;rot=a.foto?0:(i%3-1)*.8;view();linhaAtual=null;cmtAtual=null;catAtual=null;selC=null;$('catp').classList.add('hide');$('lc').classList.add('hide');drawMarks();
  verOrig=false;$('origBtn').classList.toggle('hide',!a.reesc);$('origBtn').classList.remove('on');$('origBtn').firstChild.textContent='Ver 1ª versão';$('foto').textContent='Foto 1 de 1';$('pg').classList.remove('orig');
  if(window.__celPinta)window.__celPinta();
@@ -2233,8 +2233,33 @@ function abre(k,foco){
  atualiza();lista();
  var on=document.querySelector('.it.on');if(on&&on.scrollIntoView)on.scrollIntoView({block:'nearest',inline:'nearest'});
  $('stage').scrollTo(0,0);$('fm').scrollTop=0;
+ if(a._rascMsg){toast(a._rascMsg);clearTimeout(toast.t);toast.t=setTimeout(function(){$('toast').className='toast'},6500);a._rascMsg=null}
 }
 function toast(t,err){var e=$('toast');e.textContent=t;e.className='toast show'+(err?' err':'');clearTimeout(toast.t);toast.t=setTimeout(function(){e.className='toast'+(err?' err':'')},2000);}
+/* ===== Rascunho automático da correção: o que ainda não foi salvo fica guardado neste navegador e volta ao reabrir a redação ===== */
+var RASC_P='arena_rasc_';
+function rascKey(a){return (a&&a._rid&&window.ARENA&&ARENA.perfil&&!window.profMode)?RASC_P+ARENA.perfil.id+'_'+a._rid:null}
+function rascEstado(a){var ob=(ALUNOS[i]===a&&$('obs'))?$('obs').value:(a.obs||'');var lim=function(k,v){return (k&&k.charAt(0)==='_')?undefined:v};
+ return {niv:a.niv||null,marks:JSON.parse(JSON.stringify(a.marks||[],lim)),obs:ob,anul:a.anul||null,diag:a.diag==null?null:a.diag,cp:a.cp==null?null:a.cp,autoSet:a.autoSet||null,manual:a.manual||null,det:a.det||null,base:a.base||null,resp:a.resp||null,edt:a.edt||null,salt:a.salt||0}}
+function rascSig(a){return JSON.stringify(rascEstado(a))}
+function rascTocado(e){return !!((e.marks&&e.marks.length)||(e.niv&&e.niv.some(function(v){return v!=null}))||e.anul||(e.obs&&e.obs.trim()))}
+function rascLimpa(a){var k=rascKey(a);if(k){try{localStorage.removeItem(k)}catch(x){}}a._sig0=rascSig(a)}
+function rascGrava(a){var k=rascKey(a);if(!k||a._sig0===undefined)return;var sg=rascSig(a);if(sg===a._sig0){try{localStorage.removeItem(k)}catch(x){}return}
+ if(sg===a._sigG)return;var e=rascEstado(a);if(!rascTocado(e))return;e.t=Date.now();try{localStorage.setItem(k,JSON.stringify(e));a._sigG=sg}catch(x){}}
+function rascSujo(){return ALUNOS.some(function(a){return rascKey(a)&&a._sig0!==undefined&&rascSig(a)!==a._sig0&&rascTocado(rascEstado(a))})}
+function rascRestaura(a){ // chamada uma vez por redação, antes de desenhar: guarda a base (o que veio do servidor) e aplica o rascunho, se houver
+ if(a._sig0!==undefined||!rascKey(a))return;a._sig0=rascSig(a);
+ var raw=null;try{raw=localStorage.getItem(rascKey(a))}catch(x){}if(!raw)return;
+ var d=null;try{d=JSON.parse(raw)}catch(x){}if(!d)return;
+ a.niv=d.niv||a.niv;a.marks=d.marks||[];a.obs=d.obs||'';a.anul=d.anul||null;if(d.diag!=null)a.diag=d.diag;if(d.cp!=null)a.cp=d.cp;if(d.autoSet)a.autoSet=d.autoSet;if(d.manual)a.manual=d.manual;if(d.det)a.det=d.det;if(d.base)a.base=d.base;if(d.resp)a.resp=d.resp;if(d.edt)a.edt=d.edt;if(d.salt!=null)a.salt=d.salt;
+ var mx=0;(a.marks||[]).forEach(function(m){if(m&&m.id>mx)mx=m.id});if(mid<=mx)mid=mx+1;
+ var dt=new Date(d.t||Date.now()),hh=('0'+dt.getHours()).slice(-2)+':'+('0'+dt.getMinutes()).slice(-2);
+ a._rascMsg='Rascunho recuperado ('+(dt.toDateString()===new Date().toDateString()?'hoje, '+hh:('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+', '+hh)+'). Confira e clique em Salvar.'}
+setInterval(function(){ALUNOS.forEach(function(a){if(a._sig0!==undefined)rascGrava(a)})},3000);
+function rascTudo(){ALUNOS.forEach(function(a){if(a._sig0!==undefined)rascGrava(a)})}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')rascTudo()});
+window.addEventListener('pagehide',rascTudo);
+window.addEventListener('beforeunload',function(e){rascTudo();if(rascSujo()){e.preventDefault();e.returnValue=''}});
 function salvar(){
  var a=ALUNOS[i];
  if(window.profMode&&profMode.kind==='gan'){if(total(a)==null){toast('Selecione o nível das 5 competências',1);return}a.obs=$('obs').value;var cfg=profMode,r={niv:a.niv.slice(),marks:cpy(a.marks||[]),obs:a.obs};fechaProf();cfg.onSave(r);return}
@@ -2246,7 +2271,7 @@ function salvar(){
  a.obs=$('obs').value;
  toast('Correção salva · '+a.n.split(' ')[0]);
  if(a._t0){a._seg=(a._seg||0)+Math.min(1800,Math.round((Date.now()-a._t0)/1000));a._t0=null}
- if(window.ARENA&&a._rid){var _ix=i;window.ARENA.salvarCorrecao(a).then(function(ok){if(!ok){a.salvo=false;a.nCorr=Math.max(0,(a.nCorr||1)-1);toast('Não foi possível gravar a correção de '+a.n.split(' ')[0]+' no servidor. Voltamos para ela: tente salvar de novo.',1);try{if(ALUNOS[_ix]===a&&i!==_ix)abre(_ix)}catch(x){}}})}
+ if(window.ARENA&&a._rid){var _ix=i;window.ARENA.salvarCorrecao(a).then(function(ok){if(ok)rascLimpa(a);if(!ok){a.salvo=false;a.nCorr=Math.max(0,(a.nCorr||1)-1);toast('Não foi possível gravar a correção de '+a.n.split(' ')[0]+' no servidor. Voltamos para ela: tente salvar de novo.',1);try{if(ALUNOS[_ix]===a&&i!==_ix)abre(_ix)}catch(x){}}})}
  var go=goNext;
  var tn=total(a);
  if(!a.gancho&&(a.anul||tn===0||tn===10||a.ia)&&window.__store&&!(a.duvida&&a.duvida.st==='pend')){a.fila='pend';window.__store.enfileira({pac:PACS[pacIdx].n,idx:i,aluno:a.n,c:'marina',nota:a.anul?0:tn,niv:a.niv.slice(),mot:a.anul?'Redação anulada: '+MOT[a.anul].l:'',tipo:a.ia?'ia':'',anot:a.ia?a.ia.txt:'',marks:cpy(a.marks||[]),obs:a.obs,foto:a.foto||null,seed:i+1+pacIdx*7});toast(a.ia?'Correção salva · retida: o professor vai decidir sobre a suspeita':'Nota '+fmt(a.anul?0:tn)+' · a redação segue para o professor liberar');}else a.fila=(a.duvida&&a.duvida.st==='pend')?'pend':null;
