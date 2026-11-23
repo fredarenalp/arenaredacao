@@ -1474,11 +1474,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .mk .xm.sel ellipse.xe{stroke:#d62828;stroke-width:.3;stroke-dasharray:1.2 1;opacity:.6}
 .mk .xm.pv path.xx{opacity:.6}
 /* aviso "Sua correção está pronta" no cartão da proposta */
-.pc2 .cxn{position:relative;margin-top:14px;width:100%;display:flex;align-items:center;gap:12px;border:0;background:#fff;box-shadow:0 0 0 1.5px #2f855a,0 6px 16px rgba(47,133,90,.16);color:#1c1c19;border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif}
-.pc2 .cxn:hover{background:#f3faf5}
-.pc2 .cxi{width:34px;height:34px;border-radius:10px;background:#2f855a;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.pc2 .cxn{position:relative;margin-top:14px;width:100%;display:flex;align-items:center;gap:10px;border:0;background:#e4f1ea;box-shadow:0 0 0 1.5px #2f855a;color:#1c1c19;border-radius:14px;padding:12px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;container-type:inline-size}
+.pc2 .cxn:hover{background:#d9ebe0}
+.pc2 .cxi{width:30px;height:30px;border-radius:9px;background:#2f855a;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
 .pc2 .cxi svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.pc2 .cxt{flex:1;min-width:0}.pc2 .cxt b{display:block;font:800 15px/1.25 'DM Sans',sans-serif}.pc2 .cxt small{display:block;font:500 13px/1.35 'DM Sans',sans-serif;color:#55604f;margin-top:1px}
+.pc2 .cxt{flex:1;min-width:0}.pc2 .cxt b{display:block;font:800 15px/1.25 'DM Sans',sans-serif}.pc2 .cxt small{display:block;font:500 13px/1.35 'DM Sans',sans-serif;font-size:clamp(9px,calc((100cqw - 74px)/19.5),13px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#46604f;margin-top:1px}
 .pc2 .cxa{color:#2f855a;display:flex;flex:none}.pc2 .cxa svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .pc2 .cxnova{position:absolute;top:-9px;right:12px;background:#d9806f;color:#fff;font:700 10.5px 'DM Sans',sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
 .pc2 .rwl{display:flex;align-items:center;gap:8px;margin-top:12px;font:600 13px 'DM Sans',sans-serif;color:#6a6a60}.pc2 .rwl i{width:9px;height:9px;border-radius:50%;border:2px solid #b9b6aa;box-sizing:border-box}.pc2 .rwl i.on{border-color:#3c7678}
@@ -2761,7 +2761,7 @@ function abreCat(m,keep){
  var subRow='';if(m._sub&&!m.sinal){var sn=m._sub==='ac'?'Acentuação':'Pontuação';subRow='<div class="subr"><div class="gl" style="margin:0 0 6px">'+sn+': o que há de errado?</div><div class="g2"><button type="button" data-cat="aus"><span>Ausente</span><small>falta o '+(m._sub==='ac'?'acento':'sinal')+'</small></button><button type="button" data-cat="ina"><span>Inadequado</span><small>está errado</small></button></div></div>'}
  var rr=rg(m),mu=rr[1]>rr[0];
  if(m.cat==='pc'||m.cat==='pe'||m.cat==='pd')sideCur='par';else if(m.cat==='rg'||m.cat==='cn'||m.cat==='cj')sideCur='verbo';else if(m.cat==='ele'||m.cat==='eli')sideCur='ele';else if(m.cat==='or'&&m.cor)sideCur='ort';else if(m.cat==='ol'||m.cat==='pr')sideCur='voc';else if((m.cat==='ce'||m.cat==='ca')&&m.sin&&m.sin.length)sideCur='cnx';else if(m.cat==='ti')sideCur='tit';else if(m.cat==='ss'||m.cat==='il'||m.cat==='mi')sideCur='out';
-var cnRow=(m.cat==='ce'||m.cat==='ca')?'<div class="cnq" role="group" aria-label="Conectivo: o que fazer?"><button type="button" class="cnq1" data-cnx="0">Só marcar</button><button type="button" class="cnq2 vbtog'+(sideCur==='cnx'?' on':'')+'" data-sidetog="cnx" aria-expanded="'+(sideCur==='cnx')+'" title="Escolher o conectivo certo"><span>Corrigir</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button></div>':'';
+var cnRow=''; // Só marcar / Corrigir agora abrem no painel à direita
  var sinBar=(rpCompact||m.sinal)?'':'<div class="sinbar">'+sinLinha()+'</div>';
  el.innerHTML='<div class="topo"><div class="ttl">'+(mu?'<span class="lnst">Linhas <button type="button" class="ln" data-ld="1:-1" aria-label="Começar uma linha antes">−</button><b>'+rr[0]+'</b><button type="button" class="ln" data-ld="1:1" aria-label="Começar uma linha depois">+</button> a <button type="button" class="ln" data-ld="2:-1" aria-label="Terminar uma linha antes">−</button><b>'+rr[1]+'</b><button type="button" class="ln" data-ld="2:1" aria-label="Terminar uma linha depois">+</button></span>':'<span class="lnst"><button type="button" class="ln" data-ln="-1" aria-label="Linha anterior">−</button> Linha <b>'+m.line+'</b> <button type="button" class="ln" data-ln="1" aria-label="Próxima linha">+</button></span>')+'</div>'+parRow(m)+'</div>'+
   (rpCompact?'<div class="gl rpgl">'+(m.cat==='pr'?'Precisão (palavra vaga)':'Repetição de palavra')+' <button type="button" class="rptroca" data-trocar>trocar tipo</button></div>'+rpRow:
@@ -2844,7 +2844,7 @@ $('catp').addEventListener('click',function(e){
  if(b.dataset.cat==='fit'){catAtual=null;$('catp').classList.add('hide');drawMarks();toast('Arraste as alças para mudar o tamanho. Ao soltar, os tipos voltam.');return;}
  if(b.dataset.cat==='pr'){reg({t:'mod',m:m,antes:{cat:m.cat,pal:m.pal}});m.cat='pr';drawMarks();abreCat(m);var wi2=$('rpW');if(wi2)wi2.focus();return;}
  if(b.dataset.cat==='rp'){reg({t:'mod',m:m,antes:{cat:m.cat,pal:m.pal}});m.cat='rp';if(m.line<=1)toast('Linha 1: tratada como título, que não conta. Se for texto, desmarque “É o título?”.',1);drawMarks();abreCat(m);var wi=$('rpW');if(wi)wi.focus();return;}
- if((b.dataset.cat==='ce'||b.dataset.cat==='ca')&&m.cat!==b.dataset.cat){reg({t:'mod',m:m,antes:{cat:m.cat,inad:m.inad}});m.cat=b.dataset.cat;m.inad=false;drawMarks();abreCat(m);aplicaAuto();return;} // conectivo: o AC continua aberto para escolher Só marcar ou Corrigir
+ if(b.dataset.cat==='ce'||b.dataset.cat==='ca'){if(m.cat!==b.dataset.cat){reg({t:'mod',m:m,antes:{cat:m.cat,inad:m.inad}});m.cat=b.dataset.cat;m.inad=false;m._cnC=false;drawMarks();aplicaAuto()}sideCur='cnx';try{localStorage.setItem('arena_side','cnx')}catch(x){}abreCat(m,true);return;} // conectivo: o painel à direita traz Só marcar e Corrigir (como Ortografia e Outros)
  if(b.dataset.cat==='el'){var me=b._m||m;me.cat='el';me.inad=false;catAtual=null;$('catp').classList.add('hide');drawMarks();aplicaAuto();if(!ALUNOS[i].gancho){abreLC(me.line,Math.min(181,me.cx+me.rx+4),me.cy,undefined,multi(me)?rg(me):null,me.par);if(cmtAtual){cmtAtual.elogio=true;$('lcT').placeholder='O que ficou muito bom? Ex.: bom argumento, boa escolha de palavra. (opcional)'}}return;}
  if(b.dataset.cat==='cmt'){cmtCirc={m:m,prev:m.cat};if(!m.cat)m.cat='cm';catAtual=null;$('catp').classList.add('hide');drawMarks();abreLC(m.line,Math.min(181,m.cx+m.rx+4),m.cy,undefined,multi(m)?rg(m):null,m.par);return;}
  if(b.dataset.cat==='rm'){var ix=ALUNOS[i].marks.indexOf(m);reg({t:'rem',m:m,idx:ix});ALUNOS[i].marks=ALUNOS[i].marks.filter(function(x){return x!==m});if(selC===m)selC=null;}
@@ -2889,10 +2889,12 @@ function titHtml(m){var ins=m.cat==='ti'&&m.ti==='ins'||m._tiIns;return '<div cl
 function titFim(m){ // um título por redação: os outros círculos de título saem
  ALUNOS[i].marks.slice().forEach(function(x){if(x!==m&&x.t==='o'&&x.cat==='ti'){var ix=ALUNOS[i].marks.indexOf(x);reg({t:'rem',m:x,idx:ix});ALUNOS[i].marks=ALUNOS[i].marks.filter(function(y){return y!==x})}});
  m._tiIns=false;catAtual=null;$('catp').classList.add('hide');$('catpS').classList.add('hide');drawMarks();aplicaAuto()}
-function cnPos(){var sd=$('catpS'),c=$('catp'),tg=c.querySelector('[data-sidetog="cnx"]');if(!tg||sd.classList.contains('hide'))return;var r=c.getBoundingClientRect(),t=tg.getBoundingClientRect(),w=sd.offsetWidth,h=sd.offsetHeight,L=r.right+8,T=t.top-12;if(L+w>innerWidth-8){L=r.left-w-8;if(L<8){L=Math.max(8,Math.min(innerWidth-w-8,t.right-w));T=t.bottom+4}}sd.style.left=L+'px';sd.style.top=Math.max(8,Math.min(innerHeight-h-8,T))+'px'}
+function cnPos(){var sd=$('catpS'),c=$('catp'),tg=(catAtual&&(catAtual.cat==='ce'||catAtual.cat==='ca'))?c.querySelector('button[data-cat="'+catAtual.cat+'"]'):null;if(!tg||sd.classList.contains('hide'))return;var r=c.getBoundingClientRect(),t=tg.getBoundingClientRect(),w=sd.offsetWidth,h=sd.offsetHeight,L=r.right+8,T=t.top-12;if(L+w>innerWidth-8){L=r.left-w-8;if(L<8){L=Math.max(8,Math.min(innerWidth-w-8,t.right-w));T=t.bottom+4}}sd.style.left=L+'px';sd.style.top=Math.max(8,Math.min(innerHeight-h-8,T))+'px'}
 function cnPaint(m){var b=$('cnBox');if(!b||!m)return;b.innerHTML=cnBox(m);cnPos()}
-function cnHtml(m){return '<div class="gl gl2">Corrigir conectivo</div>'+(m.cat==='ce'?'<input id="cnW" class="orw" type="text" maxlength="30" placeholder="Palavra que o aluno usou (opcional)" value="'+esc2(m.pal||'').replace(/"/g,'&quot;')+'" autocomplete="off" spellcheck="false" aria-label="Conectivo que o aluno usou">':'')+'<div id="cnBox">'+cnBox(m)+'</div>'}
-function sideSync(){var c=$('catp'),sd=$('catpS'),tg=sideCur?c.querySelector('[data-sidetog="'+sideCur+'"]'):null,src=sideCur?c.querySelector('.sidesrc[data-for="'+sideCur+'"]'):null;
+function cnHtml(m){var ce=m.cat==='ce';
+ if(!m._cnC&&!(m.sin&&m.sin.length))return '<div class="gl gl2">Conectivo '+(ce?'errado':'ausente')+'</div><div class="g2 parg"><button type="button" data-cnx="0">Só marcar</button><button type="button" class="orok" data-cnstart="1">Corrigir</button></div><p class="tihint">Corrigir escolhe a função e os conectivos que entram no comentário.</p>';
+ return '<div class="gl gl2">Corrigir conectivo '+(ce?'errado':'ausente')+'</div>'+(ce?'<input id="cnW" class="orw" type="text" maxlength="30" placeholder="Palavra que o aluno usou (opcional)" value="'+esc2(m.pal||'').replace(/"/g,'&quot;')+'" autocomplete="off" spellcheck="false" aria-label="Conectivo que o aluno usou">':'')+'<div id="cnBox">'+cnBox(m)+'</div>'}
+function sideSync(){var c=$('catp'),sd=$('catpS'),tg=sideCur==='cnx'?((catAtual&&(catAtual.cat==='ce'||catAtual.cat==='ca'))?c.querySelector('button[data-cat="'+catAtual.cat+'"]'):null):sideCur?c.querySelector('[data-sidetog="'+sideCur+'"]'):null,src=sideCur?c.querySelector('.sidesrc[data-for="'+sideCur+'"]'):null;
  if(c.classList.contains('hide')||c.classList.contains('pal')||!tg||!src){sd.classList.add('hide');return}
  var fresh=sd.dataset.k!==sideCur||sd.classList.contains('hide'),pv=(sideCur==='ort'&&!fresh&&$('orW'))?$('orW').value:null;
  if(sideCur==='ort'){var cv=pv!=null?pv:((catAtual&&catAtual.cat==='or'&&catAtual.cor)||'');sd.innerHTML='<div class="gl gl2">Ortografia</div><input id="orW" class="orw" type="text" placeholder="Palavra correta" value="'+esc2(cv)+'" autocomplete="off" spellcheck="false" aria-label="Palavra escrita corretamente"><div id="orSug" class="orsug"></div><div class="g2 parg"><button type="button" class="orok" data-ortok="1">Corrigir</button><button type="button" data-ortok="0">Só marcar</button></div>'+(function(){var L=ortLista();return L.length?'<div class="gl gl2 orlt">Já corrigidas</div><div class="orl">'+L.map(function(w){return '<button type="button" class="orc" data-ortw="'+esc2(w)+'">'+esc2(w)+'</button>'}).join('')+'</div>':''})()}
@@ -2912,6 +2914,7 @@ $('catpS').addEventListener('click',function(e){var tb=e.target.closest('[data-t
    if(tb.dataset.ti==='aus'){m1.ti='aus';m1._tiIns=false;titFim(m1);return}
    m1.ti='ins';m1._tiIns=true;drawMarks();$('catpS').innerHTML=titHtml(m1);return}
   if(tcb){reg({t:'mod',m:m1,antes:{cop:m1.cop}});m1.cop=tcb.dataset.tc==='1';titFim(m1);return}}
+ var cst=e.target.closest('[data-cnstart]');if(cst&&catAtual){catAtual._cnC=true;$('catpS').innerHTML=cnHtml(catAtual);cnCarrega(function(){if(sideCur==='cnx')cnPaint(catAtual)});cnPos();return}
  var cf=e.target.closest('[data-cnf]'),ct=e.target.closest('[data-cnt]'),cm=e.target.closest('[data-cnmais]'),ck=e.target.closest('[data-cnok]'),cx=e.target.closest('[data-cnx]');
  if(catAtual&&(cf||ct||cm||ck||cx||e.target.closest('[data-cnsel],[data-cnall],[data-cnwhy]'))){var m0=catAtual;
   if(cx){fechaCat();return}
@@ -3627,7 +3630,7 @@ function cartao2(E){
  var P=PROPS[acao]||{},txt=P.kind==='corr'?'Ver correção':P.kind==='late'?'Enviar com atraso':P.kind==='open'?(P.reesc||(acao===E.r&&O.kind==='corr')?'Enviar reescrita':'Enviar redação'):'';
  var linha='';
  if(R.kind==='corr'&&R.ant){var ms=R.niv.map(function(n,j){return n>R.ant[j]?CRIT[j]:''}).filter(Boolean);linha='<span class="sumln ok">'+(ms.length?'Você melhorou em '+ms.join(', ')+'.':'Reescrita corrigida.')+'</span>';}
- else if(O.kind==='corr'){var ab=abaixo(O);linha=ab.length?'<span class="sumln at">Para melhorar: '+ab.map(function(j){return CRIT[j]}).join(', ')+'</span>':'<span class="sumln ok">Tudo no esperado.</span>';}
+ else if(O.kind==='corr'){var ab=abaixo(O);linha=ab.length?'':'<span class="sumln ok">Tudo no esperado.</span>';}
  if(P.decAtraso)linha='<span class="sumln '+(P.decAtraso==='lib'?'ok':'at')+'">'+(P.decAtraso==='lib'?'Atraso aceito pela coordenação: vale nota normal.':'Atraso recusado: a redação será corrigida, mas vale zero.')+'</span>';
  if(O.kind==='closed')linha='<span class="sumln at"><b>Prazo encerrado.</b> Procure a coordenação para combinar a entrega.</span>';
  if(P.kind==='late'&&P.fimAt)linha+='<div class="nvent"><b>Prazo encerrado em '+P.pz0+'</b><span>Você ainda pode enviar até '+P.fimAt+'. Depois disso, é preciso procurar a coordenação.</span></div>';
@@ -3872,12 +3875,12 @@ function instrucoes(k,late){
 }
 
 // ===== Proposta atrasada: justificativa antes do envio =====
-var MOTIVOS=[['saude','Problema de saúde (com atestado)'],['viagem','Viagem'],['esq','Esqueci ou perdi o prazo'],['outro','Outro motivo']];
+var MOTIVOS=[['saude_com','Problema de saúde com atestado'],['saude_sem','Problema de saúde sem atestado'],['viagem','Viagem'],['esq','Esqueci ou perdi o prazo'],['outro','Outro motivo']];
 function atraso(k){
  var P=PROPS[k],sel=null;
  $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas propostas</button><h2>Esta proposta está em atraso</h2><p class="lead">'+P.t+' · '+P.s+'. Você ainda pode enviar. Conte o motivo para a coordenação avaliar.</p>'+
  '<div class="atr"><div class="lbl2">Por que a redação não foi entregue no prazo?</div>'+MOTIVOS.map(function(m){return '<label class="rd"><input type="radio" name="mot" value="'+m[0]+'"> '+m[1]+'</label>'+(m[0]==='viagem'?'<div class="atd hide" id="atViagem"><label for="atIda">Quando você viajou?<input type="date" id="atIda"></label><label for="atVolta">Quando você voltou?<input type="date" id="atVolta"></label><div class="atde" id="atDe"></div></div>':'')}).join('')+
- '<label class="lbl2" for="atT" id="atTl" style="margin-top:12px">Quer explicar melhor? (opcional)</label><textarea id="atT" rows="3" placeholder="Ex.: fiquei doente de 22 a 28/10 e o atestado está com a coordenação."></textarea>'+
+ '<label class="lbl2" for="atT" id="atTl" style="margin-top:12px">Quer explicar melhor? (opcional)</label><textarea id="atT" rows="3" placeholder="Ex.: fiquei doente de 22 a 28/10 (e o atestado está com a coordenação, se tiver)."></textarea>'+
  '<button type="button" class="btn" id="atGo" disabled>Continuar e enviar a foto</button>'+
  '<button type="button" class="btn sec" id="atNo">Não vou conseguir enviar — avisar a coordenação</button></div>';
  $('alVolta').onclick=lista;
