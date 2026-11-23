@@ -1432,7 +1432,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .row2 .p{font-size:14px}
 @media(max-width:640px){.left .lk,.left .ltag,.left .lsheet{display:none}.left{width:100%}}
 
-/* Aluno: o lado do formulário vira folha de caderno */
+/* Login: o lado do formulário é sempre uma folha de caderno (todos os perfis) */
 .right{position:relative;transition:background-color .2s}
 .right.caderno{background-image:repeating-linear-gradient(transparent 0 33px,rgba(60,118,120,.12) 33px 34px);background-position:0 18px}
 .right.caderno::before{content:"";position:absolute;left:64px;top:0;bottom:0;width:2px;background:rgba(217,128,111,.5);pointer-events:none}
@@ -1504,7 +1504,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   
 </aside>
 
-<main class="right">
+<main class="right caderno">
   <form class="form" id="form" novalidate>
     <div class="kicker">Entrar</div>
     <h2 class="q">Quem está acessando?</h2>
@@ -1735,7 +1735,7 @@ function render(){
  $('row2').innerHTML=SEC.map(function(k){return btn(k)}).join('');$('row2').style.display=SEC.length?'':'none';
  var p=PERFIS[cur],f=$('form').style;
  f.setProperty('--cor',p.c);f.setProperty('--soft',p.s);
- var rt=document.querySelector('.right');if(rt)rt.classList.toggle('caderno',cur==='aluno');
+ var rt=document.querySelector('.right');if(rt)rt.classList.add('caderno'); // folha de caderno fixa, para todos os perfis
  $('desc').textContent=p.d;
  $('pwd').placeholder=p.ph;
  $('fMat').classList.toggle('hide',cur!=='aluno');
