@@ -1496,6 +1496,50 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .mk .xm.est.gpg path.xx.ln,.crk .xm.est.gpg path.xx.ln,.pr-pg .xm.est.gpg path.xx.ln{stroke:#b0307a}
 .mk .xm.est.gmg ellipse.xe,.mk .xm.est.gpg ellipse.xe,.crk .xm.est.gmg ellipse.xe,.crk .xm.est.gpg ellipse.xe,.pr-pg .xm.est.gmg ellipse.xe,.pr-pg .xm.est.gpg ellipse.xe{fill:none;stroke:none}
 .mk .xm.est.gmg.sel ellipse.xe{stroke:#2f855a;stroke-width:.3;stroke-dasharray:1.2 1;opacity:.6}.mk .xm.est.gpg.sel ellipse.xe{stroke:#b0307a;stroke-width:.3;stroke-dasharray:1.2 1;opacity:.6}
+
+/* ===== Celular: correção por critérios I a V (gaveta com nível e categorias, círculo padrão para arrastar pela alça) ===== */
+.mbar,.mdr,.mmore,.mmenu{display:none}
+@media(max-width:640px){
+ .rc{position:relative}
+ .pb.big .mbar{display:flex;gap:6px;padding:8px 10px 10px;background:#fff;border-top:1px solid #d8d3c4;flex-shrink:0;align-items:stretch}
+ .pb.big .mdr[data-s="open"],.pb.big .mdr[data-s="slim"]{display:block;flex-shrink:0;background:#fff;border-top:1px solid #d8d3c4}
+ .pb.big .mdr[data-s="open"]{height:min(46vh,340px);overflow:hidden}
+ .pb.big .mmore{display:grid;place-items:center;position:absolute;top:0;right:0;width:46px;height:30px;border:0;background:transparent;font:700 20px 'DM Sans';color:#3c7678;cursor:pointer;z-index:2}
+ .pb.big .pbtog{padding-right:46px}
+ .pb.big .fm .fmh,.pb.big .fm .fa{display:none}
+ .pb.big .fmf:not(:has(.cfask:not(.hide))){display:none}
+ .mmenu{position:fixed;right:8px;z-index:60;background:#fff;border:1px solid #d8d3c4;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.22);padding:6px;min-width:230px}
+ .mmenu:not([hidden]){display:block}
+ .mmenu button{display:block;width:100%;text-align:left;font:500 14.5px 'DM Sans';padding:12px;border:0;background:transparent;border-radius:10px;color:#222;cursor:pointer}
+ .mmenu button.pr{color:#b83a2a;font-weight:700}
+ .mmenu button:active{background:#f0ede4}
+}
+.mchip{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;border:1.5px solid #d8d3c4;background:#fff;border-radius:12px;height:54px;font:inherit;cursor:pointer;color:#222;position:relative;padding:0}
+.mchip b{font:700 15px 'DM Sans'}.mchip small{font:500 10.5px 'DM Sans';color:#6b6a62}
+.mchip[aria-pressed="true"]{border-color:#3c7678;background:#e3efee}
+.mchip .mn{position:absolute;top:-6px;right:-3px;background:#b0307a;color:#fff;font:700 10px 'DM Sans';border-radius:9px;min-width:18px;height:18px;display:grid;place-items:center;padding:0 4px}
+.msalvar{flex:0 0 64px;border-radius:12px;border:0;background:#3c7678;color:#fff;font:700 13px 'DM Sans';cursor:pointer}
+.mdrc{height:100%;display:flex;flex-direction:column}
+.mdrh{display:flex;align-items:center;gap:8px;padding:10px 12px 6px}
+.mdrh em{font:700 11px 'DM Sans';font-style:normal;letter-spacing:.06em;color:#3c7678;background:#e3efee;border-radius:8px;padding:3px 7px}
+.mdrh b{font:700 15px 'DM Sans';flex:1}
+.mdrh button{width:34px;height:34px;border-radius:10px;border:0;background:#efece3;font-size:18px;cursor:pointer}
+.mniv{display:flex;align-items:center;gap:8px;padding:2px 12px 8px}
+.mniv span{font:500 12px 'DM Sans';color:#6b6a62;min-width:46px}
+.mniv button{flex:1;height:38px;border-radius:10px;border:1.5px solid #d8d3c4;background:#fff;font:700 15px 'DM Sans';cursor:pointer;color:#222}
+.mniv button[aria-pressed="true"]{background:#3c7678;border-color:#3c7678;color:#fff}
+.mcats{flex:1;min-height:0;overflow:auto;padding:2px 12px 12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
+.mcat{display:flex;align-items:center;gap:8px;text-align:left;font:500 13.5px 'DM Sans';color:#222;background:#f7f5ee;border:1.5px solid #e2ded2;border-radius:12px;padding:10px;min-height:46px;cursor:pointer}
+.mcat i{width:10px;height:10px;border-radius:50%;flex:none}.mcat small{display:block;color:#7b7a70;font:400 11px 'DM Sans'}
+.mcat.ex{background:#fff;border-style:dashed}
+.mslim{padding:10px 12px 12px;display:flex;flex-direction:column;gap:8px}
+.mslim .l1{display:flex;align-items:center;gap:8px;font:500 13.5px 'DM Sans'}.mslim .l1 b{display:flex;align-items:center;gap:6px}.mslim .l1 i{width:10px;height:10px;border-radius:50%}.mslim .l1 span{color:#6b6a62;flex:1}
+.mslim .l2{display:flex;gap:8px;align-items:center}
+.mslim .sz{display:flex;gap:6px}.mslim .sz button,.mslim .cx{width:42px;height:42px;border-radius:12px;border:1.5px solid #d8d3c4;background:#fff;font:700 20px 'DM Sans';cursor:pointer;color:#222}
+.mslim .go{flex:1;height:42px;border-radius:12px;border:0;background:#3c7678;color:#fff;font:700 14px 'DM Sans';cursor:pointer}
+.mslim .mais{height:42px;padding:0 12px;border-radius:12px;border:1.5px solid #3c7678;background:#fff;color:#3c7678;font:700 13px 'DM Sans';cursor:pointer}
+.mk .mge,.mk .mgl,.mk .mgc{fill:none;stroke-linecap:round;pointer-events:none}.mk .mge{stroke-width:.9}.mk .mgl{stroke-width:1.3}.mk .mgc{stroke-width:.4;stroke-dasharray:1 1}
+.mgrip2{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:#fff;border:2.5px solid #d62828;box-shadow:0 2px 8px rgba(0,0,0,.35);touch-action:none;cursor:grab;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;-webkit-user-select:none;user-select:none}.mgrip2 i{display:block;width:18px;height:2px;border-radius:2px;background:#555}
 </style>
 <!--PONTE--></head>
 <body>
@@ -1603,7 +1647,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="stage" id="stage"><div class="pg" id="pg"><img id="img" alt="Foto da redação"><svg id="mk" class="mk" viewBox="0 0 210 297" preserveAspectRatio="none" aria-label="Marcações sobre a redação"></svg></div></div>
       <div class="sbar" id="sbar"><span><b>Zoom</b> <span id="sbZ">60%</span></span><span><b>Linha</b> <span id="sbL">—</span></span><span class="sbh" id="sbH"></span></div>
     </div>
-    <aside class="rc"><button type="button" class="pbtog" id="pbTog" aria-expanded="false"><span>Níveis e comentários</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button>
+    <aside class="rc"><button type="button" class="pbtog" id="pbTog" aria-expanded="false"><span>Níveis e comentários</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button><button type="button" class="mmore" id="mMore" aria-label="Mais opções" aria-haspopup="true" aria-expanded="false">⋯</button><div class="mdr" id="mDr" data-s="closed"></div><div class="mbar" id="mBar"></div>
     <form class="fm" id="fm">
       <div class="fmh"><div class="fmn"><h3 id="fNome"></h3><div class="sub" id="fSub"></div></div>
         <div class="tot"><div class="big" id="totV">—</div><div class="parc" id="totP"></div><div class="seg2" id="totSeg"></div></div></div>
@@ -1629,6 +1673,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
         <div class="fa"><button type="button" class="an" id="anBtn"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg> Anular redação</button><span class="sinw" id="iaW"><button type="button" class="an iab" id="iaBtn" title="Suspeita de IA" aria-label="Suspeita de IA"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg></button></span><button class="btn" id="salvar" type="submit"><svg class="ico sv" viewBox="0 0 24 24" aria-hidden="true"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg> Salvar</button></div>
       </div>
     </form>
+<div class="mmenu" id="mMenu" role="menu" hidden><button type="button" role="menuitem" data-mm="du">Falar com o professor</button><button type="button" role="menuitem" data-mm="ia">Suspeita de IA</button><button type="button" role="menuitem" data-mm="pr">Imprimir esta folha</button><button type="button" role="menuitem" data-mm="nc">Níveis e comentários (tela cheia)</button><button type="button" role="menuitem" class="pr" data-mm="an">Anular redação</button></div>
 <div class="md hide" id="md" role="dialog" aria-modal="true" aria-labelledby="mt"><div class="mc">
  <div class="mh"><div><div class="k">Guia de perguntas</div><h3 id="mt"></h3></div><button type="button" id="mx" aria-label="Fechar">×</button></div>
  <div class="mq" id="mq" role="radiogroup"></div>
@@ -3624,6 +3669,107 @@ function setOrig(on){
 $('origBtn').addEventListener('click',function(){setOrig(!verOrig)});
 window.__arena={FIN_PLANTAO:FIN_PLANTAO,FIN_NIVEL:FIN_NIVEL,RA_TXT:RA_TXT,SS_TXT:SS_TXT,MOT:MOT,f1:function(x){return x.toFixed(1).replace('.',',')},fraseReesc:fraseReesc,margemTxt:margemTxt,foto:foto,lineY:lineY,COMPS:COMPS,NIVEIS:NIVEIS,compoe:compoe,fmt:fmt};
 montaComps();
+/* ===== Celular: correção por critérios (I a V) ===== */
+var MOB={crit:null,place:null,drag:null};
+var MCRIT=[
+ {k:'I',n:'Estética',i:0,cats:[{id:'ti',l:'Título',how:'tit'},{id:'ra',l:'Rasura',simple:1},{id:'mr',l:'Linha curta',reta:1,simple:1,col:'#2f855a'},{id:'ma',l:'Passou da margem',simple:1,col:'#2f855a'},{id:'pc',l:'Parágrafo curto',reta:1,simple:1,col:'#b0307a'},{id:'pe',l:'Parágrafo longo',simple:1,col:'#b0307a'},{id:'pd',l:'Desalinhado',simple:1,col:'#b0307a'}]},
+ {k:'II',n:'Linguagem',i:1,cats:[{id:'ac',l:'Acentuação'},{id:'pt',l:'Pontuação'},{id:'or',l:'Ortografia',how:'ort'},{id:'ss',l:'Translineação',simple:1},{id:'il',l:'Ilegibilidade',simple:1},{id:'mi',l:'Maiúscula',simple:1},{id:'cj',l:'Conjugação'},{id:'cn',l:'Concordância'},{id:'rg',l:'Regência'},{id:'ol',l:'Oralidade'},{id:'pr',l:'Precisão',sub:'palavra vaga'}]},
+ {k:'III',n:'Progressão',i:2,cats:[{id:'rp',l:'Repetição de palavra',col:'#d98300'},{id:'ce',l:'Conectivo errado',col:'#2a5a8a'},{id:'ca',l:'Conectivo ausente',col:'#2a5a8a'}]},
+ {k:'IV',n:'Proposta',i:3,cats:[{id:'ele',l:'Elemento ausente',col:'#c28a00'},{id:'eli',l:'Elemento insuficiente',col:'#c28a00'}]},
+ {k:'V',n:'Abordagem',i:4,cats:[{id:'lac',l:'Lacuna',col:'#6a3a8a'}]}
+];
+var MEXTRA=[{id:'el',l:'✓ Elogio',col:'#2f855a'},{id:'cmt',l:'Comentar',col:'#3c7678'}];
+function mobCrit(cat){for(var q=0;q<MCRIT.length;q++)if(MCRIT[q].cats.some(function(c){return c.id===cat}))return q;return -1}
+function mobDef(id){for(var q=0;q<MCRIT.length;q++){var f=MCRIT[q].cats.filter(function(c){return c.id===id})[0];if(f)return f}return MEXTRA.filter(function(c){return c.id===id})[0]}
+function mobOn(){var pb=document.querySelector('.pb');return innerWidth<=640&&pb&&pb.classList.contains('big')}
+function mobReset(){MOB.crit=null;MOB.place=null;MOB.drag=null;var m=$('mMenu');if(m)m.hidden=true;var g=$('mGrip');if(g)g.remove()}
+function mobTitulo(){var tg=$('pbTog'),pb=document.querySelector('.pb'),al=ALUNOS[i];if(!tg||!pb||!pb.classList.contains('big')||!al||!tg.firstChild)return;var t=total(al);tg.firstChild.textContent=al.n.split(' ')[0]+(t!=null?' · '+fmt(t):'')+' · Níveis e comentários'}
+function mobPinta(){
+ if(innerWidth>640)return;mobTitulo();var bar=$('mBar'),dr=$('mDr');if(!bar||!dr)return;
+ var a=ALUNOS[i];if(!a)return;
+ // barra: I a V (nível e número de marcas) + Salvar
+ var h='';MCRIT.forEach(function(c){var n=(a.marks||[]).filter(function(m){return m.t==='o'&&m.cat&&mobCrit(m.cat)===c.i}).length,nv=a.niv&&a.niv[c.i];
+  h+='<button type="button" class="mchip" data-mc="'+c.i+'" aria-pressed="'+String(MOB.crit===c.i&&!MOB.place)+'" aria-label="Critério '+c.k+', '+c.n+(n?', '+n+(n===1?' marca':' marcas'):'')+', nível '+(nv==null?'não escolhido':nv)+'"><b>'+c.k+'</b><small>'+(nv==null?'nível —':'nível '+nv)+'</small>'+(n?'<span class="mn">'+n+'</span>':'')+'</button>'});
+ bar.innerHTML=h+'<button type="button" class="msalvar" id="mSalvar">Salvar</button>';
+ // gaveta
+ if(MOB.place){dr.dataset.s='slim';mobSlim(dr);return}
+ if(MOB.crit==null){dr.dataset.s='closed';dr.innerHTML='';return}
+ var c=MCRIT[MOB.crit];dr.dataset.s='open';
+ var g='<div class="mdrc"><div class="mdrh"><em>'+c.k+'</em><b>'+c.n+'</b><button type="button" id="mDrX" aria-label="Fechar">×</button></div><div class="mniv"><span>Nível</span>'+[0,1,2,3,4].map(function(n){return '<button type="button" data-mn="'+n+'" aria-pressed="'+String(nv0(a,c.i)===n)+'">'+n+'</button>'}).join('')+'</div><div class="mcats">';
+ c.cats.forEach(function(d){g+='<button type="button" class="mcat" data-md="'+d.id+'"><i style="background:'+(d.col||'#d62828')+'"></i><span>'+d.l+(d.reta?'<small>vira uma linha reta</small>':d.sub?'<small>'+d.sub+'</small>':'')+'</span></button>'});
+ MEXTRA.forEach(function(d){g+='<button type="button" class="mcat ex" data-md="'+d.id+'"><i style="background:'+d.col+'"></i><span>'+d.l+'</span></button>'});
+ dr.innerHTML=g+'</div></div>';
+}
+function nv0(a,k){return a.niv?a.niv[k]:null}
+function mobSlim(dr){
+ var P=MOB.place,d=P.d;
+ dr.innerHTML='<div class="mslim"><div class="l1"><b><i style="background:'+(d.col||'#d62828')+'"></i>'+d.l+'</b><span>'+(d.reta?'arraste a linha pela alça':'arraste o círculo pela alça')+'</span></div><div class="l2"><div class="sz"><button type="button" id="mMenos" aria-label="Menor">−</button><button type="button" id="mMais" aria-label="Maior">+</button></div>'+(d.simple?'<button type="button" class="mais" id="mOutro">+ outro</button>':'')+'<button type="button" class="go" id="mPronto">✓ Pronto</button><button type="button" class="cx" id="mCancela" aria-label="Cancelar">×</button></div></div>';
+}
+function mobCentro(){var r=$('stage').getBoundingClientRect(),p=pt({clientX:r.left+r.width/2,clientY:r.top+r.height/2});return p?{x:p.x,y:p.y}:{x:105,y:150}}
+function mobComeca(d){var c=mobCentro(),rx=d.reta?14:9,ry=2.9;MOB.place={d:d,cx:cl(r1(c.x),rx+2,208-rx),cy:cl(r1(c.y),20,285),rx:rx,ry:ry};closeCatSilent();drawMarks();mobPinta()}
+function closeCatSilent(){try{if(catAtual)fechaCat()}catch(x){}}
+function mobOff(){return 34/pxU()}
+function mobGhost(){
+ var P=MOB.place;if(!P)return '';var d=P.d,col=d.col||'#d62828';
+ return '<g class="mghost">'+(d.reta?'<line id="mgL" class="mgl" style="stroke:'+col+'" x1="'+(P.cx-P.rx)+'" x2="'+(P.cx+P.rx)+'" y1="'+P.cy+'" y2="'+P.cy+'"/>':'<ellipse id="mgE" class="mge" style="stroke:'+col+'" cx="'+P.cx+'" cy="'+P.cy+'" rx="'+P.rx+'" ry="'+P.ry+'"/>')+'<line id="mgC" class="mgc" style="stroke:'+col+'" x1="'+(P.cx+P.rx*.6)+'" y1="'+(P.cy+P.ry*.8)+'" x2="'+(P.cx+P.rx*.85)+'" y2="'+(P.cy+P.ry+mobOff())+'"/></g>';
+}
+function mobGhostPos(){
+ var P=MOB.place;if(!P)return;var S=function(id,a,v){var e=document.getElementById(id);if(e)e.setAttribute(a,v)},gx=P.cx+P.rx*.85,gy=P.cy+P.ry+mobOff();
+ if(P.d.reta){S('mgL','x1',P.cx-P.rx);S('mgL','x2',P.cx+P.rx);S('mgL','y1',P.cy);S('mgL','y2',P.cy)}else{S('mgE','cx',P.cx);S('mgE','cy',P.cy);S('mgE','rx',P.rx);S('mgE','ry',P.ry)}
+ S('mgC','x1',P.cx+P.rx*.6);S('mgC','y1',P.cy+P.ry*.8);S('mgC','x2',gx);S('mgC','y2',gy);
+ var g=$('mGrip');if(g){g.style.left=(gx/210*100)+'%';g.style.top=(gy/297*100)+'%'}
+}
+// a alça é um elemento HTML dentro da folha (posição em %, acompanha zoom e giro): touch-action:none vale para ele, então o dedo não rola a página
+function mobGrip(){
+ var g=$('mGrip'),P=MOB.place;
+ if(!P){if(g)g.remove();return}
+ if(!g){g=document.createElement('div');g.id='mGrip';g.className='mgrip2';g.setAttribute('role','button');g.setAttribute('aria-label','Alça: arraste para mover a marca');g.innerHTML='<i></i><i></i><i></i>';$('pg').appendChild(g);
+  g.addEventListener('pointerdown',function(e){var p=pt(e);if(!p||!MOB.place)return;e.preventDefault();var P=MOB.place;MOB.drag={dx:p.x-(P.cx+P.rx*.85),dy:p.y-(P.cy+P.ry+mobOff())};try{g.setPointerCapture(e.pointerId)}catch(x){}});
+  g.addEventListener('pointermove',function(e){if(!MOB.drag||!MOB.place)return;var P=MOB.place,p=pt(e);if(!p)return;e.preventDefault();P.cx=cl(r1(p.x-MOB.drag.dx-P.rx*.85),P.rx+2,208-P.rx);P.cy=cl(r1(p.y-MOB.drag.dy-P.ry-mobOff()),20,285);mobGhostPos()});
+  ['pointerup','pointercancel'].forEach(function(t){g.addEventListener(t,function(){MOB.drag=null})});
+ }
+ g.style.borderColor=P.d.col||'#d62828';mobGhostPos();
+}
+function mobFixa(){var P=MOB.place,a=ALUNOS[i],m={cx:P.cx,cy:P.cy,rx:P.rx,ry:P.ry,id:mid++,t:'o',cat:null};m.line=linhaDe(m.cy);aplicaFaixa(m);a.marks.push(m);selC=m;reg({t:'add',m:m});return m}
+function mobAplica(m,d){ // aplica a categoria pelos mesmos botões do AC (as perguntas seguintes, como Ausente/Inadequado, continuam iguais)
+ selC=m;drawMarks();abreCat(m);var P=$('catp'),b=d.how==='tit'?P.querySelector('[data-sidetog="tit"]'):d.how==='ort'?P.querySelector('[data-sidetog="ort"]'):P.querySelector('button[data-cat="'+d.id+'"]');
+ if(b)b.click();else toast('Categoria indisponível nesta redação',1)}
+function mobPronto(outro){
+ var P=MOB.place;if(!P)return;var d=P.d,m=mobFixa();MOB.place=null;
+ if(outro&&d.simple){mobAplica(m,d);mobComeca(d);toast('Marca adicionada · coloque a próxima');return}
+ MOB.crit=null;mobAplica(m,d);mobPinta()}
+function mobNivel(k,n){var l=document.querySelectorAll('#comps .lv')[k],b=l&&l.querySelector('button[data-n="'+n+'"]');if(b)b.click()}
+function mobMenu(abre){var m=$('mMenu'),t=$('mMore'),rc=document.querySelector('.rc');m.hidden=!abre;t.setAttribute('aria-expanded',String(abre));if(abre){var r=rc.getBoundingClientRect();m.style.bottom=(innerHeight-r.top+6)+'px';var ia=m.querySelector('[data-mm="ia"]');if(ia)ia.style.display=(ALUNOS[i]&&ALUNOS[i].gancho)?'none':''}}
+// eventos
+$('mBar').addEventListener('click',function(e){
+ if(e.target.closest('#mSalvar')){$('salvar').click();return}
+ var c=e.target.closest('.mchip');if(!c)return;var k=+c.dataset.mc;
+ if(MOB.place)MOB.place=null,drawMarks();
+ MOB.crit=(MOB.crit===k)?null:k;mobPinta();
+});
+$('mDr').addEventListener('click',function(e){
+ var a=ALUNOS[i];
+ if(e.target.closest('#mDrX')){MOB.crit=null;mobPinta();return}
+ var n=e.target.closest('[data-mn]');if(n){mobNivel(MOB.crit,+n.dataset.mn);mobPinta();return}
+ var c=e.target.closest('[data-md]');if(c){var d=mobDef(c.dataset.md);if(!d)return;
+   if(d.id==='el'||d.id==='cmt'){var m0={cx:mobCentro().x,cy:mobCentro().y,rx:8,ry:2.9,id:mid++,t:'o',cat:null};m0.cx=cl(r1(m0.cx),10,200);m0.cy=cl(r1(m0.cy),20,285);m0.line=linhaDe(m0.cy);aplicaFaixa(m0);a.marks.push(m0);selC=m0;reg({t:'add',m:m0});MOB.crit=null;mobAplica(m0,d);mobPinta();return}
+   mobComeca(d);return}
+ if(e.target.closest('#mPronto')){mobPronto(false);return}
+ if(e.target.closest('#mOutro')){mobPronto(true);return}
+ if(e.target.closest('#mCancela')){MOB.place=null;drawMarks();mobPinta();return}
+ var z=e.target.closest('#mMenos,#mMais');if(z&&MOB.place){MOB.place.rx=cl(r1(MOB.place.rx+(z.id==='mMais'?2.5:-2.5)),4,40);MOB.place.cx=cl(MOB.place.cx,MOB.place.rx+2,208-MOB.place.rx);drawMarks();return}
+});
+$('mMore').addEventListener('click',function(e){e.stopPropagation();mobMenu($('mMenu').hidden)});
+document.addEventListener('click',function(e){if(!e.target.closest('#mMenu')&&!e.target.closest('#mMore'))mobMenu(false)});
+$('mMenu').addEventListener('click',function(e){var b=e.target.closest('[data-mm]');if(!b)return;mobMenu(false);var k=b.dataset.mm;
+ if(k==='an')$('anBtn').click();else if(k==='ia')$('iaBtn').click();else if(k==='du')$('duvBtn').click();else if(k==='pr')$('prBtn').click();else if(k==='nc')$('pbTog').click()});
+document.addEventListener('touchmove',function(e){if(MOB.drag)e.preventDefault()},{passive:false});
+// mantém barra e fantasma em dia
+var _drawMarks0=drawMarks;drawMarks=function(t){_drawMarks0(t);if(MOB.place)$('mk').insertAdjacentHTML('beforeend',mobGhost());mobGrip();mobPinta()};
+var _atualiza0=atualiza;atualiza=function(){_atualiza0();mobPinta()};
+var _abre0=abre;abre=function(k,f){mobReset();var r=_abre0(k,f);mobPinta();return r};
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&MOB.place){MOB.place=null;drawMarks();mobPinta()}},true);
+$('pbTog').addEventListener('click',function(){setTimeout(function(){mobReset();mobPinta()},0)});
 })();
 
 </script>

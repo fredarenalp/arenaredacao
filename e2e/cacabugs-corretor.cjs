@@ -88,7 +88,7 @@ async function rodar(b, nome, viewport) {
       await p.keyboard.press('Escape').catch(() => {})
     })
     await passo(`aba ${aba}: níveis 0 a 4 nos 5 critérios (sem salvar)`, async () => {
-      if (viewport.width < 700) { const g = p.locator('text=Níveis e comentários').first(); if (await g.count()) { await g.click(); await p.waitForTimeout(500) } } // no celular os níveis ficam numa gaveta
+      if (viewport.width < 700 && await p.evaluate(() => document.querySelector('.pb').classList.contains('big'))) { await p.click('#pbTog'); await p.waitForTimeout(500) } // no celular os níveis completos ficam atrás de "Níveis e comentários"
       for (let k = 0; k < 5; k++) for (const nv of [0, 1, 2, 3, 4]) {
         const bt = p.locator('.rc .lv').nth(k).locator(`button[data-n="${nv}"]`)
         try { await bt.click({ timeout: 2500 }) } catch (e) {
