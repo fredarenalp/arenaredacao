@@ -673,7 +673,7 @@ const ARENA = {
     const redOf = (aid, pid, v) => reds.data.find((r) => r.aluno_id === aid && r.proposta_id === pid && r.versao === v)
     const bimAtual = prop.data.length ? Math.max(...prop.data.map((x) => x.bimestre)) : 1
     const hoje = new Date().toISOString().slice(0, 10)
-    const MOT = { 'Saúde': 'saude', 'Problema de saúde (com atestado)': 'saude', 'Problema de saúde (sem atestado)': 'saude', Viagem: 'viagem', 'Problema técnico': 'outro', 'Esqueci ou perdi o prazo': 'desorganizacao', 'Outro motivo': 'outro' }
+    const MOT = { 'Saúde': 'saude', 'Problema de saúde': 'saude', 'Problema de saúde (com atestado)': 'saude', 'Problema de saúde (sem atestado)': 'saude', Viagem: 'viagem', 'Problema técnico': 'outro', 'Esqueci ou perdi o prazo': 'desorganizacao', 'Outro motivo': 'outro' }
 
     const rowDe = (a, k, prop2) => {
       const n = prop2 > 10 ? prop2 - 10 : prop2

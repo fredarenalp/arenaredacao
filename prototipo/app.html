@@ -3940,12 +3940,12 @@ function instrucoes(k,late){
 }
 
 // ===== Proposta atrasada: justificativa antes do envio =====
-var MOTIVOS=[['saude_com','Problema de saúde (com atestado)'],['saude_sem','Problema de saúde (sem atestado)'],['viagem','Viagem'],['esq','Esqueci ou perdi o prazo'],['outro','Outro motivo']];
+var MOTIVOS=[['saude','Problema de saúde'],['viagem','Viagem'],['esq','Esqueci ou perdi o prazo'],['outro','Outro motivo']];
 function atraso(k){
  var P=PROPS[k],sel=null;
  $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas propostas</button><h2>Esta proposta está em atraso</h2><p class="lead">'+P.t+' · '+P.s+'. Você ainda pode enviar. Conte o motivo para a coordenação avaliar.</p>'+
  '<div class="atr"><div class="lbl2">Por que a redação não foi entregue no prazo?</div>'+MOTIVOS.map(function(m){return '<label class="rd"><input type="radio" name="mot" value="'+m[0]+'"> '+m[1]+'</label>'+(m[0]==='viagem'?'<div class="atd hide" id="atViagem"><label for="atIda">Quando você viajou?<input type="date" id="atIda"></label><label for="atVolta">Quando você voltou?<input type="date" id="atVolta"></label><div class="atde" id="atDe"></div></div>':'')}).join('')+
- '<label class="lbl2" for="atT" id="atTl" style="margin-top:12px">Quer explicar melhor? (opcional)</label><textarea id="atT" rows="3" placeholder="Ex.: fiquei doente de 22 a 28/10 (e o atestado está com a coordenação, se tiver)."></textarea>'+
+ '<label class="lbl2" for="atT" id="atTl" style="margin-top:12px">Quer explicar melhor? (opcional)</label><textarea id="atT" rows="3" placeholder="Ex.: fiquei doente de 22 a 28/10."></textarea>'+
  '<button type="button" class="btn" id="atGo" disabled>Continuar e enviar a foto</button>'+
  '<button type="button" class="btn sec" id="atNo">Não vou conseguir enviar — avisar a coordenação</button></div>';
  $('alVolta').onclick=lista;
