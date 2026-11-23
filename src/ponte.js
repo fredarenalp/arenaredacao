@@ -650,7 +650,7 @@ const ARENA = {
     const desde = new Date(Date.now() - 70 * 86400000).toISOString()
     const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess, aeeRes, genRes] = await Promise.all([
       q('perfis'), q('turmas'), q('alunos', '*, turmas(serie, nome)'), q('propostas'), q('pacotes'),
-      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, foto_path, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario,atualizada_em)'),
+      q('redacoes', 'id, aluno_id, proposta_id, versao, etapa, pacote_id, fora_do_prazo, enviada_em, corretor_id, foto_path, correcoes(n1,n2,n3,n4,n5,nota,anulacao,liberada,extras,comentario,atualizada_em,vista_em)'),
       q('avisos', '*, alunos(nome, turmas(serie, nome)), propostas(numero, genero)'),
       supabase.from('eventos').select('*').order('em', { ascending: false }).limit(300),
       q('professor_turmas'),
@@ -713,6 +713,22 @@ const ARENA = {
         const a = (byClass[`${s}|${t}`] || [])[k]
         if (!a) return []
         return prop.data.filter((x) => x.bimestre === bimAtual && x.series.includes(s) && x.prazo && x.prazo < hoje && !redOf(a.id, x.id, 1)).map((x) => ({ p: x.numero, v: 1 }))
+      },
+      // quem abriu a correção: alunos com correção liberada no bimestre atual e quantos viram todas / parte / nenhuma
+      vistas: (s, t) => {
+        const lista = t ? byClass[`${s}|${t}`] || [] : Object.keys(byClass).filter((k) => k.startsWith(s + '|')).flatMap((k) => byClass[k])
+        const doBim = new Set(prop.data.filter((x) => x.bimestre === bimAtual).map((x) => x.id))
+        const r = { n: 0, todas: 0, parte: 0, nenhuma: 0 }
+        for (const a of lista) {
+          const cs = reds.data.filter((x) => x.aluno_id === a.id && doBim.has(x.proposta_id)).map((x) => (Array.isArray(x.correcoes) ? x.correcoes[0] : x.correcoes)).filter((c) => c && c.liberada)
+          if (!cs.length) continue
+          const v = cs.filter((c) => c.vista_em).length
+          r.n++
+          if (v === 0) r.nenhuma++
+          else if (v === cs.length) r.todas++
+          else r.parte++
+        }
+        return r
       },
       // percentual de alunos da turma por métrica e período (janela atual) e tendência vs. janela anterior
       cell: (s, t, metric, per) => cellReal(s, t, metric, per, 0),

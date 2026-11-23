@@ -23,5 +23,6 @@ if(!(await btn.count()))falha('botão do bimestre não aparece');else{
 // correção sem foto: aviso e sem folha sintética
 await p.click('.cxn').catch(()=>{});await p.waitForTimeout(1500);
 const sf=await p.evaluate(()=>({aviso:!!document.querySelector('.crsf'),classe:!!document.querySelector('.cr-left.semfoto'),img:(document.getElementById('crImg')||{}).src||''}));
+(await p.locator('#crPrint').count())===0?ok('dentro da redação não há botão de imprimir'):falha('ainda existe Imprimir correção dentro da redação');
 console.log('   sem foto:',JSON.stringify({aviso:sf.aviso,classe:sf.classe,img:sf.img.slice(0,40)}));
 await b.close();console.log(ach.length?'\nTOTAL DE FALHAS: '+ach.length:'\nTudo certo');process.exit(ach.length?1:0)})();
