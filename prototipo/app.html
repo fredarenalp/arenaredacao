@@ -1473,6 +1473,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .mk .xm ellipse.xe,.crk .xm ellipse.xe,.pr-pg .xm ellipse.xe,.al .xm ellipse.xe{fill:none;stroke:none}
 .mk .xm.sel ellipse.xe{stroke:#d62828;stroke-width:.3;stroke-dasharray:1.2 1;opacity:.6}
 .mk .xm.pv path.xx{opacity:.6}
+/* aviso "Sua correção está pronta" no cartão da proposta */
+.pc2 .cxn{position:relative;margin-top:14px;width:100%;display:flex;align-items:center;gap:12px;border:0;background:#fff;box-shadow:0 0 0 1.5px #2f855a,0 6px 16px rgba(47,133,90,.16);color:#1c1c19;border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif}
+.pc2 .cxn:hover{background:#f3faf5}
+.pc2 .cxi{width:34px;height:34px;border-radius:10px;background:#2f855a;color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.pc2 .cxi svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pc2 .cxt{flex:1;min-width:0}.pc2 .cxt b{display:block;font:800 15px/1.25 'DM Sans',sans-serif}.pc2 .cxt small{display:block;font:500 13px/1.35 'DM Sans',sans-serif;color:#55604f;margin-top:1px}
+.pc2 .cxa{color:#2f855a;display:flex;flex:none}.pc2 .cxa svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pc2 .cxnova{position:absolute;top:-9px;right:12px;background:#d9806f;color:#fff;font:700 10.5px 'DM Sans',sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
+.pc2 .rwl{display:flex;align-items:center;gap:8px;margin-top:12px;font:600 13px 'DM Sans',sans-serif;color:#6a6a60}.pc2 .rwl i{width:9px;height:9px;border-radius:50%;border:2px solid #b9b6aa;box-sizing:border-box}.pc2 .rwl i.on{border-color:#3c7678}
 </style>
 <!--PONTE--></head>
 <body>
@@ -3615,7 +3624,7 @@ function cartao2(E){
  var ultimaCorr=(R.kind==='corr')?R:(O.kind==='corr'?O:null);
  if(!acao&&ultimaCorr)acao=(R.kind==='corr')?E.r:E.o;
  var ambas=O.kind==='corr'&&R.kind==='corr';
- var P=PROPS[acao]||{},txt=P.kind==='corr'?'Ver correção':P.kind==='late'?'Enviar com atraso':P.kind==='open'?(P.reesc?'Enviar 2ª versão (reescrita)':'Enviar redação'):'';
+ var P=PROPS[acao]||{},txt=P.kind==='corr'?'Ver correção':P.kind==='late'?'Enviar com atraso':P.kind==='open'?(P.reesc||(acao===E.r&&O.kind==='corr')?'Enviar reescrita':'Enviar redação'):'';
  var linha='';
  if(R.kind==='corr'&&R.ant){var ms=R.niv.map(function(n,j){return n>R.ant[j]?CRIT[j]:''}).filter(Boolean);linha='<span class="sumln ok">'+(ms.length?'Você melhorou em '+ms.join(', ')+'.':'Reescrita corrigida.')+'</span>';}
  else if(O.kind==='corr'){var ab=abaixo(O);linha=ab.length?'<span class="sumln at">Para melhorar: '+ab.map(function(j){return CRIT[j]}).join(', ')+'</span>':'<span class="sumln ok">Tudo no esperado.</span>';}
@@ -3623,8 +3632,12 @@ function cartao2(E){
  if(O.kind==='closed')linha='<span class="sumln at"><b>Prazo encerrado.</b> Procure a coordenação para combinar a entrega.</span>';
  if(P.kind==='late'&&P.fimAt)linha+='<div class="nvent"><b>Prazo encerrado em '+P.pz0+'</b><span>Você ainda pode enviar até '+P.fimAt+'. Depois disso, é preciso procurar a coordenação.</span></div>';
  var sec='';
+ var aviso='',pillsX=null;
+ if(ultimaCorr){var kC=(R.kind==='corr')?E.r:E.o,eC=etapaDe(ultimaCorr)||{},dtC=((eC.desc||'').match(/\d{2}\/\d{2}/)||[''])[0],notaC=String(ultimaCorr.l||'').replace('Corrigida · ',''),reC=R.kind==='corr';
+  aviso='<button type="button" class="cxn" data-k="'+kC+'" title="Ver a correção"><span class="cxi"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="cxt"><b>'+(reC?'Sua reescrita foi corrigida':'Sua correção está pronta')+'</b><small>'+(reC?'2ª versão corrigida':'1ª versão corrigida')+(notaC?' · '+notaC:'')+(dtC?' · '+dtC:'')+'</small></span><span class="cxa" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span>'+(ultimaCorr.vista===false?'<span class="cxnova">Nova</span>':'')+'</button>';
+  if(!reC){var txR=R.etapa?'enviada':R.kind==='open'?'aberta':R.kind==='late'?'atrasada':R.kind==='closed'?'prazo encerrado':R.kind==='norew'?'sem reescrita':R.kind==='warned'?'coordenação avisada':'ainda não';pillsX='<span class="rwl"><i class="'+(R.kind==='open'?'on':'')+'"></i>2ª versão · '+txR+'</span>'}}
  var est=P.kind==='late'?' late':P.kind==='corr'?' feito':'';
- return '<div class="pc2'+est+'">'+(P.kind==='late'?'<span class="pin2" title="Redação atrasada" aria-label="Redação atrasada">!</span>':'')+'<div class="hd2"><span class="eb2">Proposta '+E.n+'</span><span class="gn2">'+E.g+'</span><span class="tm2"><i>Tema</i>'+E.tema+'</span></div><span class="steps2">'+passo(O,'1ª versão',E.o,ambas)+'<em></em>'+passo(R,'2ª versão',E.r,ambas)+'</span>'+linha+resumoEtapa(O,R)+(P.novaEnt?'<div class="nvent"><b>Nova oportunidade até '+P.novaEnt+'</b><span>A coordenação abriu este prazo para você. '+(P.vale?'Essa entrega vale nota.':'Essa entrega não recebe nota.')+'</span></div>':'')+(txt?'<button type="button" class="pbtn" data-k="'+acao+'">'+txt+' →</button>':'')+(O.prop?'<button type="button" class="pbtn vpb" data-vp="'+E.o+'">Ver proposta</button>':'')+sec+'</div>';
+ return '<div class="pc2'+est+'">'+(P.kind==='late'?'<span class="pin2" title="Redação atrasada" aria-label="Redação atrasada">!</span>':'')+'<div class="hd2"><span class="eb2">Proposta '+E.n+'</span><span class="gn2">'+E.g+'</span><span class="tm2"><i>Tema</i>'+E.tema+'</span></div>'+(aviso?aviso:'<span class="steps2">'+passo(O,'1ª versão',E.o,ambas)+'<em></em>'+passo(R,'2ª versão',E.r,ambas)+'</span>')+linha+(pillsX||'')+(aviso?'':resumoEtapa(O,R))+(P.novaEnt?'<div class="nvent"><b>Nova oportunidade até '+P.novaEnt+'</b><span>A coordenação abriu este prazo para você. '+(P.vale?'Essa entrega vale nota.':'Essa entrega não recebe nota.')+'</span></div>':'')+(txt?'<button type="button" class="pbtn" data-k="'+acao+'">'+txt+' →</button>':'')+(O.prop?'<button type="button" class="pbtn vpb" data-vp="'+E.o+'">Ver proposta</button>':'')+sec+'</div>';
 }
 function abasAl(on){return '<div class="altabs" role="tablist" aria-label="Seções do aluno"><button type="button" role="tab" data-al="lista" class="'+(on==='lista'?'on':'')+'">Redações</button><button type="button" role="tab" data-al="bol" class="'+(on==='bol'?'on':'')+'">Boletim</button><button type="button" role="tab" data-al="crit" class="'+(on==='crit'?'on':'')+'">Critérios</button><button type="button" role="tab" data-al="feed" class="'+(on==='feed'?'on':'')+'">Destaques'+(FEED&&FEED.pend?' <b class="fdbd">'+FEED.pend+'</b>':'')+'</button></div>'}
 var BATU=3,BSEL=3,BINI={4:'06/10'},BFIM={1:'03/05',2:'12/07'};
@@ -3788,7 +3801,7 @@ function boletim(){
  $('alMain').innerHTML=abasAl('bol')+'<h2>Boletim</h2><p class="lead">'+LD[BOLT]+'</p><div class="altabs btabs" role="tablist" aria-label="Seções do boletim">'+BT.map(function(t){return '<button type="button" role="tab" data-bt="'+t[0]+'" aria-selected="'+(BOLT===t[0])+'" class="'+(BOLT===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div>'+(BOLT==='med'?anoH:BOLT==='evo'?cpHtml():det);
 }
 var BOLT='at';
-var _vcOrig=verCorrecao;verCorrecao=function(k){_vcOrig(k);var P=PROPS[k];if(!P||!P.prop||!window.__real)return;var z=$('alVolta');if(!z)return;var b=document.createElement('button');b.type='button';b.className='link';b.style.cssText='margin-left:14px';b.textContent='Ver análise em cartões';b.onclick=function(){aiMostra(aiSlides(k),k,P.vista===false?[{P:P,k:k}]:[])};z.parentNode.insertBefore(b,z.nextSibling)};
+var _vcOrig=verCorrecao;verCorrecao=function(k){_vcOrig(k);var Pv=PROPS[k];if(Pv&&Pv.vista===false&&Pv.rid&&window.ARENA&&ARENA.marcarVista){Pv.vista=true;ARENA.marcarVista([Pv.rid])};var P=PROPS[k];if(!P||!P.prop||!window.__real)return;var z=$('alVolta');if(!z)return;var b=document.createElement('button');b.type='button';b.className='link';b.style.cssText='margin-left:14px';b.textContent='Ver análise em cartões';b.onclick=function(){aiMostra(aiSlides(k),k,P.vista===false?[{P:P,k:k}]:[])};z.parentNode.insertBefore(b,z.nextSibling)};
 
 // ilustrações
 function fr(o){
@@ -4022,7 +4035,7 @@ function verCorrecao(k){
  document.querySelectorAll('.crs-r').forEach(function(b){b.addEventListener('click',function(){var j=+b.dataset.cj;if(fj!==j){fj=j;sel=null;chips();desenha()}})});
  $('alVolta').onclick=lista;chips();desenha();
 }
-$('alMain').addEventListener('click',function(e){var ab=e.target.closest('[data-al]');if(ab){if(ab.dataset.al==='bol')boletim();else if(ab.dataset.al==='crit')conhecer();else if(ab.dataset.al==='feed'){FEED=null;feedAbre()}else lista();return;}var bt=e.target.closest('[data-bt]');if(bt){BOLT=bt.dataset.bt;boletim();return;}var fdt=e.target.closest('[data-fd-t]');if(fdt){FEEDT=fdt.dataset.fdT;feed();return;}var fdr=e.target.closest('[data-fd-r]');if(fdr){fdr.disabled=true;ARENA.responderDestaque(+fdr.dataset.fdR,fdr.dataset.v==='1').then(function(ok){FEED=null;ok?feed():(fdr.disabled=false)});return;}var vk=e.target.closest('[data-vk]');if(vk){verCorrecao(+vk.dataset.vk);return;}var b=e.target.closest('button.pc,button.pbtn,button.plnk,button.stpb');if(!b)return;var k=+b.dataset.k,kd=PROPS[k]&&PROPS[k].cta?PROPS[k].kind:'';if(kd==='corr')verCorrecao(k);else if(kd==='late')atraso(k);else if(kd==='open')instrucoes(k,null);});
+$('alMain').addEventListener('click',function(e){var ab=e.target.closest('[data-al]');if(ab){if(ab.dataset.al==='bol')boletim();else if(ab.dataset.al==='crit')conhecer();else if(ab.dataset.al==='feed'){FEED=null;feedAbre()}else lista();return;}var bt=e.target.closest('[data-bt]');if(bt){BOLT=bt.dataset.bt;boletim();return;}var fdt=e.target.closest('[data-fd-t]');if(fdt){FEEDT=fdt.dataset.fdT;feed();return;}var fdr=e.target.closest('[data-fd-r]');if(fdr){fdr.disabled=true;ARENA.responderDestaque(+fdr.dataset.fdR,fdr.dataset.v==='1').then(function(ok){FEED=null;ok?feed():(fdr.disabled=false)});return;}var vk=e.target.closest('[data-vk]');if(vk){verCorrecao(+vk.dataset.vk);return;}var b=e.target.closest('button.pc,button.pbtn,button.plnk,button.stpb,button.cxn');if(!b)return;var k=+b.dataset.k,kd=PROPS[k]&&PROPS[k].cta?PROPS[k].kind:'';if(kd==='corr')verCorrecao(k);else if(kd==='late')atraso(k);else if(kd==='open')instrucoes(k,null);});
 $('alMx').onclick=function(){$('alMdl').classList.remove('on')};
 $('alMdl').addEventListener('click',function(e){if(e.target===$('alMdl'))$('alMdl').classList.remove('on')});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')$('alMdl').classList.remove('on')});
