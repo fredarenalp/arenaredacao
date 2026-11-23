@@ -301,9 +301,9 @@ button.pc{cursor:pointer}button.pc:hover{border-color:#3c7678;box-shadow:var(--s
 .mk .pin text{fill:#fff;font:800 3.4px Arial,sans-serif;text-anchor:middle}
 .mk .hl{fill:rgba(255,190,0,.28);pointer-events:none}
 .mk .bd{fill:transparent;pointer-events:none}
-.mk .nhg:hover .bd{fill:rgba(255,190,0,.2)}
+.tool-pin .mk .nhg:hover .bd{fill:rgba(255,190,0,.2)}
 .mk .nh{fill:transparent;stroke:none}
-.mk .nhg .nh,.mk .pin,.mk .pin *{pointer-events:all;cursor:pointer}
+.mk .nhg .nh,.mk .pin,.mk .pin *{pointer-events:all;cursor:default}.tool-pin .mk .nhg .nh,.mk .pin,.mk .pin *{cursor:pointer}
 .mk .xhit{fill:transparent;stroke:none}
 .pg.tool-o .mk .pin,.pg.tool-o .mk .pin *{pointer-events:none}
 .pg.tool-o svg{cursor:crosshair}.pg.tool-pin svg{cursor:copy}
@@ -1491,6 +1491,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:640px){.vrow{grid-template-columns:70px 1fr}.vrow>span{grid-column:1/-1;text-align:left}}
 .mk .pdl,.crk .pdl,.pr-pg .pdl{fill:none;stroke:#b0307a;stroke-width:1.3;stroke-linecap:round;opacity:.85;pointer-events:none}
 .mk .pdn,.crk .pdn,.pr-pg .pdn{pointer-events:none}.mk .pdn circle,.crk .pdn circle,.pr-pg .pdn circle{fill:#b0307a;stroke:none}.mk .pdn text,.crk .pdn text,.pr-pg .pdn text{fill:#fff;stroke:none;font:700 3px 'DM Sans',sans-serif;text-anchor:middle}
+.mk .xm path.xx.ln,.crk .xm path.xx.ln,.pr-pg .xm path.xx.ln,.al .xm path.xx.ln{stroke-width:1}
+.mk .xm.est.gmg path.xx.ln,.crk .xm.est.gmg path.xx.ln,.pr-pg .xm.est.gmg path.xx.ln{stroke:#2f855a}
+.mk .xm.est.gpg path.xx.ln,.crk .xm.est.gpg path.xx.ln,.pr-pg .xm.est.gpg path.xx.ln{stroke:#b0307a}
+.mk .xm.est.gmg ellipse.xe,.mk .xm.est.gpg ellipse.xe,.crk .xm.est.gmg ellipse.xe,.crk .xm.est.gpg ellipse.xe,.pr-pg .xm.est.gmg ellipse.xe,.pr-pg .xm.est.gpg ellipse.xe{fill:none;stroke:none}
+.mk .xm.est.gmg.sel ellipse.xe{stroke:#2f855a;stroke-width:.3;stroke-dasharray:1.2 1;opacity:.6}.mk .xm.est.gpg.sel ellipse.xe{stroke:#b0307a;stroke-width:.3;stroke-dasharray:1.2 1;opacity:.6}
 </style>
 <!--PONTE--></head>
 <body>
@@ -2308,9 +2313,11 @@ window.__corr.syncGan=function(pacN,seed){var P=PACS.filter(function(x){return x
 window.xmIs=function(m){return (m.cat==='ac'||m.cat==='pt')&&!m.sinal&&m.inad!==false&&m.f!=='h'}; // acento/pontuação errados: o círculo vira um X compacto
 window.xmD=function(rx,ry){return Math.max(1.5,Math.min(rx,ry)*.5+.3)};
 window.xmSvg=function(cx,cy,rx,ry){var d=window.xmD(rx,ry),f=function(v){return Math.round(v*10)/10};return '<path class="xx" d="M'+f(cx-d)+','+f(cy-d)+'L'+f(cx+d)+','+f(cy+d)+'M'+f(cx+d)+','+f(cy-d)+'L'+f(cx-d)+','+f(cy+d)+'"/><ellipse class="xe" cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'"/>'};
+window.lnIs=function(m){return (m.cat==='mr'||m.cat==='pc')&&!m.sinal&&m.f!=='h'}; // linha curta e parágrafo curto: o círculo vira uma linha reta
+window.lnSvg=function(cx,cy,rx,ry){var f=function(v){return Math.round(v*10)/10};return '<path class="xx ln" d="M'+f(cx-rx)+','+f(cy)+'L'+f(cx+rx)+','+f(cy)+'"/><ellipse class="xe" cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'"/>'};
 window.MT=function(cx,cy,rx,ry){var h=ry>4?ry:ry*.88,f=function(v){return Math.round(v*10)/10};return '<rect class="mt" x="'+f(cx-rx)+'" y="'+f(cy-h)+'" width="'+f(2*rx)+'" height="'+f(2*h)+'" rx="1" ry="1"/>'};
 function marksSvg(marks,orig){var h='';(marks||[]).forEach(function(m){if(m.sinal)return;var nv=orig&&orig.indexOf(m.id)<0;
- if(m.t==='o')h+='<g class="xm'+(m.cat==='ca'?' cv ca':m.cat==='ce'?' cv':'')+(m.cat==='el'?' elg':'')+(m.cat==='or'&&m.cor?' cor':'')+(m.cat==='lac'?' lac':'')+(m.cat==='ele'?' ele':m.cat==='eli'?' eli':'')+(nv?' novo':'')+'">'+(m.f==='h'&&m.cat!=='ca'?MT(m.cx,m.cy,m.rx,m.ry):xmIs(m)?xmSvg(m.cx,m.cy,m.rx,m.ry):'<ellipse cx="'+m.cx+'" cy="'+m.cy+'" rx="'+m.rx+'" ry="'+m.ry+'"/>')+'<text class="cl" x="'+(xmIs(m)?m.cx+xmD(m.rx,m.ry):(m.cat==='or'&&m.cor)?m.cx:m.cx+4.4)+'" y="'+(xmIs(m)?m.cy-xmD(m.rx,m.ry)-.5:m.cy-3.4)+'">'+(m.cat?(m.cat==='rp'&&normP(m.pal)?rpLabel(m,marks):(m.cat==='or'&&m.cor)?esc2(m.cor):crN(m.cat)):'')+'</text>'+(m.cat==='ca'?'<text class="cg" x="'+m.cx+'" y="'+(m.cy+2.1)+'">C</text>':'')+'</g>';
+ if(m.t==='o')h+='<g class="xm'+(m.cat==='ca'?' cv ca':m.cat==='ce'?' cv':'')+(m.cat==='el'?' elg':'')+(m.cat==='or'&&m.cor?' cor':'')+(m.cat==='lac'?' lac':'')+(m.cat==='ele'?' ele':m.cat==='eli'?' eli':'')+(nv?' novo':'')+'">'+(m.f==='h'&&m.cat!=='ca'?MT(m.cx,m.cy,m.rx,m.ry):xmIs(m)?xmSvg(m.cx,m.cy,m.rx,m.ry):lnIs(m)?lnSvg(m.cx,m.cy,m.rx,m.ry):'<ellipse cx="'+m.cx+'" cy="'+m.cy+'" rx="'+m.rx+'" ry="'+m.ry+'"/>')+'<text class="cl" x="'+(xmIs(m)?m.cx+xmD(m.rx,m.ry):(m.cat==='or'&&m.cor)?m.cx:m.cx+4.4)+'" y="'+(xmIs(m)?m.cy-xmD(m.rx,m.ry)-.5:m.cy-3.4)+'">'+(m.cat?(m.cat==='rp'&&normP(m.pal)?rpLabel(m,marks):(m.cat==='or'&&m.cor)?esc2(m.cor):crN(m.cat)):'')+'</text>'+(m.cat==='ca'?'<text class="cg" x="'+m.cx+'" y="'+(m.cy+2.1)+'">C</text>':'')+'</g>';
  else if(m.t==='c')h+='<g class="pin'+(nv?' novo':'')+'"><circle cx="'+m.x+'" cy="'+m.y+'" r="3.7"/><text x="'+m.x+'" y="'+(m.y+1.25)+'">'+m.line+'</text></g>'});return h}
 function verCorrProf(d){var old=document.getElementById('pvw');if(old)old.remove();
  var C=COMPS,tot=function(a){return a.reduce(function(x,y){return x+y},0)/2},novos=d.orig?(d.marks||[]).filter(function(m){return !m.sinal&&d.orig.indexOf(m.id)<0}).length:0;
@@ -2714,14 +2721,14 @@ function rpSetas(src){
 function drawMarks(tmp){
  var a=ALUNOS[i],h='',srcM=verOrig?(a.origMarks||[]):a.marks;
  if(linhaAtual)h+='<rect class="hl" x="26.6" y="'+(lineY(linhaAtual)-6.8)+'" width="156.8" height="'+(6.8*((linhaAtual2||linhaAtual)-linhaAtual+1))+'"/>';
- for(var k=1;k<=35;k++){var y=lineY(k);h+='<g class="nhg" data-line="'+k+'"><title>Clique para comentar a linha '+k+'</title><rect class="bd" x="26.6" y="'+(y-6.8)+'" width="156.8" height="6.8"/><rect class="nh" x="12" y="'+(y-6.8)+'" width="12.5" height="6.8"/><rect class="nh" x="185.5" y="'+(y-6.8)+'" width="12.5" height="6.8"/></g>';}
+ for(var k=1;k<=35;k++){var y=lineY(k);h+='<g class="nhg" data-line="'+k+'"><title>Linha '+k+' · dois cliques para comentar</title><rect class="bd" x="26.6" y="'+(y-6.8)+'" width="156.8" height="6.8"/><rect class="nh" x="12" y="'+(y-6.8)+'" width="12.5" height="6.8"/><rect class="nh" x="185.5" y="'+(y-6.8)+'" width="12.5" height="6.8"/></g>';}
  var cont=verOrig?{}:resumoDv().porLinha;
  Object.keys(cont).forEach(function(l){var y=lineY(+l)-2.4,q=cont[l];h+='<g class="ld"><circle cx="14.6" cy="'+y+'" r="'+(q>1?1.9:1.4)+'"/><circle cx="196.4" cy="'+y+'" r="'+(q>1?1.9:1.4)+'"/>'+(q>1?'<text x="14.6" y="'+(y+.75)+'">'+q+'</text><text x="196.4" y="'+(y+.75)+'">'+q+'</text>':'')+'</g>';});
  h+=pdLinhaSvg(srcM.filter(function(m){return m.t==='o'&&m.cat==='pd'&&!m.sinal}).map(function(m){var l=rg(m)[0];return {x:m.cx,y:m.cy,l:l,yn:lineY(l)-3.4}}));
  srcM.forEach(function(m){
   if(m.t==='o'&&multi(m)){var rr2=rg(m),y0=lineY(rr2[0])-6.8+.8,hh=6.8*(rr2[1]-rr2[0]+1)-1.6;h+='<g class="rgb'+(ESTET[m.cat]?' est'+gcl(m.cat):'')+(m.cat==='cm'?' cmc':'')+'"><rect x="13.2" y="'+y0+'" width="1.3" height="'+hh+'"/><rect x="196" y="'+y0+'" width="1.3" height="'+hh+'"/></g>';}
   if(m.t==='o'&&m.sinal)h+='<g class="sg'+((catAtual&&catAtual.id===m.id)||selC===m?' sel':'')+'" data-id="'+m.id+'"><circle class="sgh" cx="'+m.cx+'" cy="'+m.cy+'" r="4"/><text x="'+m.cx+'" y="'+m.cy+'" font-size="'+(m.sym==='`'||m.sym==='´'||m.sym==='^'||m.sym==='~'?5.2:5.6)+'">'+String(m.sym).replace('&','&amp;')+'</text></g>';
-  else if(m.t==='o')h+='<g class="xm'+(ESTET[m.cat]?' est'+gcl(m.cat):'')+(m.cat==='rp'?' rp':(m.cat==='ce'||m.cat==='ca')?' cv':'')+(m.cat==='cm'?' cmc':'')+(m.cat==='el'?' elg':'')+(m.cat==='or'&&m.cor?' cor':'')+(m.cat==='lac'?' lac':'')+(m.cat==='ca'?' ca':'')+(m.cat==='ele'?' ele':m.cat==='eli'?' eli':'')+((catAtual&&catAtual.id===m.id)||selC===m?' sel':'')+'" data-id="'+m.id+'">'+(m.f==='h'&&m.cat!=='ca'?MT(m.cx,m.cy,m.rx,m.ry):xmIs(m)?xmSvg(m.cx,m.cy,m.rx,m.ry):'<ellipse cx="'+m.cx+'" cy="'+m.cy+'" rx="'+m.rx+'" ry="'+m.ry+'"/>')+''+((m.cat||m.par)?'<text class="cl" x="'+(xmIs(m)?m.cx+xmD(m.rx,m.ry):(m.cat==='or'&&m.cor)?m.cx:m.cx+m.rx*.55)+'" y="'+(xmIs(m)?m.cy-xmD(m.rx,m.ry)-.5:m.cy-m.ry-.5)+'">'+(m.cat?(m.cat==='rp'&&normP(m.pal)?rpLabel(m,srcM):(m.cat==='or'&&m.cor)?esc2(m.cor):crN(m.cat)):'')+(m.par?(m.cat?' ':'')+'¶'+m.par:'')+'</text>':'')+(m.cat==='ca'?'<text class="cg" x="'+m.cx+'" y="'+(m.cy+2.1)+'">C</text>':'')+'</g>';
+  else if(m.t==='o')h+='<g class="xm'+(ESTET[m.cat]?' est'+gcl(m.cat):'')+(m.cat==='rp'?' rp':(m.cat==='ce'||m.cat==='ca')?' cv':'')+(m.cat==='cm'?' cmc':'')+(m.cat==='el'?' elg':'')+(m.cat==='or'&&m.cor?' cor':'')+(m.cat==='lac'?' lac':'')+(m.cat==='ca'?' ca':'')+(m.cat==='ele'?' ele':m.cat==='eli'?' eli':'')+((catAtual&&catAtual.id===m.id)||selC===m?' sel':'')+'" data-id="'+m.id+'">'+(m.f==='h'&&m.cat!=='ca'?MT(m.cx,m.cy,m.rx,m.ry):xmIs(m)?xmSvg(m.cx,m.cy,m.rx,m.ry):lnIs(m)?lnSvg(m.cx,m.cy,m.rx,m.ry):'<ellipse cx="'+m.cx+'" cy="'+m.cy+'" rx="'+m.rx+'" ry="'+m.ry+'"/>')+''+((m.cat||m.par)?'<text class="cl" x="'+(xmIs(m)?m.cx+xmD(m.rx,m.ry):(m.cat==='or'&&m.cor)?m.cx:m.cx+m.rx*.55)+'" y="'+(xmIs(m)?m.cy-xmD(m.rx,m.ry)-.5:m.cy-m.ry-.5)+'">'+(m.cat?(m.cat==='rp'&&normP(m.pal)?rpLabel(m,srcM):(m.cat==='or'&&m.cor)?esc2(m.cor):crN(m.cat)):'')+(m.par?(m.cat?' ':'')+'¶'+m.par:'')+'</text>':'')+(m.cat==='ca'?'<text class="cg" x="'+m.cx+'" y="'+(m.cy+2.1)+'">C</text>':'')+'</g>';
   else if(!m.noPin)h+='<g class="pin" data-id="'+m.id+'"><circle cx="'+m.x+'" cy="'+m.y+'" r="3.7"/><text x="'+m.x+'" y="'+(m.y+1.25)+'">'+m.line+'</text></g>';
  });
  h+=rpSetas(srcM);
@@ -2775,10 +2782,13 @@ function salvaLC(){
 }
 $('lcok').onclick=salvaLC;$('lccancel').onclick=fechaLC;$('lcx').onclick=fechaLC;
 $('lcdel').onclick=function(){var a=ALUNOS[i],id=cmtAtual.id;reg({t:'rem',m:cmtAtual,idx:a.marks.indexOf(cmtAtual),pin:1});a.marks=a.marks.filter(function(m){return m.id!==id});syncPins();fechaLC();toast('Comentário excluído');};
+$('mk').addEventListener('dblclick',function(e){
+ if(verOrig||tool==='x')return;var nh=e.target.closest('.nh');if(nh){e.preventDefault();abreLC(+nh.closest('.nhg').dataset.line)}
+});
 $('mk').addEventListener('click',function(e){
  if(verOrig)return;
  var nh=e.target.closest('.nh');
- if(nh&&tool!=='x'){var pc0=pt(e);if(pc0&&(tool==='o'||tool==='h')&&hitCirc(pc0))return;abreLC(+nh.closest('.nhg').dataset.line);return;}
+ // um clique no número da linha não abre nada; o comentário da linha abre com dois cliques (abaixo) ou pelo botão Comentar
  var pn=e.target.closest('.pin');
  if(pn&&tool!=='x'){var m=coments().filter(function(c){return String(c.id)===pn.dataset.id})[0];if(m)abreLC(m.line,m.x,m.y,m.id);}
 });
@@ -3361,7 +3371,7 @@ function dica(){
  else if(upMode)h='<b>Clique</b> nos cantos da folha, na ordem indicada no painel';
  else if(tool==='h')h=selAtiva()?'<b>Arraste</b> para mover · <b>alças</b> ajustam · <b>Delete</b> remove · <b>1–6</b> tipo':'<b>Arraste</b> sobre a frase para grifar · <b>clique</b> numa marcação para o tipo ou comentar · <b>Esc</b> volta a mover';
  else if(tool==='o')h=selAtiva()?'<b>Arraste</b> para mover · <b>alças</b> ajustam · <b>Delete</b> remove · <b>1–6</b> tipo':'<b>Arraste</b> sobre o trecho para circular · <b>clique</b> num círculo para o tipo · <b>Ctrl+Z</b> desfaz';
- else h='<b>O</b> círculo · clique no número da linha ou no pin para comentar';
+ else h='<b>O</b> círculo · para comentar, dê dois cliques no número da linha ou use o botão Comentar';
  el.innerHTML=h;
 }
 function escH(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
@@ -3981,7 +3991,7 @@ function verCorrecao(k){
  var okF=function(c){return fj===null||(fj==='cv'?(c==='ce'||c==='ca'):critDe(c)===fj)};
  var okC=function(c){return fj===null||(fj!=='cv'&&c.j===fj)};
  var NR=function(k,w){return w?w:k==='el'?'✓':['I','II','III','IV','V'][critDe(k)]};
- var gX=function(c,cy){var k=c.c,cls=(k==='ra'||k==='ti'||isMg(k)?' est'+(isMg(k)&&k!=='mr'&&k!=='ma'?' gpg':isMg(k)?' gmg':''):'')+(k==='ca'?' cv ca':k==='ce'?' cv':'')+(k==='el'?' elg':'')+(k==='or'&&c.w?' cor':'')+(k==='lac'?' lac':'')+(k==='ele'?' ele':k==='eli'?' eli':'');return '<g class="xm'+cls+'">'+(c.xm?xmSvg(c.x,cy,8,2.9):'<ellipse cx="'+c.x+'" cy="'+cy+'" rx="8" ry="2.9"/>')+'<text class="cl" x="'+(c.xm?c.x+xmD(8,2.9):(k==='or'&&c.w)?c.x:c.x+4.4)+'" y="'+(c.xm?cy-xmD(8,2.9)-.5:cy-3.4)+'">'+esc(NR(k,k==='or'?c.w:''))+'</text>'+(k==='ca'?'<text class="cg" x="'+c.x+'" y="'+(cy+2.1)+'">C</text>':'')+'</g>'};
+ var gX=function(c,cy){var k=c.c,cls=(k==='ra'||k==='ti'||isMg(k)?' est'+(isMg(k)&&k!=='mr'&&k!=='ma'?' gpg':isMg(k)?' gmg':''):'')+(k==='ca'?' cv ca':k==='ce'?' cv':'')+(k==='el'?' elg':'')+(k==='or'&&c.w?' cor':'')+(k==='lac'?' lac':'')+(k==='ele'?' ele':k==='eli'?' eli':'');return '<g class="xm'+cls+'">'+(c.xm?xmSvg(c.x,cy,8,2.9):c.ln?lnSvg(c.x,cy,8,2.9):'<ellipse cx="'+c.x+'" cy="'+cy+'" rx="8" ry="2.9"/>')+'<text class="cl" x="'+(c.xm?c.x+xmD(8,2.9):(k==='or'&&c.w)?c.x:c.x+4.4)+'" y="'+(c.xm?cy-xmD(8,2.9)-.5:cy-3.4)+'">'+esc(NR(k,k==='or'?c.w:''))+'</text>'+(k==='ca'?'<text class="cg" x="'+c.x+'" y="'+(cy+2.1)+'">C</text>':'')+'</g>'};
  var cntF=function(f){var n=0;circ.forEach(function(c){var o=fj;fj=f;if(okF(c.c))n++;fj=o});cmts.forEach(function(c){if(f!=='cv'&&c.j===f)n++});return n};
 
  var pad=function(l){return (l<10?'0':'')+l},sorted=function(a){return a.slice().sort(function(x,y){return x-y})};

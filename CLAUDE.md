@@ -68,3 +68,6 @@ O círculo que fica em cima do número da linha agora é selecionável (antes o 
 
 ## Correção do corretor: rascunho automático (IMPLEMENTADO)
 A correção só vai ao banco no botão **Salvar**. Até lá, o que o corretor faz (marcações, níveis, comentários, anulação) é guardado a cada 3 s no navegador (`localStorage`, chave `arena_rasc_<perfil>_<redação>`) e volta ao reabrir a redação, com o aviso "Rascunho recuperado"; fechar a janela com correção não salva pede confirmação. O rascunho some ao salvar com sucesso. É local ao navegador/computador (não aparece em outro aparelho). Teste: `node e2e/rascunho-correcao.cjs`.
+
+## AC · Linha curta e Parágrafo curto viram linha reta; comentário da linha (IMPLEMENTADO)
+Ao escolher Linha curta (`mr`) ou Parágrafo curto (`pc`), o círculo vira uma linha reta (como Acentuação/Pontuação viram X), na cor da categoria (`window.lnIs`/`lnSvg`; no aluno e na impressão pelo flag `ln` de `circ`). Um clique no número da linha NÃO abre mais a caixa de comentário (decisão do dono: abria sem querer); o comentário da linha abre com dois cliques no número ou pelo botão Comentar do AC. Teste: `node e2e/linha-curta.cjs`.
