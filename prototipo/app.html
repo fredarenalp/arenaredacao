@@ -3849,7 +3849,8 @@ function boletim(){
  $('alMain').innerHTML=abasAl('bol')+'<h2>Boletim</h2><p class="lead">'+LD[BOLT]+'</p><div class="altabs btabs" role="tablist" aria-label="Seções do boletim">'+BT.map(function(t){return '<button type="button" role="tab" data-bt="'+t[0]+'" aria-selected="'+(BOLT===t[0])+'" class="'+(BOLT===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('')+'</div>'+(BOLT==='med'?anoH:BOLT==='evo'?cpHtml():det);
 }
 var BOLT='at';
-var _vcOrig=verCorrecao;verCorrecao=function(k){_vcOrig(k);var Pv=PROPS[k];if(Pv&&Pv.vista===false&&Pv.rid&&window.ARENA&&ARENA.marcarVista){Pv.vista=true;ARENA.marcarVista([Pv.rid])};var P=PROPS[k];if(!P||!P.prop||!window.__real)return;var z=$('alVolta');if(!z)return;var b=document.createElement('button');b.type='button';b.className='link';b.style.cssText='margin-left:14px';b.textContent='Ver análise em cartões';b.onclick=function(){aiMostra(aiSlides(k),k,P.vista===false?[{P:P,k:k}]:[])};z.parentNode.insertBefore(b,z.nextSibling)};
+var _vcOrig=verCorrecao;verCorrecao=function(k){var Pv0=PROPS[k],primeira=!!(Pv0&&Pv0.vista===false&&Pv0.rid&&window.__real); // 1ª vez que o aluno abre esta correção: abre direto a análise em cartões
+ _vcOrig(k);var Pv=PROPS[k];if(Pv&&Pv.vista===false&&Pv.rid&&window.ARENA&&ARENA.marcarVista){Pv.vista=true;ARENA.marcarVista([Pv.rid])};var P=PROPS[k];if(!P||!P.prop||!window.__real)return;var z=$('alVolta');if(!z)return;var b=document.createElement('button');b.type='button';b.className='link';b.style.cssText='margin-left:14px';b.textContent='Ver análise em cartões';b.onclick=function(){aiMostra(aiSlides(k),k,P.vista===false?[{P:P,k:k}]:[])};z.parentNode.insertBefore(b,z.nextSibling);if(primeira)aiMostra(aiSlides(k),k,[])};
 
 /* ===== Salvar todas as correções do bimestre em PDF (boletim + cada correção com folha, marcações e comentários) ===== */
 window.__aguardaImgs=function(el,cb){var im=[].slice.call(el.querySelectorAll('img')).filter(function(x){return !x.complete}),n=im.length,feito=false,fim=function(){if(feito)return;feito=true;cb()};if(!n){setTimeout(fim,60);return}im.forEach(function(x){var f=function(){if(--n<=0)fim()};x.addEventListener('load',f);x.addEventListener('error',f)});setTimeout(fim,10000)};
@@ -3939,7 +3940,7 @@ function instrucoes(k,late){
 }
 
 // ===== Proposta atrasada: justificativa antes do envio =====
-var MOTIVOS=[['saude_com','Problema de saúde com atestado'],['saude_sem','Problema de saúde sem atestado'],['viagem','Viagem'],['esq','Esqueci ou perdi o prazo'],['outro','Outro motivo']];
+var MOTIVOS=[['saude_com','Problema de saúde (com atestado)'],['saude_sem','Problema de saúde (sem atestado)'],['viagem','Viagem'],['esq','Esqueci ou perdi o prazo'],['outro','Outro motivo']];
 function atraso(k){
  var P=PROPS[k],sel=null;
  $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas propostas</button><h2>Esta proposta está em atraso</h2><p class="lead">'+P.t+' · '+P.s+'. Você ainda pode enviar. Conte o motivo para a coordenação avaliar.</p>'+
