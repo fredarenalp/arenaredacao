@@ -91,3 +91,7 @@ Armadilha que ficou: a busca do dicionário de conectivos não pode rodar sem se
 
 ## Corretor: painel "Quanto você recebe" recolhível (IMPLEMENTADO)
 Na lista de pacotes o detalhamento financeiro (`renderGanho`, `#phGanho`) vem **recolhido**: uma linha com o rótulo, o valor total e o período ("Novembro/2026 (em andamento) · parcial") e o botão "Ver detalhes ▾". Ao abrir mostra a tabela (1ª versão, reescritas, ganchos), o seletor de período e as métricas; a escolha fica lembrada em `localStorage arena_ganho_aberto`.
+
+## Corretor: card do pacote (IMPLEMENTADO)
+Card compacto (`.pcd`, na lista de pacotes): faixa e etiqueta coloridas por **tipo** (1ª versão = verde-água, Reescrita = azul, Atrasadas = laranja, Prova = roxo; detectado pelo texto da proposta/`P.atr`), título + série + status na primeira linha, proposta, e uma linha final com prazo (`diasPrazo`: "faltam N dias" / "vence hoje" / "atrasado N dias", em laranja/vermelho quando perto ou vencido), nº de redações, progresso e o **botão** "Começar/Continuar correção →" (cheio; "Rever pacote" é contornado nos corrigidos). Classes próprias `pkcA/pkcC/pkcL` (não usar `pc3`: já existe, de outra tela).
+Aba **Adicionais** (painel lateral): a lista de observações não tem rolagem própria; só o painel rola quando as observações passam da tela.

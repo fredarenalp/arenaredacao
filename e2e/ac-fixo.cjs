@@ -34,6 +34,7 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   ok(await vis('#cmBox') && !(await vis('#comps')), 'Adicionais mostra as observações adicionais no lugar dos critérios')
   const cx = await p.evaluate(() => { const c = document.getElementById('cmBox').getBoundingClientRect(), r = document.querySelector('.rc').getBoundingClientRect(); return c.top >= r.top && c.bottom <= r.bottom + 1 && getComputedStyle(document.getElementById('cmBox')).position === 'static' })
   ok(cx, 'a caixa de Adicionais cabe no painel, sem ficar fixa por cima de nada')
+  ok(await p.evaluate(() => { const l = getComputedStyle(document.getElementById('cmL')); return l.maxHeight === 'none' && l.overflowY === 'visible' }), 'Adicionais: a lista não tem rolagem própria (só o painel rola, se passar da tela)')
   await p.click('[data-acf="cr"]'); await p.waitForTimeout(200)
 
   // AC sempre flutuante, também com o painel aberto

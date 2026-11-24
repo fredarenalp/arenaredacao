@@ -1629,7 +1629,23 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* abas: Critérios (níveis e comentários por critério) e Adicionais (observações adicionais para o aluno, sem rolar) */
 .pb.acf[data-acftab="cr"] #cmBox{display:none}
 .pb.acf[data-acftab="ad"] #fmb>*:not(#cmBox):not(#obs){display:none}
-.pb.acf[data-acftab="ad"] #cmBox{display:flex;flex:1 1 auto;min-height:0;position:static;box-shadow:none;margin-bottom:0;overflow:auto}
+.pb.acf[data-acftab="ad"] #cmBox{display:flex;flex:0 0 auto;min-height:0;position:static;box-shadow:none;margin-bottom:0;overflow:visible}
+.pb.acf[data-acftab="ad"] .rc #cmBox .cml{max-height:none;overflow:visible} /* a lista cresce inteira; só o painel rola, e só se as observações passarem da tela */
+/* card do pacote do corretor: compacto, cor por tipo, ação em botão */
+.pcd{--c:#3c7678;padding:11px 14px 11px 16px!important;gap:5px!important;border-left:5px solid var(--c)!important}
+.pcd.t-re{--c:#2a5a8a}.pcd.t-atr{--c:#d98300}.pcd.t-pv{--c:#6a3a8a}
+.pcd .pkcA{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.pcd .pkcA .pst{margin-left:auto}
+.pcd .tipo{font:800 10.5px 'DM Sans',sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#fff;background:var(--c);border-radius:6px;padding:2px 8px}
+.pcd .tt2{font-size:16px!important}.pcd .turma{margin-top:0!important}
+.pcd .pr{font-size:12.5px;color:#6a6a60}
+.pcd .pkcC{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:3px;flex-wrap:wrap}
+.pcd .pkcL{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 220px}
+.pcd .meta2{gap:4px 12px!important;font-size:12.5px!important}
+.pcd .dias{font-weight:700;color:var(--c)}.pcd .dias.prox{color:#b86a00}.pcd .dias.hoje,.pcd .dias.atr{color:#b83a2a}
+.pcd .pb2{font-size:12px!important;white-space:nowrap}.pcd .pb2 .bar{max-width:170px;min-width:60px}
+.pcd .go{align-self:auto!important;display:inline-flex;align-items:center;gap:6px;background:var(--c);color:#fff!important;border-radius:10px;padding:8px 14px;font-size:13px!important;white-space:nowrap}
+.pcd .go svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.pcd:hover .go{filter:brightness(1.1)}.pcd.conc .go{background:transparent;color:var(--c)!important;border:1.5px solid var(--c);padding:6.5px 12.5px}
 .gh{padding:0}.ghbar{width:100%;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:none;border:0;padding:12px 18px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;color:inherit;border-radius:var(--r-lg)}
 .ghbar .ghk{margin:0}.ghbar .ghv{font-size:22px;line-height:1.1;margin:0}.ghbar .ghp{font-size:13px;color:#6a6a60}
 .ghbar .ghdet{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font:700 13px 'DM Sans',sans-serif;color:#3c7678}.ghbar .ghdet svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
@@ -2514,6 +2530,8 @@ function renderRetornos(){var el=$('phRet'),R=(window.__store&&window.__store.re
   verCorrProf({aluno:r.aluno,seed:r.seed,foto:r.foto,marks:r.marks,obs:r.obs,orig:r.orig,niv:r.depois||r.antes,corNiv:r.depois?r.antes:null,titulo:r.res==='aprovada'?'Aprovada pelo professor':r.res==='duvida'?'Resposta à sua dúvida':r.res==='modificada'?'Correção do professor':'Zerada pelo professor',voltar:'← Voltar aos retornos',onClose:renderRetornos,onOk:function(){fim(r.id)}})}});
  el.querySelectorAll('[data-rt]').forEach(function(b){b.onclick=function(){if(b.disabled)return;fim(b.dataset.rt)}});
  var ra=el.querySelector('[data-rall]');if(ra)ra.onclick=function(){RTALL=!RTALL;renderRetornos()}}
+function diasPrazo(pz){var m=String(pz||'').match(/^(\d{1,2})\/(\d{1,2})$/);if(!m)return '';var hj=new Date();hj.setHours(0,0,0,0);var d=new Date(hj.getFullYear(),+m[2]-1,+m[1]),n=Math.round((d-hj)/864e5);
+ return n<0?'<span class="dias atr">atrasado '+(-n)+(n===-1?' dia':' dias')+'</span>':n===0?'<span class="dias hoje">vence hoje</span>':n<=2?'<span class="dias prox">faltam '+n+(n===1?' dia':' dias')+'</span>':'<span class="dias">faltam '+n+' dias</span>'}
 function homePacotes(){document.body.classList.remove('pk-list');renderGanho();renderRetornos();
  $('portal').classList.add('home');
  var tot=0,fe=0,nAb=0,nCo=0;
@@ -2524,9 +2542,14 @@ function homePacotes(){document.body.classList.remove('pk-list');renderGanho();r
   var n=P.alunos.length,f=P.alunos.filter(feito).length,conc=pacConc(P);if((phTab==='co')!==conc)return '';
   var st=conc?['ok','Corrigido']:f===0?['novo','Novo']:['em','Em correção'];
   var meta=P.atr?'<span>Sempre aberto</span>':conc?'<span>Devolvido em <b>'+(P.devolvido||P.prazo)+'</b></span><span>Rendeu <b>'+rsB(n*r1)+'</b></span>':'<span>Entregue em <b>'+P.entrega+'</b></span><span>Devolver até <b>'+P.prazo+'</b></span>';
-  return '<button type="button" class="pcd'+(conc?' conc':'')+'" data-p="'+k+'"><div class="top"><div><div class="tt2">'+(P.atr?'Pacote de atrasadas':'Pacote '+P.n)+'</div><span class="turma">'+P.serie+'</span></div><span class="pst '+st[0]+'">'+st[1]+'</span></div>'+
-   '<div class="pr">'+P.prop+'</div><div class="meta2">'+meta+'<span><b>'+n+'</b> redações</span></div>'+
-   '<div class="pb2"><span>'+f+' de '+n+' corrigidas'+(P.alunos.filter(function(a){return a.fila==='pend'}).length?' · '+P.alunos.filter(function(a){return a.fila==='pend'}).length+' com o professor':'')+'</span><div class="bar"><i style="width:'+(n?f/n*100:0)+'%"></i></div></div><span class="go">'+(conc?'Rever pacote':f?'Continuar correção':'Começar correção')+' →</span></button>';
+  var tp=P.atr?['atr','Atrasadas']:/reescrit|2ª vers/i.test(P.prop)?['re','Reescrita']:/prova/i.test(P.prop+' '+P.serie)?['pv','Prova']:['v1','1ª versão'];
+  var dias=conc||P.atr?'':diasPrazo(P.prazo);
+  var pend=P.alunos.filter(function(a){return a.fila==='pend'}).length;
+  return '<button type="button" class="pcd t-'+tp[0]+(conc?' conc':'')+'" data-p="'+k+'"><div class="pkcA"><span class="tipo">'+tp[1]+'</span><span class="tt2">'+(P.atr?'Pacote de atrasadas':'Pacote '+P.n)+'</span><span class="turma">'+P.serie+'</span><span class="pst '+st[0]+'">'+st[1]+'</span></div>'+
+   '<div class="pr">'+P.prop+'</div>'+
+   '<div class="pkcC"><div class="pkcL"><div class="meta2">'+meta+dias+'<span><b>'+n+'</b> '+(n===1?'redação':'redações')+'</span></div>'+
+   '<div class="pb2"><span>'+f+' de '+n+(pend?' · '+pend+' com o professor':'')+'</span><div class="bar"><i style="width:'+(n?f/n*100:0)+'%"></i></div></div></div>'+
+   '<span class="go">'+(conc?'Rever pacote':f?'Continuar correção':'Começar correção')+'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></div></button>';
  }).join('');
  $('phCards').innerHTML=html||'<div class="phvz">'+(phTab==='co'?'Nenhum pacote corrigido ainda. Quando você terminar um pacote, ele aparece aqui.':'Nenhum pacote aberto. Quando a coordenação atribuir um pacote, ele aparece aqui.')+'</div>';
  $('phLead').textContent=nAb+(nAb===1?' pacote aberto':' pacotes abertos')+' · '+fe+' de '+tot+' redações corrigidas';
