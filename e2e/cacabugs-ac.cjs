@@ -19,7 +19,7 @@ let Y=250,tent=0;
 const marca=async(w=46,h=18)=>{if((await p.getAttribute('[data-tool="o"]','aria-checked'))!=='true'){await p.click('[data-tool="o"]');await p.waitForTimeout(150)} // Esc com o AC fechado sai da ferramenta; o teste a religa
   for(let k=0;k<14;k++){Y+=45;if(Y>780)Y=290;tent++;const x=300+((tent*53)%380);
   await p.mouse.move(x,Y);await p.mouse.down();await p.mouse.move(x+w/2,Y+h/2,{steps:4});await p.mouse.move(x+w,Y+h,{steps:4});await p.mouse.up();await p.waitForTimeout(350);
-  if(await p.locator('#catp:not(.hide)').count())return {x,Y};await fecha()}
+  if(await p.locator('#catp:not(.hide):not(.idle)').count())return {x,Y};await fecha()}
   return {x:0,Y}};
 const fecha=async()=>{await p.keyboard.press('Escape').catch(()=>{});await p.mouse.click(640,70);await p.waitForTimeout(200)};
 const passo=async(nome,fn)=>{try{await fn();await txtRuim(nome);ok(nome)}catch(e){falha(nome+' → '+String(e.message).split('\n')[0].slice(0,140))}await fecha();};
