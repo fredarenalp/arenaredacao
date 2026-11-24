@@ -359,7 +359,7 @@ const ARENA = {
         }
         const fotoUrl = urlsAluno[r.foto_path] ?? null
         const marks = (r.marcacoes ?? []).map((m) => m.dados)
-        const circ = marks.filter((m) => m.t === 'o' && m.line).map((m) => ({ l: m.line, x: Math.round(m.cx), c: m.cat, ...((m.pal || m.cor) ? { w: m.pal || m.cor } : {}), ...(m.sin?.length ? { s: m.sin } : {}), ...(m.fn ? { f: m.fn } : {}), ...((m.cat === 'ac' || m.cat === 'pt') && !m.sinal && m.inad !== false && m.f !== 'h' ? { xm: 1 } : {}), ...((m.cat === 'mr' || m.cat === 'pc') && !m.sinal ? { ln: 1 } : {}) }))
+        const circ = marks.filter((m) => m.t === 'o' && m.line && m.cat).map((m) => ({ l: m.line, x: Math.round(m.cx), c: m.cat, ...((m.pal || m.cor) ? { w: m.pal || m.cor } : {}), ...(m.sin?.length ? { s: m.sin } : {}), ...(m.fn ? { f: m.fn } : {}), ...((m.cat === 'ac' || m.cat === 'pt') && !m.sinal && m.inad !== false && m.f !== 'h' ? { xm: 1 } : {}), ...((m.cat === 'mr' || m.cat === 'pc') && !m.sinal ? { ln: 1 } : {}) }))
         const cmts = marks.filter((m) => m.t === 'c').map((m) => ({ l: m.line, x: Math.round(m.x ?? 176), j: m.j ?? m.crit ?? 1, t: m.txt ?? '' }))
         const dd = (c.liberada_em ?? r.enviada_em).slice(0, 10)
         return {

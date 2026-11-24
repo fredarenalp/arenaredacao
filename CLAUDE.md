@@ -105,3 +105,10 @@ Banco: `correcoes.extras.devolvida = {motivo, em, por}` (migrações 0036 e 0037
 ## Aluno de teste (matrícula 20260187): demo que se reinicia a cada login (IMPLEMENTADO)
 A cada login do Aluno Teste, `ponte.carregarAluno` chama `reiniciar_demo_aluno_teste()` (migração 0038, só para essa matrícula): zera `correcoes.vista_em` da correção da **Proposta 3**, então ela volta a ser "ver pela primeira vez" (clicar em "Sua correção está pronta" abre direto a análise em cartões, `vista===false`). Não mexe em `liberada` (a liberação segue sendo da coordenação). A redação da Proposta 1 (nota 8,0, 17/11) foi apagada desse aluno a pedido do dono.
 **Corretor — card do pacote devolvido:** o card mostra a etiqueta "Devolvido" e o recado da coordenação (`.pkcN`); antes só aparecia dentro da lista de redações do pacote e o corretor via "Novo, 0 de 1". "Devolver pacote" só aparece para pacotes com correção pronta e **não liberada**; uma correção já liberada ao aluno não é devolvida.
+
+## Aluno: tela "Ver a correção" → Por critérios (ajustes do dono, IMPLEMENTADO)
+- **Ver marcas** não fica mais no cabeçalho da folha: cada critério tem o botão **"Ver marcas na folha (N)"** (filtra as marcas daquele critério e leva a folha para a tela). A barra do cabeçalho só aparece com um filtro ativo ("Mostrando só X na folha · Ver todas as marcas").
+- Aviso no plural certo: "Os critérios Estética, Progressão e Abordagem ficaram abaixo do esperado" / "O critério X ficou abaixo do esperado".
+- O mesmo comentário não aparece duas vezes: com o comentário do corretor presente (`obsCrit`), os blocos vermelhos automáticos (`detEst`/`detLing`) não são mostrados (ficam só para dados de demonstração).
+- Comentários por linha/parágrafo dentro do texto do critério são **agrupados por parágrafo** (`agrupaTx`): "No parágrafo 1: …", "Já no parágrafo 4: …", "Na linha 17: …" (em vez de repetir "Parágrafo 1 –" a cada frase).
+- Marcas **sem tipo** (círculo solto) e círculos de **comentário** (`cm`) não contam como desvio (antes apareciam como "undefined 1").
