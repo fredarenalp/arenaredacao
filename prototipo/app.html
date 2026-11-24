@@ -1349,6 +1349,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* correção do aluno: barras dos critérios na cor de cada critério */
 .crs-r[data-cj="0"] .sg i.fl{background:var(--c1)}.crs-r[data-cj="1"] .sg i.fl{background:var(--c2)}.crs-r[data-cj="2"] .sg i.fl{background:var(--c3)}.crs-r[data-cj="3"] .sg i.fl{background:var(--c4)}.crs-r[data-cj="4"] .sg i.fl{background:var(--c5)}
 .crs-r.abx .sg i.fl{opacity:.75}
+.crs-t{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+.crs-t .crs-r{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;min-width:0;border:1.5px solid #e2ded2;border-radius:10px;background:#fff;text-align:center}
+.crs-t .crs-r .rn{font:700 11px "DM Sans",sans-serif;color:#6b6a62}
+.crs-t .crs-r b{font:800 24px/1 Outfit,sans-serif;text-align:center;color:#1c1c19}
+.crs-t .crs-r b small{font:600 11px "DM Sans",sans-serif;color:#8a897f}
+.crs-t .crs-r .nm{font:700 9px "DM Sans",sans-serif;letter-spacing:-.2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crs-t .crs-r .sg{display:none}.crs-t .crs-r[data-cj="0"] b{color:var(--c1)}.crs-t .crs-r[data-cj="1"] b{color:var(--c2)}.crs-t .crs-r[data-cj="2"] b{color:var(--c3)}.crs-t .crs-r[data-cj="3"] b{color:var(--c4)}.crs-t .crs-r[data-cj="4"] b{color:var(--c5)}
+.crs-t .crs-r.abx{border-color:#e3b34d}
+.crs-t .crs-r.fon{background:#eef5f5;border-color:#3c7678;border-radius:10px}
+
 .crf button{border-radius:var(--r-pill)}
 .crc{border:1px solid var(--ds-line)!important;border-left:4px solid var(--c1)!important;border-radius:var(--r-md)!important}
 .crc:nth-of-type(2){border-left-color:var(--c2)!important}.crc:nth-of-type(3){border-left-color:var(--c3)!important}.crc:nth-of-type(4){border-left-color:var(--c4)!important}.crc:nth-of-type(5){border-left-color:var(--c5)!important}
@@ -4481,7 +4491,7 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  cmts.forEach(function(c){var f=c.t.split(/(?<=[.!?])\s/)[0];if(f.length>70)f=f.slice(0,67).replace(/\s+\S*$/,'')+'…';pri.push({t:f,s:rot(c),l:c.l});});
  pri=pri.slice(0,3);
  var resumoHtml=''; // card "Comece por aqui" retirado (decisão do dono: selecionava marcas aleatórias)
- var barrasHtml='<div class="crs-b"><div class="lab">Seus 5 critérios · toque para abrir</div>'+A.COMPS.map(function(c,j){var n=NIV[j];return '<button type="button" class="crs-r'+(n<ESPERADO?' abx':'')+'" data-cj="'+j+'"><span class="nm">'+c.nome+'</span><span class="sg">'+[0,1,2,3].map(function(q){return '<i'+(q<n?' class="fl"':'')+'></i>'}).join('')+'</span><b>'+n+'</b></button>'}).join('')+'</div>';
+ var barrasHtml='<div class="crs-b"><div class="lab">Seus 5 critérios · toque para abrir</div><div class="crs-t">'+A.COMPS.map(function(c,j){var n=NIV[j];return '<button type="button" class="crs-r'+(n<ESPERADO?' abx':'')+'" data-cj="'+j+'"><span class="rn">'+['I','II','III','IV','V'][j]+'</span><b>'+n+'<small>/4</small></b><span class="nm">'+c.nome+'</span><span class="sg">'+[0,1,2,3].map(function(q){return '<i'+(q<n?' class="fl"':'')+'></i>'}).join('')+'</span></button>'}).join('')+'</div></div>';
  $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas propostas</button><h2>Correção · '+P.t+'</h2>'+verSw+'<p class="lead"><b class="volta">'+(P.reesc?'Sua reescrita':'Sua '+((ESSAYS.filter(function(e){return e.o===k||e.r===k})[0]||{g:'redação'}).g.toLowerCase()))+' voltou da correção.</b> Corrigida em '+(P.data||'12/09')+'. Clique nos pins da redação ou nos comentários da lista para ver a linha.</p>'+resumoHtml+
  '<div class="cr-grid"><div class="cr-left"><div class="crf" id="crF" role="group" aria-label="Mostrar marcações da folha por critério"></div><div class="crfn hide" id="crFn"></div><div class="cr-tb"><button type="button" id="crM" aria-label="Diminuir zoom">−</button><span id="crZ">80%</span><button type="button" id="crP" aria-label="Aumentar zoom">+</button></div><div class="cr-photo" id="crPh"><div class="cr-pg" id="crPg"><img id="crImg" alt="Sua redação corrigida"><svg id="crK" class="crk" viewBox="0 0 210 297" preserveAspectRatio="none"></svg><div id="crPop" class="crpop hide" role="dialog" aria-label="Comentário"></div></div></div></div>'+
  '<aside class="cr-right"><div class="cr-nota"><div><div class="lab" style="margin:0 0 2px">Nota final</div><div class="cr-big">'+A.fmt(total)+'<small> / 10</small></div></div><div class="cr-pill">Corrigida</div></div>'+barrasHtml+
