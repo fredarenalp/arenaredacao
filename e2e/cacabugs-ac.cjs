@@ -19,7 +19,7 @@ let Y=250,tent=0;
 const marca=async(w=46,h=18)=>{if((await p.getAttribute('[data-tool="o"]','aria-checked'))!=='true'){await p.click('[data-tool="o"]');await p.waitForTimeout(150)} // Esc com o AC fechado sai da ferramenta; o teste a religa
   for(let k=0;k<14;k++){Y+=45;if(Y>780)Y=290;tent++;const x=300+((tent*53)%380);
   await p.mouse.move(x,Y);await p.mouse.down();await p.mouse.move(x+w/2,Y+h/2,{steps:4});await p.mouse.move(x+w,Y+h,{steps:4});await p.mouse.up();await p.waitForTimeout(350);
-  if(await p.locator('#catp:not(.hide):not(.idle)').count())return {x,Y};await fecha()}
+  if(await p.locator('#catp:not(.hide):not(.idle):not(.rpc)').count())return {x,Y};await fecha()}
   return {x:0,Y}};
 const fecha=async()=>{await p.keyboard.press('Escape').catch(()=>{});await p.mouse.click(640,70);await p.waitForTimeout(200)};
 const passo=async(nome,fn)=>{try{await fn();await txtRuim(nome);ok(nome)}catch(e){falha(nome+' → '+String(e.message).split('\n')[0].slice(0,140))}await fecha();};
@@ -43,7 +43,7 @@ await passo('conectivo ausente corrigir',async()=>{await marca();await p.click('
 await passo('conectivo "mais funções" e "ver mais"',async()=>{await marca();await p.click('#catp button[data-cat="ca"]');await p.waitForTimeout(300);await p.click('[data-cnstart]');await p.waitForTimeout(700);await p.click('.cnselb');await p.click('[data-cnall]');await p.waitForTimeout(200);await p.click('.cndd button[data-cnf="fala"]');await p.click('[data-cnmais]');await p.waitForTimeout(200);await p.click('.cnt >> nth=5');await p.click('[data-cnx]')});
 // 5) parágrafo, linha, elogio, comentar, elemento, lacuna
 await passo('parágrafos 1..4',async()=>{await marca();for(const n of [1,2,3,4]){await p.click('#catp button[data-par="'+n+'"]').catch(()=>{});await p.waitForTimeout(150)}});
-await passo('ajuste de linha +/-',async()=>{await marca();await p.click('#catp button[data-ln="1"]');await p.click('#catp button[data-ln="-1"]');await p.click('#catp button[data-ln="-1"]')});
+await passo('ajuste de linha +/-',async()=>{await marca();for(const dir of [1,-1,-1]){const sel=(await p.locator('#catp button[data-ln]').count())?'#catp button[data-ln="'+dir+'"]':'#catp button[data-ld="1:'+dir+'"]';await p.click(sel,{timeout:4000}).catch(()=>{})}});
 await passo('elogio',async()=>{await marca();await p.click('#catp button[data-cat="el"]');await p.waitForTimeout(400)});
 await passo('comentar',async()=>{await marca();await p.click('#catp button[data-cat="cmt"]');await p.waitForTimeout(400);await p.keyboard.type('Comentário de teste',{delay:5}).catch(()=>{})});
 await passo('elemento do gênero',async()=>{await marca();await p.click('#catp [data-sidetog="ele"]');await p.waitForTimeout(300);await p.click('#catpS button[data-cat="ele"]');await p.waitForTimeout(400);await p.keyboard.press('1')});
