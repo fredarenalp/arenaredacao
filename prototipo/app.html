@@ -1046,7 +1046,7 @@ table.bt{border-collapse:collapse;width:100%;font-size:13px}.bt th{font:700 11px
 .ai-crsb .crs-t .crs-r.abx{border-color:#f2cf7a}
 .ai-crsb .crs-t .crs-r::before{content:'';display:block;width:22px;height:4px;border-radius:2px;background:#bfe3e4;margin-bottom:2px}
 .ai-crsb .crs-t .crs-r[data-cj="1"]::before{background:#9db8ee}.ai-crsb .crs-t .crs-r[data-cj="2"]::before{background:#d1b3ea}.ai-crsb .crs-t .crs-r[data-cj="3"]::before{background:#f2cf7a}.ai-crsb .crs-t .crs-r[data-cj="4"]::before{background:#a6e0bf}
-#crT1.one>*:not(.crc){display:none}#crT1.one>.crc:not(.crsel){display:none}
+#crT1.one>*:not(.crc){display:none}#crT1.one>.crc:not(.crsel){display:none}#crT1:not(.one) .cradc.vazio{display:none}#cmBox.pulse{box-shadow:0 0 0 3px rgba(176,122,16,.55)}
 .pc2{position:relative}
 .pc2.late{border-color:#e6cf9a}
 .pin2{position:absolute;top:-9px;left:-9px;width:26px;height:26px;border-radius:50%;background:#d9822b;color:#fff;font:800 15px/26px Outfit,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(160,90,10,.35);border:2px solid #f5f4ef}
@@ -2476,12 +2476,15 @@ function rascTudo(){ALUNOS.forEach(function(a){if(a._sig0!==undefined)rascGrava(
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')rascTudo()});
 window.addEventListener('pagehide',rascTudo);
 window.addEventListener('beforeunload',function(e){rascTudo();if(rascSujo()){e.preventDefault();e.returnValue=''}});
+// a correção precisa de ao menos um comentário (por linha ou adicional geral): o aluno sempre lê algo do corretor além dos textos automáticos dos critérios
+function temComentario(a){var ob=($('obs')?$('obs').value:(a.obs||'')).split('\n').filter(function(l){return l.trim()&&!/^Comp\. /.test(l)&&!/^Final – /.test(l)&&!/^Redação anulada – /.test(l)});return ob.length>0||(a.marks||[]).some(function(m){return m.t==='c'})}
 function salvar(){
  var a=ALUNOS[i];
  if(window.profMode&&profMode.kind==='gan'){if(total(a)==null){toast('Selecione o nível das 5 competências',1);return}a.obs=$('obs').value;var cfg=profMode,r={niv:a.niv.slice(),marks:cpy(a.marks||[]),obs:a.obs};fechaProf();cfg.onSave(r);return}
  if(a.reesc&&!a.anul&&a.diag==null){toast('Escolha o diagnóstico da 2ª versão',1);$('diagBox').scrollIntoView({behavior:'smooth',block:'center'});$('diagBox').classList.add('pulse');setTimeout(function(){$('diagBox').classList.remove('pulse')},1400);return;}
  if(!a.anul&&total(a)==null){toast('Selecione o nível das 5 competências ou anule a redação',1);return;}
  if(!a.anul&&!confereAntesDeSalvar(a))return;
+ if(!a.anul&&!temComentario(a)){toast('Escreva ao menos um comentário adicional geral antes de salvar',1);var _ta=document.querySelector('[data-acf="ad"]');if(_ta)_ta.click();var _cb=$('cmBox');if(_cb){_cb.scrollIntoView({behavior:'smooth',block:'center'});_cb.classList.add('pulse');setTimeout(function(){_cb.classList.remove('pulse')},1400)}return}
  $('cfAsk').classList.add('hide');
  a.salvo=true;a.devolvida=null;var _dvb=$('devolBar');if(_dvb)_dvb.classList.add('hide');a.lastPick=Object.assign(a.lastPick||{},a._pick||{});a.nCorr=(a.nCorr||0)+1; // lembra as frases mostradas, para não repetir na próxima correção
  a.obs=$('obs').value;
@@ -4504,13 +4507,13 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  var nrm=function(t){return String(t||'').replace(/^(Linha|Linhas|Parágrafo)[^–:]*[–:]\s*/i,'').replace(/\s+/g,' ').trim().toLowerCase()};
  var jaNoCrit=cmts.map(function(c){return nrm(c.t)}).filter(Boolean),obsAll=(P.obsCrit||[]).map(nrm).join(' | ');
  var adic=(P.adic||[]).filter(function(t){var n=nrm(t);return n&&jaNoCrit.indexOf(n)<0&&obsAll.indexOf(n)<0}); // o que já aparece num critério não repete em "Comentários adicionais"
- var adH=adic.length?'<div class="crc cradc"><div class="crh"><b>Comentários adicionais</b><span>do corretor</span></div>'+adic.map(function(t){return '<p>'+esc(t)+'</p>'}).join('')+'</div>':'';
- var barrasHtml='<div class="crs-b"><div class="lab">Seus 5 critérios · toque para abrir</div><div class="crs-t">'+A.COMPS.map(function(c,j){var n=NIV[j];return '<button type="button" class="crs-r'+(n<ESPERADO?' abx':'')+'" data-cj="'+j+'"><span class="rn">'+['I','II','III','IV','V'][j]+'</span><b>'+n+'<small>/4</small></b><span class="nm">'+c.nome+'</span><span class="sg">'+[0,1,2,3].map(function(q){return '<i'+(q<n?' class="fl"':'')+'></i>'}).join('')+'</span></button>'}).join('')+'</div>'+(adic.length?'<button type="button" class="crs-add" id="crAdBtn"><b>Comentários adicionais</b><span>'+adic.length+'</span></button>':'')+'</div>';
+ var adH='<div class="crc cradc'+(adic.length?'':' vazio')+'"><div class="crh"><b>Comentários adicionais</b><span>do corretor</span></div>'+(adic.length?adic.map(function(t){return '<p>'+esc(t)+'</p>'}).join(''):'<p>Não há comentários adicionais.</p>')+'</div>';
+ var barrasHtml='<div class="crs-b"><div class="lab">Seus 5 critérios · toque para abrir</div><div class="crs-t">'+A.COMPS.map(function(c,j){var n=NIV[j];return '<button type="button" class="crs-r'+(n<ESPERADO?' abx':'')+'" data-cj="'+j+'"><span class="rn">'+['I','II','III','IV','V'][j]+'</span><b>'+n+'<small>/4</small></b><span class="nm">'+c.nome+'</span><span class="sg">'+[0,1,2,3].map(function(q){return '<i'+(q<n?' class="fl"':'')+'></i>'}).join('')+'</span></button>'}).join('')+'</div>'+'<button type="button" class="crs-add" id="crAdBtn"><b>Comentários adicionais</b></button>'+'</div>';
  $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas propostas</button><h2>Correção · '+String(P.t).replace(/^(Proposta \d+) · /,'$1<br>')+'</h2>'+verSw+'<p class="lead"><b class="volta">Sua redação voltou da correção!</b><br></p>'+resumoHtml+
  '<div class="cr-grid"><div class="cr-left"><div class="crf" id="crF" role="group" aria-label="Mostrar marcações da folha por critério"></div><div class="crfn hide" id="crFn"></div><div class="cr-tb"><button type="button" id="crM" aria-label="Diminuir zoom">−</button><span id="crZ">80%</span><button type="button" id="crP" aria-label="Aumentar zoom">+</button></div><div class="cr-photo" id="crPh"><div class="cr-pg" id="crPg"><img id="crImg" alt="Sua redação corrigida"><svg id="crK" class="crk" viewBox="0 0 210 297" preserveAspectRatio="none"></svg><div id="crPop" class="crpop hide" role="dialog" aria-label="Comentário"></div></div></div></div>'+
  '<aside class="cr-right"><div class="cr-nota"><div><div class="lab" style="margin:0 0 2px">Nota final</div><div class="cr-big">'+A.fmt(total)+'<small> / 10</small></div></div><div class="cr-pill">Corrigida</div></div>'+barrasHtml+
- '<div class="crtabs" role="tablist"><button type="button" data-tab="1" role="tab">Por critérios</button><button type="button" class="on" data-tab="2" role="tab">Em texto</button></div><div id="crT1" class="hide">'+cmpHtml+(abaixo(P).length?'<div class="crwarn"><b>Atenção:</b> '+(abaixo(P).length>1?'os critérios '+jn(abaixo(P).map(function(j){return CRIT[j]}))+' ficaram abaixo do esperado':'o critério '+CRIT[abaixo(P)[0]]+' ficou abaixo do esperado')+'. Leia os comentários e use a reescrita para melhorar.</div>':'')+'<h3>Competências</h3>'+comps+adH+(finA.length?'<div class="crwarn finw">'+finA.map(function(t){return '<p>'+esc(t)+'</p>'}).join('')+'</div>':'')+
- '<h3>Comentários por linha</h3><div id="crC">'+cmts.map(function(c){return '<button type="button" class="crcm" data-l="'+c.l+'"><b>'+(c.par?'Parágrafo '+c.par:c.l2?'Parágrafo (linhas '+c.l+' a '+c.l2+')':'Linha '+c.l)+'</b><span>'+c.t+'</span></button>'}).join('')+'</div></div><div id="crT2">'+cartaHtml+'</div></aside></div>';
+ '<div id="crT1">'+cmpHtml+(abaixo(P).length?'<div class="crwarn"><b>Atenção:</b> '+(abaixo(P).length>1?'os critérios '+jn(abaixo(P).map(function(j){return CRIT[j]}))+' ficaram abaixo do esperado':'o critério '+CRIT[abaixo(P)[0]]+' ficou abaixo do esperado')+'. Leia os comentários e use a reescrita para melhorar.</div>':'')+'<h3>Competências</h3>'+comps+adH+(finA.length?'<div class="crwarn finw">'+finA.map(function(t){return '<p>'+esc(t)+'</p>'}).join('')+'</div>':'')+
+ '<h3>Comentários por linha</h3><div id="crC">'+cmts.map(function(c){return '<button type="button" class="crcm" data-l="'+c.l+'"><b>'+(c.par?'Parágrafo '+c.par:c.l2?'Parágrafo (linhas '+c.l+' a '+c.l2+')':'Linha '+c.l)+'</b><span>'+c.t+'</span></button>'}).join('')+'</div></div><div id="crT2" class="hide">'+cartaHtml+'</div></aside></div>';
  $('crImg').src=(P.fotoUrl||A.foto(P.fseed||11));
  if(semFoto){var cl=document.querySelector('.cr-left');if(cl){cl.classList.add('semfoto');cl.insertAdjacentHTML('afterbegin','<div class="crsf"><b>A foto desta redação foi arquivada.</b><span>A escola guarda só a nota e os comentários. Eles continuam aqui ao lado.</span></div>')}}
  document.querySelectorAll('.crtabs button').forEach(function(b){b.onclick=function(){$('crT1').classList.remove('one');document.querySelectorAll('.crtabs button').forEach(function(x){x.classList.toggle('on',x===b)});$('crT1').classList.toggle('hide',b.dataset.tab!=='1');$('crT2').classList.toggle('hide',b.dataset.tab!=='2');};});
@@ -4534,8 +4537,9 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  function z(d){zoom=Math.max(50,Math.min(200,zoom+d));$('crPg').style.width=zoom+'%';$('crZ').textContent=zoom+'%';}
  $('crP').onclick=function(){z(15)};$('crM').onclick=function(){z(-15)};z(0);
  document.querySelectorAll('[data-pl]').forEach(function(b){b.onclick=function(){var l=+b.dataset.pl;if(sel!==l)foco(l);$('crPh').scrollIntoView({block:'nearest',behavior:'smooth'});};});
- var adb=$('crAdBtn');if(adb)adb.onclick=function(){var t=document.querySelector('.crtabs [data-tab="1"]');if(t)t.click();document.querySelectorAll('#crT1 .crc').forEach(function(c){c.classList.toggle('crsel',c.classList.contains('cradc'))});$('crT1').classList.add('one')};
- document.querySelectorAll('[data-cj]').forEach(function(b){b.onclick=function(){var t=document.querySelector('.crtabs [data-tab="1"]');if(t)t.click();var j=+b.dataset.cj;document.querySelectorAll('#crT1 .crc').forEach(function(c,q){c.classList.toggle('crsel',q===j)});$('crT1').classList.add('one')};});
+ function crUm(q){var T=$('crT1'),cs=[].slice.call(document.querySelectorAll('#crT1 .crc')),c=cs[q];if(!c)return;var ja=T.classList.contains('one')&&c.classList.contains('crsel');cs.forEach(function(x){x.classList.toggle('crsel',!ja&&x===c)});T.classList.toggle('one',!ja)} // 1 toque mostra só aquele quadro; outro toque no mesmo volta a mostrar todos
+ var adb=$('crAdBtn');if(adb)adb.onclick=function(){crUm(5)};
+ document.querySelectorAll('[data-cj]').forEach(function(b){b.onclick=function(){crUm(+b.dataset.cj)};});
  function chips(){
   document.querySelectorAll('.crvm').forEach(function(b){var on=fj!==null&&+b.dataset.vm===fj;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
   var bar=$('crF');bar.classList.toggle('hide',fj===null);
