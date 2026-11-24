@@ -3877,6 +3877,14 @@ var ACF={on:false,tool:null,tab:'ac',col:false,idle:{t:'o',_idle:true,cat:null,l
  var _a1=abreCat;abreCat=function(m,keep){var r=_a1(m,keep);var id=!!(m&&m._idle);$('catp').classList.toggle('idle',id);if(ACF.on&&m&&!id){if(ACF.tab!=='ac')tab('ac');if(ACF.col)colapsa(false)}return r};
  var _at=atualiza;atualiza=function(){var r=_at.apply(this,arguments);rail();return r};
  var _ab=abre;abre=function(){var r=_ab.apply(this,arguments);if(ACF.on){rail();idle()}return r};
+ // os diálogos (Limpar correção, Falar com o professor, Anular, Guia, comentário…) abrem dentro da coluna do painel: com o painel recolhido (56 px) ficariam cortados.
+ // Por isso, enquanto algum estiver aberto o painel se abre sozinho e, ao fechar o último, volta a recolher.
+ (function(){var rc=document.querySelector('.rc'),volta=false;if(!rc)return;
+  function aberto(){return [].some.call(rc.querySelectorAll('.md'),function(d){return !d.classList.contains('hide')})}
+  function ver(){if(!ACF.on)return;if(aberto()){if(ACF.col){volta=true;colapsa(false)}}else if(volta){volta=false;colapsa(true)}}
+  rc.querySelectorAll('.md').forEach(function(d){new MutationObserver(ver).observe(d,{attributes:true,attributeFilter:['class']})});
+  document.getElementById('acfCol').addEventListener('click',function(){volta=false},true);
+ })();
  addEventListener('resize',sync);
  window.ACFX={
   aplica:function(m){var T=ACF.tool;if(!ACF.on||!T)return false;var b=achaBtn(T);if(!b)return false;b.click();return true},

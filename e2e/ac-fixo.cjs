@@ -66,6 +66,11 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   const w1 = await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width)
   ok(w1 < 80 && w0 > 300, `recolher estreita o painel (${Math.round(w0)} → ${Math.round(w1)} px)`)
   ok(await p.locator('.acfchip').count() === 5, 'faixa recolhida mostra os 5 critérios')
+  // diálogo com o painel recolhido: o painel se abre sozinho e volta a recolher ao fechar
+  await p.click('#mkClear'); await p.waitForTimeout(400)
+  ok(await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width) > 300 && await p.locator('#lmpNo').isVisible(), 'diálogo "Limpar correção" com o painel recolhido abre inteiro (com botões)')
+  await p.click('#lmpNo'); await p.waitForTimeout(400)
+  ok(await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width) < 80, 'fechado o diálogo, o painel volta a recolher')
   await p.click('#acfOpen'); await p.waitForTimeout(300)
   ok(await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width) > 300, 'a seta reabre o painel')
   ok(erros.length === 0, 'sem erros de JavaScript' + (erros.length ? ': ' + erros[0] : ''))
