@@ -15,7 +15,7 @@
 - **AC** = Assistente de correção (o painel/popover da tela de correção do corretor: categorias, Ortografia, Vocabulário, Verbo…).
 
 ## AC · conectivos (implementado)
-Conectivo errado/ausente no AC abre "Só marcar | Corrigir"; Corrigir abre o painel lateral (opção B, escolhida pelo dono): campo "Função: X (sugerida) ▾" (palavra usada → função mais confundida, ou posição da linha),
+Conectivo errado/ausente no AC abre "Só marcar | Corrigir"; Corrigir abre o painel lateral (opção B, escolhida pelo dono). **Nenhuma função vem pré-selecionada (decisão do dono): o campo começa em "Escolher função ▾" e os conectivos só aparecem depois de escolher a função; a função sugerida continua na lista, marcada como "sugerida".** Campo "Função: X ▾" (palavra usada → função mais confundida, ou posição da linha),
 lista com as 5 mais prováveis + "Mais funções…", "por que essa sugestão?" e os conectivos (3 + Ver mais). As escolhas ficam em `m.sin` (e a palavra usada em `m.pal`), entram no comentário da Progressão ("Experimente: …")
 e aparecem ao aluno em "Palavras para treinar". Dicionário na tabela privada `conectivos` (16 funções, inclui verbos de fala); o conteúdo NÃO está no repositório.
 

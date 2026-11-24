@@ -15,6 +15,9 @@ let s1=await dentro('#catpS');ok(s1&&s1.visivel&&s1.dentro,'conectivo: a folha "
 ok((await dentro('#catp')).visivel===false,'o AC inteiro fica escondido atrás da folha');
 await p.click('[data-cnstart]');await p.waitForTimeout(1500);
 s1=await dentro('#catpS');ok(s1&&s1.visivel&&s1.dentro,'conectivo: depois de Corrigir, a folha com a função e os conectivos cabe na tela '+JSON.stringify(s1&&s1.rect));
+ok((await p.locator('#catpS .cnselb').innerText()).includes('Escolher função'),'conectivo: o campo começa em "Escolher função", sem função pré-selecionada');
+ok(await p.locator('#catpS .cnt').count()===0,'conectivo: nenhum conectivo aparece antes de escolher a função');
+await p.click('#catpS .cnselb');await p.waitForTimeout(300);await p.locator('#catpS .cndd button').first().click();await p.waitForTimeout(400);
 const nCnt=await p.locator('#catpS .cnt').count();ok(nCnt>0,'conectivo: há conectivos para escolher ('+nCnt+')');
 if(nCnt){await p.locator('#catpS .cnt').first().tap().catch(()=>p.locator('#catpS .cnt').first().click());await p.waitForTimeout(400);}
 const okb=p.locator('#catpS [data-cnok]');if(await okb.count()){await okb.first().scrollIntoViewIfNeeded();await okb.first().click();await p.waitForTimeout(600)}
