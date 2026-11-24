@@ -1502,6 +1502,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .pc2 .cxa{color:#2f855a;display:flex;flex:none}.pc2 .cxa svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .pc2 .cxnova{position:absolute;top:-9px;right:12px;background:#d9806f;color:#fff;font:700 10.5px 'DM Sans',sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px}
 .pc2 .rwl{display:flex;align-items:center;gap:8px;margin-top:12px;font:600 13px 'DM Sans',sans-serif;color:#6a6a60}.pc2 .rwl i{width:9px;height:9px;border-radius:50%;border:2px solid #b9b6aa;box-sizing:border-box}.pc2 .rwl i.on{border-color:#3c7678}
+#alMain .cr-tb{gap:6px;margin-bottom:6px;font-size:12px}#alMain .cr-tb button{width:26px;height:26px;font-size:15px;line-height:1;padding:0}
 .cr-left.semfoto .cr-photo,.cr-left.semfoto .cr-tb,.cr-left.semfoto .crf,.cr-left.semfoto .crfn,.cr-left.semfoto .crnum{display:none}
 .crsf{background:#f3f0e6;border:1px solid #e3ddcc;border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:4px;color:#5d584a;font-size:14px}.crsf b{color:#2f5f61;font-size:15px}
 .pdfbim{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 14px}.pdfbim .pbtn{width:auto;margin:0}.pdfbim small{color:#6b7280;font-size:12.5px}
@@ -4274,7 +4275,7 @@ function boletim(){
 }
 var BOLT='at';
 var _vcOrig=verCorrecao;verCorrecao=function(k){var Pv0=PROPS[k],primeira=!!(Pv0&&Pv0.vista===false&&Pv0.rid&&window.__real); // 1ª vez que o aluno abre esta correção: abre direto a análise em cartões
- _vcOrig(k);var Pv=PROPS[k];if(Pv&&Pv.vista===false&&Pv.rid&&window.ARENA&&ARENA.marcarVista){Pv.vista=true;ARENA.marcarVista([Pv.rid])};var P=PROPS[k];if(!P||!P.prop||!window.__real)return;var z=$('alVolta');if(!z)return;var b=document.createElement('button');b.type='button';b.className='link';b.style.cssText='margin-left:14px';b.textContent='Ver análise em cartões';b.onclick=function(){aiMostra(aiSlides(k),k,P.vista===false?[{P:P,k:k}]:[])};z.parentNode.insertBefore(b,z.nextSibling);if(primeira)aiMostra(aiSlides(k),k,[])};
+ _vcOrig(k);var Pv=PROPS[k];if(Pv&&Pv.vista===false&&Pv.rid&&window.ARENA&&ARENA.marcarVista){Pv.vista=true;ARENA.marcarVista([Pv.rid])};var P=PROPS[k];if(!P||!P.prop||!window.__real)return;var z=$('alVolta');if(!z)return;if(primeira)aiMostra(aiSlides(k),k,[])};
 
 /* ===== Salvar todas as correções do bimestre em PDF (boletim + cada correção com folha, marcações e comentários) ===== */
 window.__aguardaImgs=function(el,cb){var im=[].slice.call(el.querySelectorAll('img')).filter(function(x){return !x.complete}),n=im.length,feito=false,fim=function(){if(feito)return;feito=true;cb()};if(!n){setTimeout(fim,60);return}im.forEach(function(x){var f=function(){if(--n<=0)fim()};x.addEventListener('load',f);x.addEventListener('error',f)});setTimeout(fim,10000)};
