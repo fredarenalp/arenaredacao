@@ -19,7 +19,7 @@ await passo('destaques: abas',async()=>{await p.click('[data-al="feed"]');await 
 // correções
 const ks=await p.evaluate(()=>window.__aluno.PROPS.map((q,k)=>({k,kind:q.kind,nota:q.nota})).filter(x=>x.kind==='corr').map(x=>x.k));
 console.log(nome,'correções do aluno:',ks.length);
-for(const k of ks){await passo('correção '+k+' (tela completa)',async()=>{await p.click('[data-al="lista"]');await p.waitForTimeout(300);await p.evaluate((k)=>window.__aluno.verCorrecao(k),k);await p.waitForTimeout(800);
+for(const k of ks){await passo('correção '+k+' (tela completa)',async()=>{if(!(await p.locator('[data-al="lista"]').count())){await p.locator('text=Minhas propostas').first().click();await p.waitForTimeout(400)}await p.click('[data-al="lista"]');await p.waitForTimeout(300);await p.evaluate((k)=>window.__aluno.verCorrecao(k),k);await p.waitForTimeout(800);
   for(const t of ['txt','crit','cri','por']){}
   const abas=await p.locator('#alMain [data-tab],#alMain .vsw2 button,#alMain [role=tab]').count();
   for(let i=0;i<abas;i++){await p.locator('#alMain [data-tab],#alMain .vsw2 button,#alMain [role=tab]').nth(i).click({timeout:2000}).catch(()=>{});await p.waitForTimeout(150)}});
