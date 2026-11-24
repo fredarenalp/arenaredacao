@@ -66,6 +66,11 @@ async function comprimirFoto(blob) {
 // Sinônimos (dicionário no banco): busca a palavra e variações simples de plural/feminino.
 const _sinCache = new Map()
 const _palCache = new Map()
+// Palavras comuns (≈21 mil) no navegador: as sugestões da Ortografia saem na hora, sem ir ao banco a cada tecla.
+// Carrega uma vez (cache em localStorage, o dicionário não muda); só palavras raras (sem nenhuma comum com o prefixo) vão ao banco.
+let _palLocal = null // [[palavra, norm], ...] já ordenado por tamanho e ordem alfabética
+let _palLoading = null
+const PAL_KEY = 'arena_pal_v1'
 const _semAcento = (w) => w.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 function _variantes(w) {
   const v = new Set([w])
@@ -228,6 +233,7 @@ const ARENA = {
     const { data: minhas } = await supabase.from('redacoes').select('versao, etapa, corretor_id, correcoes(atualizada_em, n1, anulacao)').eq('corretor_id', ARENA.perfil.id).limit(5000)
     ARENA.definirFinanceiro((minhas ?? []).flatMap((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c ? [{ corretor_id: r.corretor_id, versao: r.versao, em: c.atualizada_em, feita: c.n1 != null || !!c.anulacao }] : [] }))
     window.__corretor.setMes(mesAtual())
+    ARENA.aquecerPalavras?.() // sugestões da Ortografia na hora (não espera)
     const { data: rets } = await supabase.from('retornos').select('id, resultado, antes, depois, resposta, visto, redacao_id, redacoes(foto_path, alunos(nome), pacotes(numero), correcoes(comentario, extras), marcacoes(dados))').eq('corretor_id', ARENA.perfil.id).eq('entendido', false).order('criado_em', { ascending: false })
     const itens = []
     const urlsRets = await assinarFotos((rets ?? []).map((r) => r.redacoes?.foto_path))
@@ -626,10 +632,34 @@ const ARENA = {
     }
   },
 
+  // Baixa (ou lê do cache do navegador) as palavras comuns. Chamar ao abrir a correção; não bloqueia nada.
+  aquecerPalavras() {
+    if (_palLocal || _palLoading) return _palLoading ?? Promise.resolve()
+    _palLoading = (async () => {
+      try {
+        const salvo = localStorage.getItem(PAL_KEY)
+        if (salvo) { _palLocal = JSON.parse(salvo); return }
+      } catch { /* sem cache */ }
+      try {
+        const { data, error } = await supabase.rpc('palavras_comuns')
+        if (!error && Array.isArray(data) && data.length) {
+          _palLocal = data
+          try { localStorage.setItem(PAL_KEY, JSON.stringify(data)) } catch { /* cota cheia: segue só em memória */ }
+        }
+      } catch { /* cai no banco */ }
+    })().finally(() => { _palLoading = null })
+    return _palLoading
+  },
+
   async palavras(prefixo) {
     try {
       const q = _semAcento(String(prefixo || '')).replace(/[^a-z-]/g, '')
       if (q.length < 3) return []
+      if (_palLocal) { // resposta imediata: as 6 primeiras comuns que começam com o prefixo (mesma ordem do banco: menores primeiro)
+        const loc = []
+        for (let i = 0; i < _palLocal.length && loc.length < 6; i++) if (_palLocal[i][1].startsWith(q)) loc.push(_palLocal[i][0])
+        if (loc.length) return loc
+      }
       if (_palCache.has(q)) return _palCache.get(q)
       const { data, error } = await supabase.from('palavras_pt').select('palavra').like('norm', q + '%')
         .order('comum', { ascending: false }).order('tam', { ascending: true }).order('palavra').limit(6)

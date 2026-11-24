@@ -8,6 +8,8 @@ await p.goto('http://localhost:4173');await p.waitForTimeout(500);await p.click(
 await p.waitForSelector('#phCards',{timeout:20000});await p.waitForTimeout(800);
 if(!(await p.locator('.pcd').count())){await p.click('#phTabs [data-pt="co"]').catch(()=>{});await p.waitForTimeout(400)};const cards=await p.locator('.pcd').allInnerTexts();const idx=cards.findIndex(t=>/1ª versão ·/.test(t));await p.locator('.pcd').nth(Math.max(idx,0)).click();await p.waitForTimeout(600);
 await (async()=>{if(await p.locator('#plGo').isEnabled().catch(()=>false))await p.locator('#plGo').click();else await p.locator('.plr').first().click()})();await p.waitForTimeout(2000);
+await p.click('#mkClear');await p.waitForTimeout(300);if(await p.locator('#lmpOk').isVisible().catch(()=>false)){await p.click('#lmpOk');await p.waitForTimeout(600)} // começa sem marcas (o pacote aberto pode já ter sido corrigido)
+
 await p.click('[data-tool="o"]');await p.waitForTimeout(200);
 const svg=await p.evaluate(()=>{const r=document.querySelector('#mk').getBoundingClientRect();return [r.x,r.y,r.width,r.height]});
 const px=(u,v)=>[svg[0]+svg[2]*u/210,svg[1]+svg[3]*v/297];
