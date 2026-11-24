@@ -10,6 +10,7 @@ const abre=async()=>{const p=await ctx.newPage();p.on('pageerror',e=>{console.lo
  await (async()=>{if(await p.locator('#plGo').isEnabled().catch(()=>false))await p.locator('#plGo').click();else await p.locator('.plr').first().click()})();await p.waitForTimeout(2000);return p};
 // 1ª janela: marca e escolhe níveis, sem salvar
 let p=await abre();
+await p.click('#mkClear');await p.waitForTimeout(300);if(await p.locator('#lmpOk').isVisible().catch(()=>false)){await p.click('#lmpOk');await p.waitForTimeout(600)} // começa sem marcas (o pacote aberto pode já ter sido corrigido)
 await p.evaluate(()=>{Object.keys(localStorage).filter(k=>k.startsWith('arena_rasc_')).forEach(k=>localStorage.removeItem(k))});
 await p.click('[data-tool="o"]');
 const svg=await p.evaluate(()=>{const r=document.querySelector('#mk').getBoundingClientRect();return [r.x,r.y,r.width,r.height]});

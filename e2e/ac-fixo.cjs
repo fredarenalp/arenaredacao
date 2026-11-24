@@ -14,6 +14,7 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   if(!(await p.locator('.pcd').count())){await p.click('#phTabs [data-pt="co"]').catch(()=>{});await p.waitForTimeout(400)};await p.locator('.pcd').first().click(); await p.waitForTimeout(800)
   if (await p.locator('#plGo').isEnabled().catch(() => false)) await p.locator('#plGo').click(); else await p.locator('.plr').first().click()
   await p.waitForSelector('#mk', { timeout: 8000 }); await p.waitForTimeout(1500)
+  await p.click('#mkClear');await p.waitForTimeout(300);if(await p.locator('#lmpOk').isVisible().catch(()=>false)){await p.click('#lmpOk');await p.waitForTimeout(600)} // começa sem marcas (o pacote aberto pode já ter sido corrigido)
   const vis = (sel) => p.evaluate((q) => { const e = document.querySelector(q); return !!e && e.offsetParent !== null && getComputedStyle(e).display !== 'none' }, sel)
   const larg = () => p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width)
   const arrasta = async (x0, y0, x1, y1) => { const r = await p.locator('#mk').boundingBox(); await p.mouse.move(r.x + r.width * x0, r.y + r.height * y0); await p.mouse.down(); await p.mouse.move(r.x + r.width * (x0 + x1) / 2, r.y + r.height * y0 + 3, { steps: 4 }); await p.mouse.move(r.x + r.width * x1, r.y + r.height * y1, { steps: 4 }); await p.mouse.up(); await p.waitForTimeout(300) }
