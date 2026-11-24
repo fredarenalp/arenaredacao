@@ -68,6 +68,7 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   // abas e recolher
   await p.click('[data-acf="cr"]'); await p.waitForTimeout(200)
   ok(await p.evaluate(() => document.querySelector('.pb').dataset.acftab === 'cr' && document.getElementById('acpane').offsetParent === null && document.getElementById('comps').offsetParent !== null), 'aba Critérios mostra os níveis e esconde o AC')
+  ok(await p.evaluate(() => getComputedStyle(document.getElementById('cmBox')).position === 'static'), 'Observações adicionais rola com os critérios (não fica fixa sobrepondo)')
   await p.click('[data-acf="ac"]'); await p.waitForTimeout(200)
   const w0 = await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width)
   await p.click('#acfCol'); await p.waitForTimeout(300)
