@@ -995,13 +995,60 @@ begin
      and c.n1 is not null and c.anulacao is null
      and coalesce(c.n1,0)+coalesce(c.n2,0)+coalesce(c.n3,0)+coalesce(c.n4,0)+coalesce(c.n5,0) between 1 and 19
      and not exists (select 1 from public.alunos_aee a where a.aluno_id = r.aluno_id)
-     and not coalesce((c.extras->>'retida')::boolean, false);
+     and not coalesce((c.extras->>'retida')::boolean, false)
+     and (c.extras->'devolvida') is null;
   get diagnostics n = row_count;
   return n;
 end $$;
 revoke execute on function public.liberar_pacote(bigint) from public, anon;
 grant execute on function public.liberar_pacote(bigint) to authenticated;
 
+-- Devolver correções ao corretor (migração 0036)
+create function public.devolver_redacao(p_redacao bigint, p_motivo text) returns int
+language plpgsql security definer set search_path = public as $$
+declare n int;
+begin
+  if public.meu_tipo() is distinct from 'coordenacao' then raise exception 'Somente a coordenação devolve correções'; end if;
+  if coalesce(btrim(p_motivo), '') = '' then raise exception 'Escreva o que falta corrigir'; end if;
+  update public.correcoes c
+     set extras = coalesce(c.extras, '{}'::jsonb) || jsonb_build_object('devolvida', jsonb_build_object('motivo', btrim(p_motivo), 'em', now(), 'por', auth.uid()))
+   where c.redacao_id = p_redacao and not c.liberada;
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+create function public.devolver_pacote(p_pacote bigint, p_motivo text) returns int
+language plpgsql security definer set search_path = public as $$
+declare n int;
+begin
+  if public.meu_tipo() is distinct from 'coordenacao' then raise exception 'Somente a coordenação devolve correções'; end if;
+  if coalesce(btrim(p_motivo), '') = '' then raise exception 'Escreva o que falta corrigir'; end if;
+  update public.correcoes c
+     set extras = coalesce(c.extras, '{}'::jsonb) || jsonb_build_object('devolvida', jsonb_build_object('motivo', btrim(p_motivo), 'em', now(), 'por', auth.uid()))
+    from public.redacoes r
+   where r.id = c.redacao_id and r.pacote_id = p_pacote and not c.liberada
+     and (c.n1 is not null or c.anulacao is not null);
+  get diagnostics n = row_count;
+  return n;
+end $$;
+
+revoke execute on function public.devolver_redacao(bigint, text), public.devolver_pacote(bigint, text) from public, anon;
+grant execute on function public.devolver_redacao(bigint, text), public.devolver_pacote(bigint, text) to authenticated;
+
+
 -- pacotes que já tinham correções liberadas continuam liberados (dados atuais)
 update public.pacotes p set liberado_em = now()
  where exists (select 1 from public.redacoes r join public.correcoes c on c.redacao_id = r.id where r.pacote_id = p.id and c.liberada);
+
+-- Cancelar devolução (migração 0037)
+create function public.cancelar_devolucao(p_redacao bigint) returns int
+language plpgsql security definer set search_path = public as $$
+declare n int;
+begin
+  if public.meu_tipo() is distinct from 'coordenacao' then raise exception 'Somente a coordenação cancela devoluções'; end if;
+  update public.correcoes c set extras = c.extras - 'devolvida' where c.redacao_id = p_redacao and (c.extras->'devolvida') is not null;
+  get diagnostics n = row_count;
+  return n;
+end $$;
+revoke execute on function public.cancelar_devolucao(bigint) from public, anon;
+grant execute on function public.cancelar_devolucao(bigint) to authenticated;

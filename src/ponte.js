@@ -207,7 +207,8 @@ const ARENA = {
           if (c.comentario != null) a.obs = c.comentario
           if (c.diag != null) a.diag = c.diag
           a.nCorr = c.extras?.nCorr || 0
-          if (c.n1 != null || c.anulacao) a.salvo = true
+          if (c.extras?.devolvida) a.devolvida = c.extras.devolvida // a coordenação devolveu: volta a ser pendente, com o motivo
+          else if (c.n1 != null || c.anulacao) a.salvo = true
           if (r.etapa === 'aguardando_liberacao') {
             a.fila = 'pend'
             if (c.extras?.duvida) a.duvida = { tipo: 'prof', txt: c.extras.duvida.pergunta, crit: c.extras.duvida.crit, linha: c.extras.duvida.linha, st: 'pend' }
@@ -454,6 +455,45 @@ const ARENA = {
   // ===== Feed e destaques =====
   // Aluno: convites e destaques próprios, feed da série (sem nomes) e erros da série (agregado).
   // Coordenação: libera o pacote (as correções prontas passam a aparecer para os alunos). Devolve quantas foram liberadas.
+  // Coordenação: as correções de um pacote (para ver antes de liberar): aluno, nota, níveis, comentários, marcações e foto.
+  async correcoesPacote(pid) {
+    try {
+      const { data, error } = await supabase.from('redacoes')
+        .select('id, foto_path, etapa, alunos(nome, turmas(serie, nome)), correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,anulacao,extras), marcacoes(dados)')
+        .eq('pacote_id', pid).order('id')
+      if (error) return []
+      const urls = await assinarFotos((data ?? []).map((r) => r.foto_path))
+      return (data ?? []).map((r) => {
+        const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes
+        const al = r.alunos
+        return {
+          id: r.id, aluno: al?.nome ?? '', turma: al?.turmas ? `${al.turmas.serie}º ano ${al.turmas.nome}` : '', etapa: r.etapa,
+          nota: c?.nota != null ? Number(c.nota) : null, niv: c && c.n1 != null ? [c.n1, c.n2, c.n3, c.n4, c.n5] : null,
+          obs: c?.comentario ?? '', liberada: !!c?.liberada, anulada: c?.anulacao ?? null, devolvida: c?.extras?.devolvida ?? null,
+          foto: urls[r.foto_path] ?? null, marks: (r.marcacoes ?? []).map((m) => m.dados),
+        }
+      })
+    } catch {
+      return []
+    }
+  },
+
+  async devolverRedacao(rid, motivo) {
+    const { data, error } = await supabase.rpc('devolver_redacao', { p_redacao: rid, p_motivo: motivo })
+    if (error) throw error
+    return data ?? 0
+  },
+  async cancelarDevolucao(rid) {
+    const { data, error } = await supabase.rpc('cancelar_devolucao', { p_redacao: rid })
+    if (error) throw error
+    return data ?? 0
+  },
+  async devolverPacote(pid, motivo) {
+    const { data, error } = await supabase.rpc('devolver_pacote', { p_pacote: pid, p_motivo: motivo })
+    if (error) throw error
+    return data ?? 0
+  },
+
   async liberarPacote(pid) {
     const { data, error } = await supabase.rpc('liberar_pacote', { p_pacote: pid })
     return error ? null : data
@@ -779,11 +819,12 @@ const ARENA = {
     const nPac = Object.fromEntries(pacs.data.map((x) => [x.id, reds.data.filter((r) => r.pacote_id === x.id)]))
     fill(C.PACS, pacs.data.map((x) => {
       const rs = nPac[x.id]
-      const feitas = rs.filter((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && (c.n1 != null || c.anulacao) }).length
+      const feitas = rs.filter((r) => { const c = Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes; return c && (c.n1 != null || c.anulacao) && !c.extras?.devolvida }).length
       const corr = (r) => (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes)
-      const pend = rs.filter((r) => r.etapa === 'corrigida' && corr(r) && !corr(r).liberada).length
+      const pend = rs.filter((r) => r.etapa === 'corrigida' && corr(r) && !corr(r).liberada && !corr(r).extras?.devolvida).length
+      const dev = rs.filter((r) => corr(r) && !corr(r).liberada && corr(r).extras?.devolvida).length
       const lib = rs.filter((r) => corr(r)?.liberada).length
-      const o = { id: x.numero, turma: x.serie, prop: x.rotulo, ver: x.reescrita ? '2ª' : '1ª', n: rs.length, prazo: dm(x.prazo) || '', c: x.corretor_id, ok: feitas, _pid: x.id, aee: !!x.aee, pend, lib, liberado: !!x.liberado_em }
+      const o = { id: x.numero, turma: x.serie, prop: x.rotulo, ver: x.reescrita ? '2ª' : '1ª', n: rs.length, prazo: dm(x.prazo) || '', c: x.corretor_id, ok: feitas, _pid: x.id, aee: !!x.aee, pend, lib, liberado: !!x.liberado_em, dev }
       o.g = C.genero(x.rotulo); o.sg = x.reescrita; o.gan = { aluno: null, prof: null, cor: null }
       return o
     }))
