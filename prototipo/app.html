@@ -1709,6 +1709,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .pb.acf .rc #catpS .cndesc{color:#4a4a42}.pb.acf .rc #catpS .cndesc b{color:#222}
 .pb.acf .rc #catpS .tihint,.pb.acf .rc #catpS .cnhint,.pb.acf .rc #catpS .cnvz{color:#6b6a62}
 .pb.acf .rc #catpS .cnbox input,.pb.acf .rc #catpS input[type=text]{background:#fff!important;color:#222!important;border:1.5px solid #d8d3c4!important;font-size:16px}
+
+.gh{padding:0}.ghbar{width:100%;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:none;border:0;padding:12px 18px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;color:inherit;border-radius:var(--r-lg)}
+.ghbar .ghk{margin:0}.ghbar .ghv{font-size:22px;line-height:1.1;margin:0}.ghbar .ghp{font-size:13px;color:#6a6a60}
+.ghbar .ghdet{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font:700 13px 'DM Sans',sans-serif;color:#3c7678}.ghbar .ghdet svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.gh.ab .ghdet svg{transform:rotate(180deg)}.ghbar:hover{background:#faf9f4}.ghbar:focus-visible{outline:3px solid #3c7678;outline-offset:-3px}
+.ghdb{padding:0 18px 14px;border-top:1px solid #ebe9e0}.ghdb[hidden]{display:none}.ghdb .ghh{margin:10px 0}
 </style>
 <!--PONTE--></head>
 <body>
@@ -2566,9 +2572,13 @@ var ganhoMes='2026-11';
 function rsB(v){return 'R$ '+v.toFixed(2).replace('.',',').replace(/\B(?=(\d{3})+,)/g,'.')}
 function renderGanho(){var el=$('phGanho'),F=window.__fin&&window.__fin((window.__real&&window.ARENA&&window.ARENA.perfil)?window.ARENA.perfil.id:'marina',ganhoMes);if(!el||!F)return;
  var parcial=F.parcial!=null?F.parcial:ganhoMes==='2026-11',n1=F.q1,n2=F.q2;
- el.innerHTML='<div class="gh"><div class="ghh"><div><div class="ghk">Quanto você recebe</div><div class="ghv">'+rsB(F.tot)+'</div><div class="ghs">'+(parcial?'Valor parcial: o mês ainda está em andamento.':'Mês fechado.')+'</div></div><label class="ghm">Período<select id="ghMes">'+Object.keys(F.meses).map(function(k){return '<option value="'+k+'"'+(k===ganhoMes?' selected':'')+'>'+F.meses[k]+'</option>'}).join('')+'</select></label></div>'+
+ var aberto=false;try{aberto=localStorage.getItem('arena_ganho_aberto')==='1'}catch(e){}
+ var mesTxt=F.meses[ganhoMes]||ganhoMes;
+ el.innerHTML='<div class="gh'+(aberto?' ab':'')+'"><button type="button" class="ghbar" id="ghTog" aria-expanded="'+aberto+'" aria-controls="ghDet"><span class="ghk">Quanto você recebe</span><span class="ghv">'+rsB(F.tot)+'</span><span class="ghp">'+mesTxt+(parcial?' · parcial':'')+'</span><span class="ghdet">'+(aberto?'Ocultar detalhes':'Ver detalhes')+'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></button>'+
+ '<div class="ghdb" id="ghDet"'+(aberto?'':' hidden')+'><div class="ghh"><div class="ghs">'+(parcial?'Valor parcial: o mês ainda está em andamento.':'Mês fechado.')+'</div><label class="ghm">Período<select id="ghMes">'+Object.keys(F.meses).map(function(k){return '<option value="'+k+'"'+(k===ganhoMes?' selected':'')+'>'+F.meses[k]+'</option>'}).join('')+'</select></label></div>'+
  '<table class="ght"><tbody><tr><td>1ª versão</td><td class="n">'+n1+' × '+rsB(F.r1)+'</td><td class="n"><b>'+rsB(F.v1)+'</b></td></tr><tr><td>Reescritas</td><td class="n">'+n2+' × '+rsB(F.r1)+'</td><td class="n"><b>'+rsB(F.v2)+'</b></td></tr><tr><td>Ganchos <small>(pagos pela metade)</small></td><td class="n">'+F.ng+' × '+rsB(F.rg)+'</td><td class="n"><b>'+rsB(F.vg)+'</b></td></tr></tbody></table>'+
- '<div class="ghf"><span><b>'+(n1+n2)+'</b> redações corrigidas</span>'+(F.avg!=null?'<span>Tempo médio <b>'+Math.floor(F.avg/60)+':'+('0'+Math.round(F.avg%60)).slice(-2)+'</b> por redação</span>':'')+(F.prazo!=null?'<span><b>'+F.prazo+'%</b> devolvidas no prazo</span>':'')+'</div></div>';
+ '<div class="ghf"><span><b>'+(n1+n2)+'</b> redações corrigidas</span>'+(F.avg!=null?'<span>Tempo médio <b>'+Math.floor(F.avg/60)+':'+('0'+Math.round(F.avg%60)).slice(-2)+'</b> por redação</span>':'')+(F.prazo!=null?'<span><b>'+F.prazo+'%</b> devolvidas no prazo</span>':'')+'</div></div></div>';
+ var tg=$('ghTog');if(tg)tg.onclick=function(){var ab=$('ghDet').hasAttribute('hidden');if(ab)$('ghDet').removeAttribute('hidden');else $('ghDet').setAttribute('hidden','');tg.setAttribute('aria-expanded',ab);tg.querySelector('.ghdet').firstChild.nodeValue=ab?'Ocultar detalhes':'Ver detalhes';tg.parentNode.classList.toggle('ab',ab);try{localStorage.setItem('arena_ganho_aberto',ab?'1':'0')}catch(x){}};
  var sel=$('ghMes');if(sel)sel.onchange=function(){ganhoMes=sel.value;renderGanho()}}
 var phTab='ab';
 function pacConc(P){var n=P.alunos.length;return !P.atr&&n>0&&P.alunos.filter(feito).length===n}
