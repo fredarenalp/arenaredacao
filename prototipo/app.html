@@ -4559,6 +4559,7 @@ function aiSlides(k){
  s0.nota=1;S.push(s0);
  // critérios
  var ord=P.niv.map(function(n,j){return [n,j]});
+ var cart=[]; // cartões por critério (j) e as palavras para treinar (critério II): saem na ordem dos critérios
  if(tom==='baixa'){
   var fortes=ord.slice().sort(function(a,b){return b[0]-a[0]||a[1]-b[1]}).slice(0,2),fraco=ord.slice().sort(function(a,b){return a[0]-b[0]||a[1]-b[1]})[0];
   S.push({c:'acr',h:'<div class="ai-tg d">O que você já faz bem</div>'+fortes.map(function(x){return '<div class="ai-fc"><b>'+CRIT[x[1]]+'<em>'+x[0]+'/4</em></b><span>'+aiEsc(aiResumo(P.obsCrit&&P.obsCrit[x[1]],1)||AI_FRASE[4-x[0]])+'</span></div>'}).join('')+'<div class="ai-step"><small>Seu primeiro passo</small><p>'+aiEsc(AI_DICA[fraco[1]])+'</p></div>'});
@@ -4567,7 +4568,7 @@ function aiSlides(k){
   // um ponto por vez: os critérios abaixo de 4, do mais fraco ao mais forte (até 2)
   ord.filter(function(x){return x[0]<4}).sort(function(a,b){return a[0]-b[0]||a[1]-b[1]}).slice(0,2).forEach(function(x){var n=x[0],j=x[1],ls={};(P.circ||[]).forEach(function(c){if(AI_CATC[c.c]===j){(ls[c.c]=ls[c.c]||[]).push(c.l)}});
    var ch=Object.keys(ls).map(function(c){var a=ls[c].filter(function(l,q,A){return A.indexOf(l)===q});return '<span class="ai-chip d">'+AI_CATN[c]+' · '+aiLinhas(a)+'</span>'}).join('');
-   S.push({c:'ag',h:'<div class="ai-tg">'+CRIT[j]+'</div><div class="ai-big m">'+n+'<small>/4</small></div><div class="ai-h2">'+aiEsc(aiResumo(P.obsCrit&&P.obsCrit[j],2)||AI_FRASE[4-n])+'</div><div class="ai-ch">'+ch+'</div>'})});
+   cart.push({j:j,c:{c:'ag',h:'<div class="ai-tg">'+CRIT[j]+'</div><div class="ai-big m">'+n+'<small>/4</small></div><div class="ai-h2">'+aiEsc(aiResumo(P.obsCrit&&P.obsCrit[j],2)||AI_FRASE[4-n])+'</div><div class="ai-ch">'+ch+'</div>'}})});
  }
  // palavras para treinar
  var pal=[],vis={};
@@ -4576,7 +4577,8 @@ function aiSlides(k){
   else if(c.c==='pr')pal.push({k:'Palavra vaga',a:'<b>'+aiEsc(c.w)+'</b>',b:(c.s&&c.s.length?'Troque por: <u>'+c.s.map(aiEsc).join(' · ')+'</u>':'Procure uma palavra mais precisa.')});
   else if((c.c==='ce'||c.c==='ca')&&c.s&&c.s.length)pal.push({k:'Conectivo'+(c.f&&{adicao:'adição',conclusao:'conclusão',contexto:'continuidade',explicacao:'explicação',oposicao:'oposição',ordem:'ordem',causa:'causa',consequencia:'consequência',exemplo:'exemplificação',comparacao:'comparação',concessao:'concessão',finalidade:'finalidade',enfase:'ênfase',condicao:'condição',reformulacao:'reformulação',fala:'fala'}[c.f]?' de '+{adicao:'adição',conclusao:'conclusão',contexto:'continuidade',explicacao:'explicação',oposicao:'oposição',ordem:'ordem',causa:'causa',consequencia:'consequência',exemplo:'exemplificação',comparacao:'comparação',concessao:'concessão',finalidade:'finalidade',enfase:'ênfase',condicao:'condição',reformulacao:'reformulação',fala:'fala'}[c.f]:''),a:c.w?'<b>'+aiEsc(c.w)+'</b>':'<b>Faltou um conectivo</b>',b:'Experimente: <u>'+c.s.map(aiEsc).join(' · ')+'</u>'});
   else if(c.c==='rp')pal.push({k:'Repetida',a:'<b>'+aiEsc(c.w)+'</b>',b:(c.s&&c.s.length?'Que tal: <u>'+c.s.map(aiEsc).join(' · ')+'</u>':'Use sinônimos ou um pronome.')})});
- if(pal.length)S.push({c:'awh',h:'<div class="ai-tg d">Palavras para treinar</div>'+pal.slice(0,4).map(function(w){return '<div class="ai-wd"><small>'+w.k+'</small>'+w.a+'<span>'+w.b+'</span></div>'}).join('')});
+ if(pal.length)cart.push({j:1.5,c:{c:'awh',h:'<div class="ai-tg d">Palavras para treinar</div>'+pal.slice(0,4).map(function(w){return '<div class="ai-wd"><small>'+w.k+'</small>'+w.a+'<span>'+w.b+'</span></div>'}).join('')}}); // palavras = critério II (Linguagem)
+ cart.sort(function(a,b){return a.j-b.j}).forEach(function(x){S.push(x.c)});
  if(false/*card "Sua opinião" retirado (decisão do dono): só faz sentido depois que o aluno vê a correção completa; fica guardado para outro momento*/&&!P.aval&&window.ARENA&&ARENA.avaliar)S.push({c:'ag',rate:1,h:'<div class="ai-tg">Sua opinião</div><div class="ai-h2" style="font-size:30px;margin-bottom:6px">Essa correção ajudou?</div><div class="ai-stars">'+[1,2,3].map(function(n){return '<button type="button" class="ai-star" data-ai="star" data-n="'+n+'"><i>★</i><small>'+['Mais ou menos','Ajudou','Ajudou muito'][n-1]+'</small></button>'}).join('')+'</div><p class="ai-p" style="font-size:14px;font-weight:700;margin:10px 0 6px">O que mais ajudou?</p><div class="ai-opts">'+[['comentarios','Os comentários'],['marcacoes','As marcações na foto'],['palavras','As palavras sugeridas'],['foco','As dicas de foco']].map(function(o){return '<button type="button" class="ai-opt" data-ai="chip" data-v="'+o[0]+'">'+o[1]+'</button>'}).join('')+'</div><textarea id="aiAvC" rows="2" maxlength="500" placeholder="Quer contar mais? (opcional)"></textarea><button type="button" class="ai-btn w" data-ai="avalenv" id="aiAvB" disabled>Enviar minha opinião</button><p class="ai-mini wh">Só o corretor e a coordenação veem. Não muda a sua nota.</p>'});
  var NMC=['Estética','Linguagem','Progressão','Proposta','Abordagem'],COLC=['#3c7678','#1a4888','#6a3a8a','#b07a10','#2f855a'];
  var grafico='<div class="ai-chart" role="img" aria-label="Seus cinco critérios">'+NMC.map(function(n,j){var v=(P.niv&&P.niv[j])||0;return '<div class="ai-cr"><span class="nm">'+n+'</span><span class="sg">'+[0,1,2,3].map(function(q){return '<i'+(q<v?' style="background:'+COLC[j]+'"':'')+'></i>'}).join('')+'</span><b>'+v+'<small>/4</small></b></div>'}).join('')+'</div>';
@@ -4650,7 +4652,7 @@ function aiDuvida(){
  var sh=$('aiSheet'),P=PROPS[AI.k];if(!sh||!P||!P.prop)return;var pr=P.prop;
  var el=(pr.elem||[]).map(function(x){return '<span>'+aiEsc(x)+'</span>'}).join('');
  sh.classList.remove('hide');
- sh.innerHTML='<div class="ai-sh tall"><div class="hd"></div><div class="ai-tb"><b class="on" data-ai="tabg">Gênero</b><b data-ai="tabp">Proposta</b><b data-ai="tabn">Minha anotação</b></div><div id="aiDv"></div><button type="button" class="ai-btn o" data-ai="plfecha">Fechar</button></div>';
+ sh.innerHTML='<div class="ai-sh tall"><div class="hd"></div><div class="ai-tb"><b class="on" data-ai="tabg">Gênero</b><b data-ai="tabp">Proposta</b></div><div id="aiDv"></div><button type="button" class="ai-btn o" data-ai="plfecha">Fechar</button></div>';
  var G='<h3>'+aiEsc(pr.g)+'</h3><p>'+(aiEsc(pr.desc)||'A coordenação ainda não escreveu a explicação deste gênero.')+'</p>'+(el?'<div class="vpc">'+el+'</div>':''),
      PP='<h3>Proposta '+pr.n+'</h3><p><b>Tema:</b> '+aiEsc(pr.tema)+'</p><p>'+(aiEsc(pr.orient).replace(/\n/g,'<br>')||'A coordenação ainda não escreveu as orientações desta proposta.')+'</p>';
  $('aiDv').innerHTML=G;AI.dv={g:G,p:PP};
