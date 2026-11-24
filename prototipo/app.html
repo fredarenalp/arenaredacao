@@ -3008,7 +3008,7 @@ $('mk').addEventListener('click',function(e){
  var pn=e.target.closest('.pin');
  if(pn&&tool!=='x'){var m=coments().filter(function(c){return String(c.id)===pn.dataset.id})[0];if(m)abreLC(m.line,m.x,m.y,m.id);}
 });
-function fechaCat(){if(catAtual){catAtual._sub=null;catAtual._pal=null;catAtual=null;$('catp').classList.add('hide');$('catp').classList.remove('pal');drawMarks();}}
+function fechaCat(){if(catAtual&&!(window.ACFX&&ACFX.ocioso())){catAtual._sub=null;catAtual._pal=null;catAtual=null;$('catp').classList.add('hide');$('catp').classList.remove('pal');drawMarks();}}
 var catTab='tx';
 function abreCat(m,keep){
  if(!keep&&m.cat&&m.cat!=='cm')catTab=(ESTET[m.cat]&&!PROG[m.cat])?'es':'tx';
