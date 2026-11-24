@@ -1611,8 +1611,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 /* ===== AC fixo na lateral (computador): painel permanente à direita, abas Ferramentas / Critérios, recolhível ===== */
 .acft,.acfr,.acpane{display:none}
 @media(min-width:901px){
-.pb.acf{grid-template-columns:minmax(0,1fr) 330px}
-.pb.acf:has(.md:not(.hide)){grid-template-columns:minmax(0,1fr) 460px}
+.pb.acf{grid-template-columns:minmax(0,1fr) 400px}
+.pb.acf:has(.md:not(.hide)){grid-template-columns:minmax(0,1fr) 480px}
 .pb.acf.acfc,.pb.acf.acfc:has(.md:not(.hide)){grid-template-columns:minmax(0,1fr) 56px}
 }
 .pb.acf .acft{display:flex;align-items:center;gap:4px;padding:6px 6px 0;border-bottom:1px solid #e2ded2;background:#faf9f4;flex:none}
@@ -1620,7 +1620,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .acftab[aria-selected="true"]{background:#fff;color:#3c7678;border:1px solid #e2ded2;border-bottom:0;margin-bottom:-1px}
 .acfsp{flex:1}
 .acfcol,.acfopen{width:28px;height:28px;border:0;border-radius:9px;background:#efece3;color:#222;font-size:15px;cursor:pointer;line-height:1}
-.pb.acf .acpane{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;background:#fff;padding:5px 8px 2px}
+.pb.acf .acpane{position:relative;display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;background:#fff;padding:5px 8px 2px}
 .pb.acf[data-acftab="cr"] .acpane{display:none}
 .pb.acf[data-acftab="ac"] .rc .fm{flex:none}
 .pb.acf[data-acftab="ac"] .fm .fmh,.pb.acf[data-acftab="ac"] .fm .fmb{display:none}
@@ -1677,10 +1677,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .pb.acf .rc #catp .fitb{border:1.5px dashed #b9d3d2!important;color:#3c7678;background:transparent!important;font:700 12px "DM Sans",sans-serif;padding:6px!important;margin:0 0 2px;min-height:0;border-radius:8px}
 .pb.acf .rc #catp .hint3{display:none}
 /* submenus (Parágrafo, Verbo, Vocabulário, Outros, Elemento) e as opções (Ortografia, Conectivo, Título…): no painel, claros */
-.pb.acf .rc #catpS.catps{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto!important;max-height:none!important;overflow:visible;margin:0 0 6px;border:1.5px solid #3c7678;border-radius:11px;box-shadow:none;flex:none;z-index:auto;padding:7px 8px 8px;background:#fff!important;color:#222}
+.pb.acf .rc #catpS.catps{position:absolute!important;left:8px!important;right:8px!important;bottom:auto!important;width:auto!important;max-height:none!important;overflow:visible;margin:0;border:1.5px solid #3c7678;border-radius:11px;box-shadow:0 8px 22px rgba(0,0,0,.22);flex:none;z-index:30;padding:7px 8px 8px;background:#fff!important;color:#222}
 .pb.acf .rc #catpS.catps.hide{display:none!important}
 .pb.acf .rc #catpS .g2 button,.pb.acf .rc #catpS .g2.parg button{min-height:30px;font:500 12.5px "DM Sans",sans-serif;border-radius:8px}
 .pb.acf .rc #catpS .orw,.pb.acf .rc #catpS input[type=text]{font-size:14px!important}
+.pb.acf .rc #catpS .g2 button,.pb.acf .rc #catpS .g2.parg button,.pb.acf .rc #catpS .orok,.pb.acf .rc #catpS button[data-cnstart],.pb.acf .rc #catpS .cnselb{min-height:30px!important;padding:4px 9px!important;font:500 12.5px "DM Sans",sans-serif!important;border-radius:8px!important}
+.pb.acf .rc #catpS .g2{gap:5px;margin-bottom:6px}
+.pb.acf .rc #catpS .cnt{padding:5px 9px!important;font-size:12.5px!important}
+.pb.acf .rc #catpS .cndd button{min-height:0!important;padding:6px 8px!important;font-size:12.5px!important}
+.pb.acf .rc #catpS .gl,.pb.acf .rc #catpS .gl2{font-size:10.5px}
 .pb.acf .rc #catpS .srow .syb{height:30px;font:700 15px "DM Sans"!important}
 .pb.acf .rc #catpS.catps{background:#fff!important;color:#222;padding:10px 12px 12px}
 .pb.acf .rc #catpS .gl,.pb.acf .rc #catpS .gl2,.pb.acf .rc #catpS .qh{color:#6b6a62!important}
@@ -3885,6 +3890,15 @@ var ACF={on:false,tool:null,tab:'ac',col:false,idle:{t:'o',_idle:true,cat:null,l
   rc.querySelectorAll('.md').forEach(function(d){new MutationObserver(ver).observe(d,{attributes:true,attributeFilter:['class']})});
   document.getElementById('acfCol').addEventListener('click',function(){volta=false},true);
  })();
+ // as opções (Parágrafo, Verbo, Ortografia, Conectivo, Título…) abrem logo abaixo do critério a que pertencem, sobre o painel
+ function posS(){var sd=$('catpS'),pane=$('acpane');if(!ACF.on||!sd||sd.classList.contains('hide'))return;
+  var k=sideCur,q=(k==='par'||k==='tit')?'.pg-e':k==='cnx'?'.pg-p':k==='ele'?'.pg-a':'.pg-d',sec=$('catp').querySelector(q);if(!sec)return;
+  var pr=pane.getBoundingClientRect(),sr=sec.getBoundingClientRect(),h=sd.offsetHeight,top=sr.bottom-pr.top+pane.scrollTop+3;
+  if(sr.bottom+3+h>pr.bottom&&sr.top-pr.top-h-3>=0)top=sr.top-pr.top+pane.scrollTop-h-3; // sem espaço embaixo: abre acima do critério
+  sd.style.left='';sd.style.right='';sd.style.top=top+'px'}
+ var _ss=sideSync;sideSync=function(){var r=_ss.apply(this,arguments);posS();return r};
+ var _cp=cnPos;cnPos=function(){var r=_cp.apply(this,arguments);posS();return r};
+ try{new ResizeObserver(function(){posS()}).observe($('catpS'))}catch(e){} // o conteúdo muda de altura (dicionário carregando, lista de funções aberta)
  addEventListener('resize',sync);
  window.ACFX={
   aplica:function(m){var T=ACF.tool;if(!ACF.on||!T)return false;var b=achaBtn(T);if(!b)return false;b.click();return true},

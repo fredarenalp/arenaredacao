@@ -52,6 +52,14 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   ok(await p.evaluate(() => document.getElementById('catp').classList.contains('idle')), 'depois de corrigir a palavra o painel volta ao estado ocioso')
   await p.keyboard.press('Escape')
 
+  // as opções abrem logo abaixo do próprio critério (não no topo do painel)
+  const abaixo = async (sec) => p.evaluate((q) => { const s = document.getElementById('catpS').getBoundingClientRect(), c = document.querySelector('#catp ' + q).getBoundingClientRect(); return { ok: !document.getElementById('catpS').classList.contains('hide') && (Math.abs(s.top - (c.bottom + 3)) < 8 || Math.abs(s.bottom - (c.top - 3)) < 8), s: [Math.round(s.top), Math.round(s.bottom)], c: [Math.round(c.top), Math.round(c.bottom)] } }, sec)
+  await arrasta(.2, .55, .4, .55); await p.click('#catp [data-sidetog="par"]'); await p.waitForTimeout(300)
+  const pp = await abaixo('.pg-e'); ok(pp.ok, 'Parágrafo abre logo abaixo da Estética ' + JSON.stringify(pp))
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
+  await arrasta(.2, .62, .4, .62); await p.click('#catp button[data-cat="ca"]'); await p.waitForTimeout(500)
+  const pc = await abaixo('.pg-p'); ok(pc.ok, 'Conectivo ausente abre junto da Progressão ' + JSON.stringify(pc))
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
   // teclas: R escolhe Rasura
   await p.keyboard.press('r'); await p.waitForTimeout(150)
   ok(/Rasura/.test(await p.innerText('#acFoot')), 'tecla R escolhe Rasura')
@@ -64,7 +72,7 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   const w0 = await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width)
   await p.click('#acfCol'); await p.waitForTimeout(300)
   const w1 = await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width)
-  ok(w1 < 80 && w0 > 300, `recolher estreita o painel (${Math.round(w0)} → ${Math.round(w1)} px)`)
+  ok(w1 < 80 && w0 > 380, `recolher estreita o painel (${Math.round(w0)} → ${Math.round(w1)} px)`)
   ok(await p.locator('.acfchip').count() === 5, 'faixa recolhida mostra os 5 critérios')
   // diálogo com o painel recolhido: o painel se abre sozinho e volta a recolher ao fechar
   await p.click('#mkClear'); await p.waitForTimeout(400)
