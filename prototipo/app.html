@@ -1607,6 +1607,103 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 }
 .mcat.on{border-color:#3c7678;background:#e3efee}.mcat.mrem{grid-column:1/-1;justify-content:center;color:#b83a2a;border-color:#e6b3aa;background:#fff;font-weight:700}
 .msymh{grid-column:1/-1;font:700 12px 'DM Sans';color:#6b6a62;margin-top:4px}.msyms{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}.msym{width:44px;height:44px;border-radius:12px;border:1.5px solid #e2ded2;background:#f7f5ee;font:700 18px 'DM Sans';color:#222;cursor:pointer}
+
+/* ===== AC fixo na lateral (computador): painel permanente à direita, abas Ferramentas / Critérios, recolhível ===== */
+.acft,.acfr,.acpane{display:none}
+@media(min-width:901px){
+.pb.acf{grid-template-columns:minmax(0,1fr) 330px}
+.pb.acf:has(.md:not(.hide)){grid-template-columns:minmax(0,1fr) 460px}
+.pb.acf.acfc,.pb.acf.acfc:has(.md:not(.hide)){grid-template-columns:minmax(0,1fr) 56px}
+}
+.pb.acf .acft{display:flex;align-items:center;gap:4px;padding:6px 6px 0;border-bottom:1px solid #e2ded2;background:#faf9f4;flex:none}
+.acftab{font:700 12.5px "DM Sans",sans-serif;border:0;background:transparent;color:#6b6a62;padding:6px 11px;border-radius:9px 9px 0 0;cursor:pointer}
+.acftab[aria-selected="true"]{background:#fff;color:#3c7678;border:1px solid #e2ded2;border-bottom:0;margin-bottom:-1px}
+.acfsp{flex:1}
+.acfcol,.acfopen{width:28px;height:28px;border:0;border-radius:9px;background:#efece3;color:#222;font-size:15px;cursor:pointer;line-height:1}
+.pb.acf .acpane{display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;background:#fff;padding:5px 8px 2px}
+.pb.acf[data-acftab="cr"] .acpane{display:none}
+.pb.acf[data-acftab="ac"] .rc .fm{flex:none}
+.pb.acf[data-acftab="ac"] .fm .fmh,.pb.acf[data-acftab="ac"] .fm .fmb{display:none}
+.pb.acf[data-acftab="cr"] .rc .fm{flex:1}
+.pb.acf.acfc .acft,.pb.acf.acfc .acpane,.pb.acf.acfc .rc .fm{display:none}
+.pb.acf.acfc .acfr{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0;background:#fff;flex:1}
+.acfr #acfRc{display:flex;flex-direction:column;gap:6px}
+.acfr .acfchip{width:40px;height:40px;border-radius:10px;border:1.5px solid #e2ded2;background:#fff;font:700 12.5px "DM Sans",sans-serif;color:#222;cursor:pointer;line-height:1.05}
+.acfr .acfchip small{display:block;font-size:9.5px;color:#6b6a62;font-weight:500}
+.acfoot{order:99;flex:none;margin-top:auto;border-top:1px solid #e2ded2;padding:5px 2px 2px;font:500 11.5px "DM Sans",sans-serif;color:#8a8578;display:flex;align-items:center;gap:6px;min-height:28px;line-height:1.2}
+.acfoot.on{color:#244}.acfoot b{color:#173f40}
+.acfoot button{margin-left:auto;width:20px;height:20px;border:0;border-radius:6px;background:#e3efee;cursor:pointer;font-size:13px;line-height:1;color:#222}
+/* o AC em si: sempre visível, no fluxo, paleta clara e compacta */
+.pb.acf .rc #catp{position:static!important;left:auto!important;top:auto!important;width:auto!important;max-width:none!important;max-height:none!important;overflow:visible;margin:0;padding:0;background:transparent!important;color:#222;box-shadow:none;border-radius:0;display:block!important;visibility:visible!important;z-index:auto;flex:none}
+.pb.acf .rc #catp .topo{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 0 5px;padding:0 0 5px;border-bottom:1px solid #e2ded2}
+.pb.acf .rc #catp .ttl{margin:0;padding:0;border:0;display:flex;align-items:center}
+.pb.acf .rc #catp .ttl .lnst,.pb.acf .rc #catp .ttl .lnst b{color:#222;font-size:12.5px;gap:4px}
+.pb.acf .rc #catp .ln{width:24px;height:24px;border-radius:7px;background:#ece8dc;color:#222;padding:0;justify-content:center;font-size:13px}
+.pb.acf .rc #catp .pr{margin:0;gap:4px}
+.pb.acf .rc #catp .pr span{color:#8a8578;font-size:10px;margin-right:2px}
+.pb.acf .rc #catp .pr button{width:24px;height:24px;border-radius:7px;background:#ece8dc;color:#222;box-shadow:none}
+.pb.acf .rc #catp .pr button.on{background:#3c7678;color:#fff;box-shadow:none}
+.pb.acf .rc #catp.idle .ln,.pb.acf .rc #catp.idle .pr button,.pb.acf .rc #catp.idle .acts .rm,.pb.acf .rc #catp.idle .fitb{opacity:.4;pointer-events:none}
+.pb.acf .rc #catp .pgp{border-radius:11px;padding:5px 7px 2px;margin:4px 0 0;position:relative}
+.pb.acf .rc #catp .pg-e{background:#eaf4f3;border:1px solid #c9e0de}
+.pb.acf .rc #catp .pg-d{background:#fbeceb;border:1px solid #f0cbc7}
+.pb.acf .rc #catp .pg-p{background:#fdf1e0;border:1px solid #f1d9b0}
+.pb.acf .rc #catp .pg-a{background:#f3edf8;border:1px solid #dccdea}
+.pb.acf .rc #catp .gl,.pb.acf .rc #catp .pgp .gl{color:#4a4a42;opacity:1;font-size:10.5px;margin:0 0 3px;letter-spacing:.06em}
+.pb.acf .rc #catp .gl2,.pb.acf .rc #catp .pgp .gl2{color:#6b6a62;font-size:10px;margin:2px 0 3px}
+.pb.acf .rc #catp .pg-a .gl:first-child,.pb.acf .rc #catp .cnlab{color:#4a4a42}
+.pb.acf .rc #catp .gl em{font-size:9.5px;padding:0 6px}
+.pb.acf .rc #catp .g2{gap:4px;margin:0 0 4px}
+.pb.acf .rc #catp .g2 button,.pb.acf .rc #catp .est,.pb.acf .rc #catp .prg button{background:#fff;color:#222;border:1.5px solid #e2ded2;border-radius:8px;min-height:28px;padding:3px 6px 3px 12px;font:500 12px "DM Sans",sans-serif;gap:4px;line-height:1.1;box-shadow:none}
+.pb.acf .rc #catp .g2 button::before{top:5px;bottom:5px}
+.pb.acf .rc #catp .g2 button small{color:#8a8578;opacity:1;font-size:10px;margin-left:4px}
+.pb.acf .rc #catp .g2 button:hover,.pb.acf .rc #catp .g2 button:focus-visible{background:#fff;border-color:#b9b39f;color:#222;outline:none}
+.pb.acf .rc #catp .g2 button.cur,.pb.acf .rc #catp .g2 button.on,.pb.acf .rc #catp .g2 button.acton,.pb.acf .rc #catp .vbtog.on,.pb.acf .rc #catp .vbtog.acton,.pb.acf .rc #catp .partog.on,.pb.acf .rc #catp .partog.acton{background:#e3efee;border-color:#3c7678;color:#173f40}
+.pb.acf .rc #catp .g2 button svg{width:12px;height:12px}
+.pb.acf .rc #catp .partog{color:#4a4a42;background:transparent;border:0;min-height:0;padding:2px 4px;font:700 11.5px "DM Sans",sans-serif;border-radius:8px}
+.pb.acf .rc #catp .partog:hover{background:#ece8dc;color:#222}
+.pb.acf .rc #catp .sinbar{margin:0 0 5px}
+.pb.acf .rc #catp .sinbar .srow{gap:3px;margin:0}
+.pb.acf .rc #catp .sinbar .syb,.pb.acf .rc #catp .sinbar .srow .syb{height:26px!important;font:700 13px "DM Sans",sans-serif!important;background:#fff;color:#222;border:1.5px solid #e2ded2;border-radius:7px;min-width:0;padding:0!important}
+.pb.acf .rc #catp .sinbar .syb.mais{flex:0 0 28px;background:#ece8dc;color:#222}
+.pb.acf .rc #catp .sinbar .syb.mais.on{background:#e3efee;border-color:#3c7678}
+.pb.acf .rc #catp .pg-p .g2.prg{margin-top:9px}
+.pb.acf .rc #catp .pg-p .g2.prg button{min-height:30px}
+.pb.acf .rc #catp .g2.acts{padding-top:5px;margin:5px 0 3px;border-top:1px solid #e2ded2;gap:4px}
+.pb.acf .rc #catp .g2.acts button{height:30px;min-height:30px;font-size:12.5px;padding:3px 6px;justify-content:center}
+.pb.acf .rc #catp .g2.acts .cmb{background:#dfe9f5;border-color:#c1d3ea;color:#1f4a7a}
+.pb.acf .rc #catp .g2.acts .rm{color:#b83a2a}
+.pb.acf .rc #catp .g2.acts .elb svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.pb.acf .rc #catp .fitb{border:1.5px dashed #b9d3d2!important;color:#3c7678;background:transparent!important;font:700 12px "DM Sans",sans-serif;padding:6px!important;margin:0 0 2px;min-height:0;border-radius:8px}
+.pb.acf .rc #catp .hint3{display:none}
+/* submenus (Parágrafo, Verbo, Vocabulário, Outros, Elemento) e as opções (Ortografia, Conectivo, Título…): no painel, claros */
+.pb.acf .rc #catpS.catps{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto!important;max-height:none!important;overflow:visible;margin:0 0 6px;border:1.5px solid #3c7678;border-radius:11px;box-shadow:none;flex:none;z-index:auto;padding:7px 8px 8px;background:#fff!important;color:#222}
+.pb.acf .rc #catpS.catps.hide{display:none!important}
+.pb.acf .rc #catpS .g2 button,.pb.acf .rc #catpS .g2.parg button{min-height:30px;font:500 12.5px "DM Sans",sans-serif;border-radius:8px}
+.pb.acf .rc #catpS .orw,.pb.acf .rc #catpS input[type=text]{font-size:14px!important}
+.pb.acf .rc #catpS .srow .syb{height:30px;font:700 15px "DM Sans"!important}
+.pb.acf .rc #catpS.catps{background:#fff!important;color:#222;padding:10px 12px 12px}
+.pb.acf .rc #catpS .gl,.pb.acf .rc #catpS .gl2,.pb.acf .rc #catpS .qh{color:#6b6a62!important}
+.pb.acf .rc #catpS .g2 button,.pb.acf .rc #catpS .g2.parg button{background:#f7f5ee!important;color:#222!important;border:1.5px solid #e2ded2!important;border-radius:12px;min-height:46px;font:500 14px 'DM Sans',sans-serif}
+.pb.acf .rc #catpS .g2 button.cur,.pb.acf .rc #catpS .g2 button.on{background:#e3efee!important;border-color:#3c7678!important}
+.pb.acf .rc #catpS .g2 button.orok,.pb.acf .rc #catpS .orok{background:#3c7678!important;color:#fff!important;border-color:#3c7678!important;font-weight:700}
+.pb.acf .rc #catpS .orok:disabled{opacity:.45}
+.pb.acf .rc #catpS .g2 button::before{display:none!important}
+.pb.acf .rc #catpS .orw{background:#fff!important;color:#222!important;border:1.5px solid #3c7678!important;font-size:16px}
+.pb.acf .rc #catpS .orw::placeholder{color:#8a8578}
+.pb.acf .rc #catpS .orc,.pb.acf .rc #catpS .orsg{background:#f1eee5!important;color:#222!important}
+.pb.acf .rc #catpS .cnselb{border-color:#d8d3c4;background:#fff;color:#222}
+.pb.acf .rc #catpS .cnselb b{color:#222}.pb.acf .rc #catpS .cnselb small{color:#3c7678}
+.pb.acf .rc #catpS .cndd{background:#fff;border-color:#d8d3c4}
+.pb.acf .rc #catpS .cndd button{background:none!important;border:0!important;color:#222!important;min-height:0}
+.pb.acf .rc #catpS .cndd button.on,.pb.acf .rc #catpS .cndd button:hover{background:#e3efee!important}
+.pb.acf .rc #catpS .cndd button small{color:#7b7a70}
+.pb.acf .rc #catpS .cnwhy{color:#6b6a62}.pb.acf .rc #catpS .cnwhy button,.pb.acf .rc #catpS .cnmais{color:#3c7678;background:none!important;border:0!important;text-decoration:underline}
+.pb.acf .rc #catpS .cnt{background:#3c7678!important;color:#fff!important;border:0!important}
+.pb.acf .rc #catpS .cnlist.has .cnt:not(.on){background:#f1eee5!important;color:#444!important}
+.pb.acf .rc #catpS .cndesc{color:#4a4a42}.pb.acf .rc #catpS .cndesc b{color:#222}
+.pb.acf .rc #catpS .tihint,.pb.acf .rc #catpS .cnhint,.pb.acf .rc #catpS .cnvz{color:#6b6a62}
+.pb.acf .rc #catpS .cnbox input,.pb.acf .rc #catpS input[type=text]{background:#fff!important;color:#222!important;border:1.5px solid #d8d3c4!important;font-size:16px}
 </style>
 <!--PONTE--></head>
 <body>
@@ -1715,6 +1812,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="sbar" id="sbar"><span><b>Zoom</b> <span id="sbZ">60%</span></span><span><b>Linha</b> <span id="sbL">—</span></span><span class="sbh" id="sbH"></span></div>
     </div>
     <aside class="rc"><button type="button" class="pbtog" id="pbTog" aria-expanded="false"><span>Níveis e comentários</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button><button type="button" class="mmore" id="mMore" aria-label="Mais opções" aria-haspopup="true" aria-expanded="false">⋯</button><div class="mdr" id="mDr" data-s="closed"></div><div class="mbar" id="mBar"></div>
+    <div class="acft" id="acft" role="tablist" aria-label="Painel de correção"><button type="button" class="acftab on" role="tab" data-acf="ac" aria-selected="true">Ferramentas</button><button type="button" class="acftab" role="tab" data-acf="cr" aria-selected="false">Critérios</button><span class="acfsp"></span><button type="button" class="acfcol" id="acfCol" aria-label="Recolher o painel" title="Recolher o painel">›</button></div>
+    <div class="acfr" id="acfR"><button type="button" class="acfopen" id="acfOpen" aria-label="Abrir o painel" title="Abrir o painel">‹</button><div id="acfRc"></div></div>
+    <div class="acpane" id="acpane"><div class="acfoot" id="acFoot"></div></div>
     <form class="fm" id="fm">
       <div class="fmh"><div class="fmn"><h3 id="fNome"></h3><div class="sub" id="fSub"></div></div>
         <div class="tot"><div class="big" id="totV">—</div><div class="parc" id="totP"></div><div class="seg2" id="totSeg"></div></div></div>
@@ -3162,7 +3262,7 @@ $('mk').addEventListener('pointerup',function(){
  if(d.mode==='new'){
   var ddx=Math.abs(d.e.x-d.s.x),ddy=Math.abs(d.e.y-d.s.y);
   if(ddx<4&&ddy<2){drawMarks();return;} // clique simples não cria círculo: é preciso arrastar sobre o trecho
-  var m=tool==='h'?hbox(d.s,d.e):elipse(d.s,d.e);m.id=mid++;m.t='o';m.cat=null;m.line=linhaDe(m.cy);aplicaFaixa(m);ALUNOS[i].marks.push(m);selC=m;reg({t:'add',m:m});drawMarks();abreCat(m);return;}
+  var m=tool==='h'?hbox(d.s,d.e):elipse(d.s,d.e);m.id=mid++;m.t='o';m.cat=null;m.line=linhaDe(m.cy);aplicaFaixa(m);ALUNOS[i].marks.push(m);selC=m;reg({t:'add',m:m});drawMarks();abreCat(m);if(window.ACFX)ACFX.aplica(m);return;}
  var m=d.m;
  if(!d.moved){if(m.sinal){abreSinal(m);return}m._nv=0;abreCat(m);return;} // clique simples sobre um círculo: seletor de tipo
  var op={t:'mod',m:m,antes:d.orig};
@@ -3189,6 +3289,7 @@ function criaCirculoAuto(p){
  var a=ALUNOS[i];if(tool!=='o'&&tool!=='h')setTool('o');
  var m={cx:cl(r1(p.x),9,201),cy:r1(p.y),rx:8,ry:2.9};if(tool==='h')m.f='h';m.cy=cl(m.cy,m.ry,297-m.ry);m.id=mid++;m.t='o';m.cat=null;m.line=linhaDe(m.cy);aplicaFaixa(m);m._nv=1;
  a.marks.push(m);selC=m;reg({t:'add',m:m});drawMarks();abreCat(m); // já abre os tipos; as alças continuam para ajustar o tamanho
+ if(window.ACFX&&ACFX.aplica(m))return;
  if(!criaCirculoAuto.av){criaCirculoAuto.av=1;toast('Escolha o tipo. Para mudar o tamanho, arraste as alças do círculo.')}
 }
 $('mk').addEventListener('pointerdown',function(e){downInfo={t:Date.now(),x:e.clientX,y:e.clientY}},true);
@@ -3230,9 +3331,10 @@ document.addEventListener('keydown',function(e){
  if(!document.body.classList.contains('in-portal'))return;
  var tg=e.target.tagName;if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT')return;
  var k=e.key.toLowerCase();
+ if(window.ACFX&&ACFX.tecla(e,k))return;
  if(catAtual&&catAtual._pick&&/^[1-5]$/.test(k)){var ek=+k-1;if(ek<elemPd().length){catAtual.el=ek;catAtual._pick=false;lacComenta(catAtual)}return}
  if(catAtual&&/^[0-9rmavuplei]$/.test(k)){var LK={p:'rp',r:'ra',m:'mr',a:'ma',u:'mi',l:'lac',e:'ele',i:'eli'},ix=/\d/.test(k)?VIS.findIndex(function(c){return c.k===DIGS[+k-1]}):VIS.findIndex(function(c){return c.k===LK[k]});if(VIS[ix]&&!catAtual.sinal){reg({t:'mod',m:catAtual,antes:{cat:catAtual.cat,inad:catAtual.inad}});catAtual.cat=VIS[ix].k;catAtual.inad=(catAtual.cat==='ac'||catAtual.cat==='pt');if(catAtual.cat==='ele'||catAtual.cat==='eli'){elPick(catAtual);return;}if(catAtual.cat==='lac'){lacComenta(catAtual);return;}catAtual=null;$('catp').classList.add('hide');drawMarks();return;}}
- if(e.key==='Escape'&&catAtual){fechaCat();return;}
+ if(e.key==='Escape'&&catAtual&&!(window.ACFX&&ACFX.ocioso())){fechaCat();return;}
  if((e.ctrlKey||e.metaKey)&&k==='z'){e.preventDefault();desfaz();return;}
  if(e.ctrlKey||e.metaKey||e.altKey)return;
  if((e.key==='Delete'||e.key==='Backspace')&&(tool==='o'||tool==='h')&&selAtiva()){e.preventDefault();var a2=ALUNOS[i],ix2=a2.marks.indexOf(selC);reg({t:'rem',m:selC,idx:ix2});a2.marks.splice(ix2,1);selC=null;fechaCat();drawMarks();toast('Círculo removido · Ctrl+Z desfaz');return;}
@@ -3735,6 +3837,57 @@ function setOrig(on){
 }
 $('origBtn').addEventListener('click',function(){setOrig(!verOrig)});
 window.__arena={FIN_PLANTAO:FIN_PLANTAO,FIN_NIVEL:FIN_NIVEL,RA_TXT:RA_TXT,SS_TXT:SS_TXT,MOT:MOT,f1:function(x){return x.toFixed(1).replace('.',',')},fraseReesc:fraseReesc,margemTxt:margemTxt,foto:foto,lineY:lineY,COMPS:COMPS,NIVEIS:NIVEIS,compoe:compoe,fmt:fmt};
+/* ===== AC fixo na lateral (computador) =====
+   O painel do AC fica sempre à direita (aba Ferramentas), ao lado da aba Critérios, e pode ser recolhido pela seta.
+   Sem marca selecionada o painel está "ocioso": escolher uma categoria deixa a ferramenta ativa e cada círculo desenhado já sai com o tipo.
+   Com uma marca selecionada ele funciona como o AC de sempre (trocar o tipo, opções, remover). Só em telas largas; no celular continua a gaveta.
+   Desligar: localStorage arena_acfixo = "0". */
+var ACF={on:false,tool:null,tab:'ac',col:false,idle:{t:'o',_idle:true,cat:null,line:1,l1:1,l2:1,cx:0,cy:0,rx:1,ry:1,id:-1}};
+(function(){
+ var pbEl=document.querySelector('.pb'),orig=null;
+ function can(){var ok=true;try{ok=localStorage.getItem('arena_acfixo')!=='0'}catch(e){}return ok&&innerWidth>900}
+ function nomeTool(T){if(!T)return '';if(T.st)return T.st==='ort'?'Ortografia':'Título';if(T.sym)return 'Sinal “'+T.sym+'”';var c=catDe(T.cat);return c?(c.l||c.k):T.cat}
+ function foot(){var f=$('acFoot');if(!f)return;if(ACF.tool){f.className='acfoot on';f.innerHTML='<span>Ativa: <b>'+esc2(nomeTool(ACF.tool))+'</b> · arraste na folha</span><button type="button" id="acfSolta" aria-label="Soltar a ferramenta" title="Soltar a ferramenta (Esc)">×</button>'}
+  else{f.className='acfoot';f.innerHTML='<span>Escolha e arraste na folha, ou arraste e escolha depois</span>'}}
+ function achaBtn(T){var b=null;$('catp').querySelectorAll('button').forEach(function(x){if(b)return;var d=x.dataset;if(T.st?d.sidetog===T.st:T.sym?d.sym===T.sym:d.cat===T.cat)b=x});return b}
+ function marcaUI(){var c=$('catp');c.querySelectorAll('.acton').forEach(function(x){x.classList.remove('acton')});var T=ACF.tool;
+  if(T&&catAtual===ACF.idle){var b=achaBtn(T);if(b){b.classList.add('acton');var src=b.closest('.sidesrc');if(src){var t=c.querySelector('[data-sidetog="'+src.dataset['for']+'"]');if(t)t.classList.add('acton')}}}
+  foot()}
+ function idle(){if(!ACF.on)return;ACF.idle.cat=null;abreCat(ACF.idle);var c=$('catp');c.classList.remove('hide');var b=c.querySelector('.lnst b');if(b)b.textContent='—';marcaUI()}
+ function usaFerr(T){ACF.tool=(ACF.tool&&JSON.stringify(ACF.tool)===JSON.stringify(T))?null:T;if(ACF.tool&&tool!=='o'&&tool!=='h')setTool('o');marcaUI()}
+ function tab(t){ACF.tab=t;if(pbEl)pbEl.setAttribute('data-acftab',t);document.querySelectorAll('.acftab').forEach(function(b){var on=b.dataset.acf===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)})}
+ function colapsa(v){ACF.col=v;if(pbEl)pbEl.classList.toggle('acfc',v);var b=$('acfCol');if(b)b.setAttribute('aria-label',v?'Abrir o painel':'Recolher o painel')}
+ function rail(){var r=$('acfRc');if(!r||!ACF.on)return;var a=ALUNOS[i];if(!a||!a.niv)return;
+  r.innerHTML=a.niv.map(function(v,k){return '<button type="button" class="acfchip" data-acfr="'+k+'" aria-label="Critério '+(COMPS[k]?COMPS[k].id:k+1)+', nível '+(v==null?'sem nível':v)+'">'+(COMPS[k]?COMPS[k].id:k+1)+'<small>'+(v==null?'—':v)+'</small></button>'}).join('')}
+ function sync(){var w=can();if(w===ACF.on)return;ACF.on=w;
+  if(w){if(!orig)orig={p:$('catp').parentNode};pbEl.classList.add('acf');var pane=$('acpane'),f=$('acFoot');pane.insertBefore($('catpS'),f);pane.insertBefore($('catp'),f);tab(ACF.tab);colapsa(false);rail();idle()}
+  else{pbEl.classList.remove('acf','acfc');pbEl.removeAttribute('data-acftab');var mb=$('mBar');orig.p.insertBefore($('catp'),mb);orig.p.insertBefore($('catpS'),mb);ACF.tool=null;catAtual=null;$('catp').classList.add('hide');$('catp').classList.remove('idle');$('catpS').classList.add('hide');drawMarks()}}
+ // categoria escolhida com o painel ocioso = ferramenta ativa (não age numa marca)
+ $('catp').addEventListener('click',function(e){
+  if(!ACF.on||catAtual!==ACF.idle)return;var b=e.target.closest('button');if(!b)return;var d=b.dataset;
+  if(d.sidetog){if(d.sidetog==='ort'||d.sidetog==='tit'){e.stopPropagation();usaFerr({st:d.sidetog})}return}
+  if(d.cat){e.stopPropagation();if(!/^(rm|fit|voltar|mais|troca)$/.test(d.cat))usaFerr({cat:d.cat});return}
+  if(d.sym){e.stopPropagation();usaFerr({sym:d.sym});return}
+  if(d.par||d.ld||d.ln)e.stopPropagation()},true);
+ $('acft').addEventListener('click',function(e){var b=e.target.closest('[data-acf]');if(b){tab(b.dataset.acf);return}if(e.target.closest('#acfCol'))colapsa(true)});
+ $('acfR').addEventListener('click',function(e){if(e.target.closest('#acfOpen')){colapsa(false);return}var c=e.target.closest('[data-acfr]');if(c){colapsa(false);tab('cr')}});
+ $('acpane').addEventListener('click',function(e){if(e.target.closest('#acfSolta')){ACF.tool=null;marcaUI()}});
+ // sempre que o AC "fecha" (aplicou, Esc, clicou fora) ele volta ao estado ocioso, que continua à vista
+ new MutationObserver(function(){if(ACF.on&&$('catp').classList.contains('hide'))Promise.resolve().then(function(){if(ACF.on&&$('catp').classList.contains('hide'))idle()})}).observe($('catp'),{attributes:true,attributeFilter:['class']});
+ var _a1=abreCat;abreCat=function(m,keep){var r=_a1(m,keep);var id=!!(m&&m._idle);$('catp').classList.toggle('idle',id);if(ACF.on&&m&&!id){if(ACF.tab!=='ac')tab('ac');if(ACF.col)colapsa(false)}return r};
+ var _at=atualiza;atualiza=function(){var r=_at.apply(this,arguments);rail();return r};
+ addEventListener('resize',sync);
+ window.ACFX={
+  aplica:function(m){var T=ACF.tool;if(!ACF.on||!T)return false;var b=achaBtn(T);if(!b)return false;b.click();return true},
+  ocioso:function(){return ACF.on&&catAtual===ACF.idle},
+  tecla:function(e,k){if(!ACF.on||catAtual!==ACF.idle)return false;
+   if(e.key==='Escape'){if(ACF.tool){ACF.tool=null;marcaUI();return true}return false}
+   if(e.ctrlKey||e.metaKey||e.altKey||!/^[1-9rmavuplei]$/.test(k))return false;
+   var LK={p:'rp',r:'ra',m:'mr',a:'ma',u:'mi',l:'lac',e:'ele',i:'eli'},ix=/\d/.test(k)?VIS.findIndex(function(c){return c.k===DIGS[+k-1]}):VIS.findIndex(function(c){return c.k===LK[k]});
+   if(!VIS[ix])return false;usaFerr({cat:VIS[ix].k});return true},
+  sync:sync,estado:function(){return ACF}};
+ setTimeout(sync,0); // depois do bloco do celular, que também move #catp para dentro do .rc
+})();
 montaComps();
 /* ===== Celular: correção por critérios (I a V) ===== */
 var MOB={symMais:false,crit:null,place:null,edit:null,editD:null,editNew:false,sel:null,selC:0,int:0,drag:null};
