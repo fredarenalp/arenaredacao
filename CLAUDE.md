@@ -112,3 +112,4 @@ A cada login do Aluno Teste, `ponte.carregarAluno` chama `reiniciar_demo_aluno_t
 - O mesmo comentário não aparece duas vezes: com o comentário do corretor presente (`obsCrit`), os blocos vermelhos automáticos (`detEst`/`detLing`) não são mostrados (ficam só para dados de demonstração).
 - Comentários por linha/parágrafo dentro do texto do critério são **agrupados por parágrafo** (`agrupaTx`): "No parágrafo 1: …", "Já no parágrafo 4: …", "Na linha 17: …" (em vez de repetir "Parágrafo 1 –" a cada frase).
 - Marcas **sem tipo** (círculo solto) e círculos de **comentário** (`cm`) não contam como desvio (antes apareciam como "undefined 1").
+- **Card "Comece por aqui" RETIRADO** da tela "Ver a correção" do aluno (decisão do dono: ao clicar selecionava marcas aleatórias). `resumoHtml` ficou vazio em `verCorrecao`; os critérios seguem em "Seus 5 critérios" e em "Por critérios".
