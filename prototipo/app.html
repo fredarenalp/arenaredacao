@@ -1641,7 +1641,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .pcd .pkcC{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:3px;flex-wrap:wrap}
 .pcd .pkcL{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 220px}
 .pcd .meta2{gap:4px 12px!important;font-size:12.5px!important}
-.pcd .dias{font-weight:700;color:var(--c)}.pcd .dias.prox{color:#b86a00}.pcd .dias.hoje,.pcd .dias.atr{color:#b83a2a}
+.pcd .pkcDias{font-weight:700;color:var(--c)}.pcd .pkcP{color:#b86a00}.pcd .pkcH,.pcd .pkcV{color:#b83a2a}
+.pcd{position:relative}
+.pcd .pkcD{white-space:nowrap}
+/* pacote atrasado: mesma marcação do card de redação atrasada do aluno (borda âmbar, selo "!" e botão laranja) */
+.pcd.late{border-color:#e6cf9a!important;border-left-color:#d9822b!important}
+.pcd.late .go{background:#c26a14}
 .pcd .pb2{font-size:12px!important;white-space:nowrap}.pcd .pb2 .bar{max-width:170px;min-width:60px}
 .pcd .go{align-self:auto!important;display:inline-flex;align-items:center;gap:6px;background:var(--c);color:#fff!important;border-radius:10px;padding:8px 14px;font-size:13px!important;white-space:nowrap}
 .pcd .go svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
@@ -2531,7 +2536,7 @@ function renderRetornos(){var el=$('phRet'),R=(window.__store&&window.__store.re
  el.querySelectorAll('[data-rt]').forEach(function(b){b.onclick=function(){if(b.disabled)return;fim(b.dataset.rt)}});
  var ra=el.querySelector('[data-rall]');if(ra)ra.onclick=function(){RTALL=!RTALL;renderRetornos()}}
 function diasPrazo(pz){var m=String(pz||'').match(/^(\d{1,2})\/(\d{1,2})$/);if(!m)return '';var hj=new Date();hj.setHours(0,0,0,0);var d=new Date(hj.getFullYear(),+m[2]-1,+m[1]),n=Math.round((d-hj)/864e5);
- return n<0?'<span class="dias atr">atrasado '+(-n)+(n===-1?' dia':' dias')+'</span>':n===0?'<span class="dias hoje">vence hoje</span>':n<=2?'<span class="dias prox">faltam '+n+(n===1?' dia':' dias')+'</span>':'<span class="dias">faltam '+n+' dias</span>'}
+ return n<0?'<span class="pkcDias pkcV">atrasado '+(-n)+(n===-1?' dia':' dias')+'</span>':n===0?'<span class="pkcDias pkcH">vence hoje</span>':n<=2?'<span class="pkcDias pkcP">faltam '+n+(n===1?' dia':' dias')+'</span>':'<span class="pkcDias">faltam '+n+' dias</span>'}
 function homePacotes(){document.body.classList.remove('pk-list');renderGanho();renderRetornos();
  $('portal').classList.add('home');
  var tot=0,fe=0,nAb=0,nCo=0;
@@ -2541,13 +2546,13 @@ function homePacotes(){document.body.classList.remove('pk-list');renderGanho();r
  var html=PACS.map(function(P,k){
   var n=P.alunos.length,f=P.alunos.filter(feito).length,conc=pacConc(P);if((phTab==='co')!==conc)return '';
   var st=conc?['ok','Corrigido']:f===0?['novo','Novo']:['em','Em correção'];
-  var meta=P.atr?'<span>Sempre aberto</span>':conc?'<span>Devolvido em <b>'+(P.devolvido||P.prazo)+'</b></span><span>Rendeu <b>'+rsB(n*r1)+'</b></span>':'<span>Entregue em <b>'+P.entrega+'</b></span><span>Devolver até <b>'+P.prazo+'</b></span>';
+  var dias=conc||P.atr?'':diasPrazo(P.prazo),late=!!dias&&/pkcV/.test(dias);
+  var meta=P.atr?'<span>Sempre aberto</span>':conc?'<span>Devolvido em <b>'+(P.devolvido||P.prazo)+'</b></span><span>Rendeu <b>'+rsB(n*r1)+'</b></span>':'<span>Entregue em <b>'+P.entrega+'</b></span><span class="pkcD">Devolver até <b>'+P.prazo+'</b>'+(dias?' · '+dias:'')+'</span>';
   var tp=P.atr?['atr','Atrasadas']:/reescrit|2ª vers/i.test(P.prop)?['re','Reescrita']:/prova/i.test(P.prop+' '+P.serie)?['pv','Prova']:['v1','1ª versão'];
-  var dias=conc||P.atr?'':diasPrazo(P.prazo);
   var pend=P.alunos.filter(function(a){return a.fila==='pend'}).length;
-  return '<button type="button" class="pcd t-'+tp[0]+(conc?' conc':'')+'" data-p="'+k+'"><div class="pkcA"><span class="tipo">'+tp[1]+'</span><span class="tt2">'+(P.atr?'Pacote de atrasadas':'Pacote '+P.n)+'</span><span class="turma">'+P.serie+'</span><span class="pst '+st[0]+'">'+st[1]+'</span></div>'+
+  return '<button type="button" class="pcd t-'+tp[0]+(conc?' conc':'')+(late?' late':'')+'" data-p="'+k+'">'+(late?'<span class="pin2" title="Pacote atrasado" aria-label="Pacote atrasado">!</span>':'')+'<div class="pkcA"><span class="tipo">'+tp[1]+'</span><span class="tt2">'+(P.atr?'Pacote de atrasadas':'Pacote '+P.n)+'</span><span class="turma">'+P.serie+'</span><span class="pst '+st[0]+'">'+st[1]+'</span></div>'+
    '<div class="pr">'+P.prop+'</div>'+
-   '<div class="pkcC"><div class="pkcL"><div class="meta2">'+meta+dias+'<span><b>'+n+'</b> '+(n===1?'redação':'redações')+'</span></div>'+
+   '<div class="pkcC"><div class="pkcL"><div class="meta2">'+meta+'<span><b>'+n+'</b> '+(n===1?'redação':'redações')+'</span></div>'+
    '<div class="pb2"><span>'+f+' de '+n+(pend?' · '+pend+' com o professor':'')+'</span><div class="bar"><i style="width:'+(n?f/n*100:0)+'%"></i></div></div></div>'+
    '<span class="go">'+(conc?'Rever pacote':f?'Continuar correção':'Começar correção')+'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></div></button>';
  }).join('');
