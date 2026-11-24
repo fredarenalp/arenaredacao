@@ -1,4 +1,4 @@
-// AC fixo na lateral (computador): painel permanente, abas Ferramentas/Critérios, recolher, ferramenta ativa.
+// Painel lateral do corretor no computador: abas Critérios / Adicionais, recolher e expandir, AC sempre flutuante.
 // Não grava nada no banco (nunca clica em Salvar). Uso: node e2e/ac-fixo.cjs   (preview em localhost:4173)
 const { chromium } = require('playwright')
 const falhas = []
@@ -14,100 +14,53 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   await p.locator('.pcd').first().click(); await p.waitForTimeout(800)
   if (await p.locator('#plGo').isEnabled().catch(() => false)) await p.locator('#plGo').click(); else await p.locator('.plrow, [data-pl], .plr').first().click()
   await p.waitForSelector('#mk', { timeout: 8000 }); await p.waitForTimeout(1500)
-  const marcas = async () => p.locator('#mk g.xm').count()
+  const vis = (sel) => p.evaluate((q) => { const e = document.querySelector(q); return !!e && e.offsetParent !== null && getComputedStyle(e).display !== 'none' }, sel)
+  const larg = () => p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width)
   const arrasta = async (x0, y0, x1, y1) => { const r = await p.locator('#mk').boundingBox(); await p.mouse.move(r.x + r.width * x0, r.y + r.height * y0); await p.mouse.down(); await p.mouse.move(r.x + r.width * (x0 + x1) / 2, r.y + r.height * y0 + 3, { steps: 4 }); await p.mouse.move(r.x + r.width * x1, r.y + r.height * y1, { steps: 4 }); await p.mouse.up(); await p.waitForTimeout(300) }
 
-  ok(await p.evaluate(() => document.querySelector('.pb').classList.contains('acf')), 'painel fixo ligado no computador')
-  ok(await p.evaluate(() => document.getElementById('acpane').contains(document.getElementById('catp'))), 'o AC mora dentro do painel lateral')
-  const m = await p.evaluate(() => { const a = document.getElementById('acpane'); return { c: a.clientHeight, s: a.scrollHeight } })
-  ok(m.s <= m.c + 1, `o AC cabe sem rolar em 1366×768 (conteúdo ${m.s} px, painel ${m.c} px)`)
-  ok(await p.evaluate(() => document.querySelector('#catp .pg-d .sinbar') !== null), 'sinais que faltam dentro do critério II')
-  ok(await p.locator('#acFoot').innerText().then((t) => t.trim() === ''), 'sem a frase de orientação no rodapé')
+  const ferr = async () => { if ((await p.getAttribute('[data-tool="o"]', 'aria-checked')) !== 'true') { await p.click('[data-tool="o"]'); await p.waitForTimeout(150) } }
+  // o AC flutuante abre ao lado da marca, sem cobri-la
+  const aoLado = () => p.evaluate(() => { const g = [...document.querySelectorAll('#mk g.xm')].pop(), r = g.getBoundingClientRect(), c = document.getElementById('catp').getBoundingClientRect(); return !(r.right > c.left && r.left < c.right && r.bottom > c.top && r.top < c.bottom) })
+  // abas: Critérios (abre por padrão) e Adicionais; a aba Ferramentas não existe mais
+  ok(await p.evaluate(() => document.querySelector('.pb').classList.contains('acf')), 'painel lateral ligado no computador')
+  const abas = await p.evaluate(() => [...document.querySelectorAll('.acftab')].map((x) => x.textContent.replace(/\d+/g, '').trim() + (x.getAttribute('aria-selected') === 'true' ? '*' : '')))
+  ok(abas.join('|') === 'Critérios*|Adicionais', 'duas abas: Critérios (aberta) e Adicionais ' + JSON.stringify(abas))
+  ok(await p.evaluate(() => !document.querySelector('[data-acf="ac"]') && !document.getElementById('acpane')), 'a aba Ferramentas foi retirada')
+  ok(await vis('#comps') && !(await vis('#cmBox')), 'Critérios mostra os critérios (níveis 0–4) e não a caixa de observações')
+  ok(await vis('#fm .fmf'), 'Anular redação e Salvar continuam à vista')
 
-  // ferramenta ativa: escolhe Rasura e arrasta duas vezes
-  await p.click('#catp button[data-cat="ra"]')
-  ok(await p.evaluate(() => document.querySelector('#catp button[data-cat="ra"]').classList.contains('acton')), 'escolher Rasura deixa a ferramenta ativa (botão destacado)')
-  const n0 = await marcas()
-  await arrasta(.2, .3, .45, .3)
-  ok(await marcas() === n0 + 1, 'arrastar na folha cria a marca já com o tipo (sem balão)')
-  ok(await p.evaluate(() => document.getElementById('catp').classList.contains('idle')), 'depois de marcar o painel volta ao estado ocioso')
-  await arrasta(.2, .4, .45, .4)
-  ok(await marcas() === n0 + 2, 'a ferramenta continua ativa para o próximo erro')
-  await p.keyboard.press('Escape')
-  ok(await p.evaluate(() => !document.querySelector('#catp .acton')), 'Esc solta a ferramenta')
-
-  // arrasta sem ferramenta: marca sem tipo selecionada; classifica depois
-  await arrasta(.2, .5, .45, .5)
-  ok(await p.evaluate(() => !document.getElementById('catp').classList.contains('idle')), 'sem ferramenta a marca fica selecionada para classificar')
-  await p.click('#catp button[data-cat="ac"]'); await p.waitForTimeout(300)
-  ok(await p.evaluate(() => document.getElementById('catp').classList.contains('idle') || document.querySelector('#catp .subr')) !== null, 'classificar a marca pelo painel funciona')
-  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
-
-  // Ortografia como ferramenta: abre as opções no painel
-  await p.click('#catp [data-sidetog="ort"]')
-  ok(await p.evaluate(() => document.querySelector('#catp [data-sidetog="ort"]').classList.contains('acton')), 'Ortografia pode ser a ferramenta ativa')
-  await arrasta(.2, .6, .4, .6)
-  ok(await p.locator('#catpS #orW').count() === 1 && await p.evaluate(() => document.getElementById('acpane').contains(document.getElementById('catpS'))), 'as opções de Ortografia abrem dentro do painel')
-  await p.fill('#orW', 'exceção'); await p.click('#catpS [data-ortok="1"]'); await p.waitForTimeout(300)
-  ok(await p.evaluate(() => document.getElementById('catp').classList.contains('idle')), 'depois de corrigir a palavra o painel volta ao estado ocioso')
-  await p.keyboard.press('Escape')
-
-  // as opções abrem logo abaixo do próprio critério (não no topo do painel)
-  const abaixo = async (sec) => p.evaluate((q) => { const sd = document.getElementById('catpS'), s = sd.getBoundingClientRect(), c = document.querySelector('#catp ' + q).getBoundingClientRect(), a = document.getElementById('acpane').getBoundingClientRect(); return { ok: !sd.classList.contains('hide') && s.top <= c.bottom && s.bottom >= c.top && s.top >= a.top - 1 && s.bottom <= a.bottom + 1, s: [Math.round(s.top), Math.round(s.bottom)], c: [Math.round(c.top), Math.round(c.bottom)] } }, sec)
-  await arrasta(.2, .55, .4, .55); await p.click('#catp [data-sidetog="par"]'); await p.waitForTimeout(300)
-  const pp = await abaixo('.pg-e'); ok(pp.ok, 'Parágrafo abre sobre a própria Estética, dentro do painel ' + JSON.stringify(pp))
-  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
-  await arrasta(.2, .62, .4, .62); await p.click('#catp button[data-cat="ca"]'); await p.waitForTimeout(500)
-  const pc = await abaixo('.pg-p'); ok(pc.ok, 'Conectivo ausente abre sobre a própria Progressão, dentro do painel ' + JSON.stringify(pc))
-  // o balão do conectivo não pula nem estoura o painel quando o conteúdo cresce (Corrigir → Escolher função → lista)
-  const estavel = async () => p.evaluate(() => { const s = document.getElementById('catpS').getBoundingClientRect(), a = document.getElementById('acpane'), r = a.getBoundingClientRect(); return { dentro: s.top >= r.top - 1 && s.bottom <= r.bottom + 1, semRolar: a.scrollHeight <= a.clientHeight + 1, top: Math.round(s.top), bottom: Math.round(s.bottom) } })
-  await p.click('#catpS [data-cnstart]'); await p.waitForTimeout(900)
-  const e1 = await estavel(); await p.click('#catpS .cnselb'); await p.waitForTimeout(500)
-  const e2 = await estavel()
-  ok(e1.dentro && e1.semRolar && e2.dentro && e2.semRolar, 'balão do conectivo fica dentro do painel, sem rolar a tela ' + JSON.stringify([e1, e2]))
-  ok(e2.top <= e1.top + 1, 'balão do conectivo só cresce para cima/baixo sem pular para o outro lado')
-  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
-  // Repetição de palavra: escolher a palavra volta à ferramenta
-  await arrasta(.2, .35, .4, .35); await p.click('#catp button[data-cat="rp"]'); await p.waitForTimeout(500)
-  await p.fill('#rpW', 'arte'); await p.waitForTimeout(300)
-  const chip = p.locator('#catp .rpc2 button[data-pal]').first()
-  if (await chip.count()) { await chip.click(); await p.waitForTimeout(400); ok(await p.evaluate(() => document.getElementById('catp').classList.contains('idle')), 'escolher a palavra repetida volta para a tela da ferramenta') }
-  else { await p.click('#catp .rpok'); await p.waitForTimeout(300); ok(await p.evaluate(() => document.getElementById('catp').classList.contains('idle')), 'OK da palavra repetida volta para a tela da ferramenta') }
-  await p.keyboard.press('Escape')
-  // teclas: R escolhe Rasura
-  await p.keyboard.press('r'); await p.waitForTimeout(150)
-  ok(await p.evaluate(() => document.querySelector('#catp button[data-cat="ra"]').classList.contains('acton')), 'tecla R escolhe Rasura')
-  await p.keyboard.press('Escape')
-
-  // três jeitos de trabalhar: AC na lateral, AC flutuante com a aba Critérios, AC flutuante com o painel recolhido
-  const flutuante = async () => p.evaluate(() => { const c = document.getElementById('catp'); return !document.getElementById('acpane').contains(c) && !c.classList.contains('hide') && getComputedStyle(c).position === 'fixed' })
-  await p.click('[data-acf="cr"]'); await p.waitForTimeout(300)
-  await p.click('[data-tool="o"]'); await arrasta(.55, .5, .75, .5); await p.waitForTimeout(300)
-  ok(await flutuante(), 'aba Critérios: o AC abre flutuante, como antes, ao criar um círculo')
-  await p.click('#catp button[data-cat="ac"]').catch(() => {}); await p.keyboard.press('Escape'); await p.waitForTimeout(200)
-  await p.click('#acfCol'); await p.waitForTimeout(300)
-  await p.click('[data-tool="o"]'); await arrasta(.55, .42, .75, .42); await p.waitForTimeout(300)
-  ok(await flutuante(), 'painel recolhido: o AC abre flutuante, como antes, ao criar um círculo')
-  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
-  await p.click('#acfOpen'); await p.waitForTimeout(300); await p.click('[data-acf="ac"]'); await p.waitForTimeout(400)
-  ok(await p.evaluate(() => document.getElementById('acpane').contains(document.getElementById('catp'))), 'voltando para Ferramentas o AC volta para a lateral')
-  // abas e recolher
+  // Adicionais: observações adicionais sem rolar a tela
+  await p.click('[data-acf="ad"]'); await p.waitForTimeout(300)
+  ok(await vis('#cmBox') && !(await vis('#comps')), 'Adicionais mostra as observações adicionais no lugar dos critérios')
+  const cx = await p.evaluate(() => { const c = document.getElementById('cmBox').getBoundingClientRect(), r = document.querySelector('.rc').getBoundingClientRect(); return c.top >= r.top && c.bottom <= r.bottom + 1 && getComputedStyle(document.getElementById('cmBox')).position === 'static' })
+  ok(cx, 'a caixa de Adicionais cabe no painel, sem ficar fixa por cima de nada')
   await p.click('[data-acf="cr"]'); await p.waitForTimeout(200)
-  ok(await p.evaluate(() => document.querySelector('.pb').dataset.acftab === 'cr' && document.getElementById('acpane').offsetParent === null && document.getElementById('comps').offsetParent !== null), 'aba Critérios mostra os níveis e esconde o AC')
-  ok(await p.evaluate(() => getComputedStyle(document.getElementById('cmBox')).position === 'static'), 'Observações adicionais rola com os critérios (não fica fixa sobrepondo)')
-  await p.click('[data-acf="ac"]'); await p.waitForTimeout(200)
-  const w0 = await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width)
+
+  // AC sempre flutuante, também com o painel aberto
+  await ferr(); await arrasta(.2, .3, .4, .3)
+  const flut = () => p.evaluate(() => { const c = document.getElementById('catp'); return !c.classList.contains('hide') && getComputedStyle(c).position === 'fixed' })
+  ok(await flut(), 'criar um círculo abre o AC flutuante, junto da marca (painel aberto em Critérios)')
+  ok(await aoLado(), 'o AC abre ao lado da marca, sem cobrir o trecho marcado (painel aberto)')
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
+
+  // recolher e expandir
+  const w0 = await larg()
   await p.click('#acfCol'); await p.waitForTimeout(300)
-  const w1 = await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width)
-  ok(w1 < 80 && w0 > 380, `recolher estreita o painel (${Math.round(w0)} → ${Math.round(w1)} px)`)
+  const w1 = await larg()
+  ok(w1 < 80 && w0 > 380, `recolher deixa só a redação (${Math.round(w0)} → ${Math.round(w1)} px)`)
   ok(await p.locator('.acfchip').count() === 5, 'faixa recolhida mostra os 5 critérios')
+  await ferr(); await arrasta(.55, .4, .75, .4)
+  ok(await flut(), 'painel recolhido: o AC abre flutuante, como antes')
+  ok(await aoLado(), 'o AC abre ao lado da marca, sem cobrir o trecho marcado (painel recolhido)')
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
   // diálogo com o painel recolhido: o painel se abre sozinho e volta a recolher ao fechar
   await p.click('#mkClear'); await p.waitForTimeout(400)
-  ok(await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width) > 300 && await p.locator('#lmpNo').isVisible(), 'diálogo "Limpar correção" com o painel recolhido abre inteiro (com botões)')
+  ok(await larg() > 300 && await p.locator('#lmpNo').isVisible(), 'diálogo "Limpar correção" com o painel recolhido abre inteiro (com botões)')
   await p.click('#lmpNo'); await p.waitForTimeout(400)
-  ok(await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width) < 80, 'fechado o diálogo, o painel volta a recolher')
+  ok(await larg() < 80, 'fechado o diálogo, o painel volta a recolher')
   await p.click('#acfOpen'); await p.waitForTimeout(300)
-  ok(await p.evaluate(() => document.querySelector('.rc').getBoundingClientRect().width) > 300, 'a seta reabre o painel')
+  ok(await larg() > 380, 'a seta ‹ reabre o painel')
+  await p.click('.acfchip >> nth=0').catch(() => {})
   ok(erros.length === 0, 'sem erros de JavaScript' + (erros.length ? ': ' + erros[0] : ''))
   await b.close()
   console.log(falhas.length ? `\n${falhas.length} falha(s)` : '\nTudo certo')

@@ -1608,182 +1608,28 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .mcat.on{border-color:#3c7678;background:#e3efee}.mcat.mrem{grid-column:1/-1;justify-content:center;color:#b83a2a;border-color:#e6b3aa;background:#fff;font-weight:700}
 .msymh{grid-column:1/-1;font:700 12px 'DM Sans';color:#6b6a62;margin-top:4px}.msyms{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}.msym{width:44px;height:44px;border-radius:12px;border:1.5px solid #e2ded2;background:#f7f5ee;font:700 18px 'DM Sans';color:#222;cursor:pointer}
 
-/* ===== AC fixo na lateral (computador): painel permanente à direita, abas Ferramentas / Critérios, recolhível ===== */
-.acft,.acfr,.acpane{display:none}
+/* ===== Painel lateral do computador: abas Critérios / Adicionais, recolhível (o AC continua flutuante, junto da marca) ===== */
+.acft,.acfr{display:none}
 @media(min-width:901px){
 .pb.acf{grid-template-columns:minmax(0,1fr) 400px}
 .pb.acf:has(.md:not(.hide)){grid-template-columns:minmax(0,1fr) 480px}
 .pb.acf.acfc,.pb.acf.acfc:has(.md:not(.hide)){grid-template-columns:minmax(0,1fr) 56px}
 }
 .pb.acf .acft{display:flex;align-items:center;gap:4px;padding:6px 6px 0;border-bottom:1px solid #e2ded2;background:#faf9f4;flex:none}
-.acftab{font:700 12.5px "DM Sans",sans-serif;border:0;background:transparent;color:#6b6a62;padding:6px 11px;border-radius:9px 9px 0 0;cursor:pointer}
+.acftab{font:700 12.5px "DM Sans",sans-serif;border:0;background:transparent;color:#6b6a62;padding:6px 11px;border-radius:9px 9px 0 0;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
 .acftab[aria-selected="true"]{background:#fff;color:#3c7678;border:1px solid #e2ded2;border-bottom:0;margin-bottom:-1px}
+.acftab .acfn{background:#3c7678;color:#fff;border-radius:9px;min-width:17px;height:17px;padding:0 5px;font:700 10.5px "DM Sans",sans-serif;display:inline-grid;place-items:center}.acftab .acfn:empty{display:none}
 .acfsp{flex:1}
 .acfcol,.acfopen{width:28px;height:28px;border:0;border-radius:9px;background:#efece3;color:#222;font-size:15px;cursor:pointer;line-height:1}
-.pb.acf .acpane{position:relative;display:flex;flex-direction:column;flex:1;min-height:0;overflow-y:auto;background:#fff;padding:5px 8px 2px}
-.pb.acf[data-acftab="cr"] .acpane{display:none}
-.pb.acf[data-acftab="ac"] .rc .fm{flex:none}
-.pb.acf[data-acftab="ac"] .fm .fmh,.pb.acf[data-acftab="ac"] .fm .fmb{display:none}
-.pb.acf[data-acftab="cr"] .rc .fm{flex:1}
-.pb.acf.acfc .acft,.pb.acf.acfc .acpane,.pb.acf.acfc .rc .fm{display:none}
+.pb.acf.acfc .acft,.pb.acf.acfc .rc .fm{display:none}
 .pb.acf.acfc .acfr{display:flex;flex-direction:column;align-items:center;gap:6px;padding:8px 0;background:#fff;flex:1}
 .acfr #acfRc{display:flex;flex-direction:column;gap:6px}
 .acfr .acfchip{width:40px;height:40px;border-radius:10px;border:1.5px solid #e2ded2;background:#fff;font:700 12.5px "DM Sans",sans-serif;color:#222;cursor:pointer;line-height:1.05}
 .acfr .acfchip small{display:block;font-size:9.5px;color:#6b6a62;font-weight:500}
-.acfoot{order:99;flex:none;margin-top:auto;border-top:1px solid #e2ded2;padding:5px 2px 2px;font:500 11.5px "DM Sans",sans-serif;color:#8a8578;display:flex;align-items:center;gap:6px;min-height:28px;line-height:1.2}
-.acfoot.on{color:#244}.acfoot b{color:#173f40}
-.acfoot button{margin-left:auto;width:20px;height:20px;border:0;border-radius:6px;background:#e3efee;cursor:pointer;font-size:13px;line-height:1;color:#222}
-/* o AC em si: sempre visível, no fluxo, paleta clara e compacta */
-.pb.acf.acfx .rc #catp{position:static!important;left:auto!important;top:auto!important;width:auto!important;max-width:none!important;max-height:none!important;overflow:visible;margin:0;padding:0;background:transparent!important;color:#222;box-shadow:none;border-radius:0;display:block!important;visibility:visible!important;z-index:auto;flex:none}
-.pb.acf.acfx .rc #catp .topo{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 0 5px;padding:0 0 5px;border-bottom:1px solid #e2ded2}
-.pb.acf.acfx .rc #catp .ttl{margin:0;padding:0;border:0;display:flex;align-items:center}
-.pb.acf.acfx .rc #catp .ttl .lnst,.pb.acf.acfx .rc #catp .ttl .lnst b{color:#222;font-size:12.5px;gap:4px}
-.pb.acf.acfx .rc #catp .ln{width:24px;height:24px;border-radius:7px;background:#ece8dc;color:#222;padding:0;justify-content:center;font-size:13px}
-.pb.acf.acfx .rc #catp .pr{margin:0;gap:4px}
-.pb.acf.acfx .rc #catp .pr span{color:#8a8578;font-size:10px;margin-right:2px}
-.pb.acf.acfx .rc #catp .pr button{width:24px;height:24px;border-radius:7px;background:#ece8dc;color:#222;box-shadow:none}
-.pb.acf.acfx .rc #catp .pr button.on{background:#3c7678;color:#fff;box-shadow:none}
-.pb.acf.acfx .rc #catp.idle .ln,.pb.acf.acfx .rc #catp.idle .pr button,.pb.acf.acfx .rc #catp.idle .acts .rm,.pb.acf.acfx .rc #catp.idle .fitb{opacity:.4;pointer-events:none}
-.pb.acf.acfx .rc #catp .pgp{border-radius:11px;padding:5px 7px 2px;margin:4px 0 0;position:relative}
-.pb.acf.acfx .rc #catp .pg-e{background:#eaf4f3;border:1px solid #c9e0de}
-.pb.acf.acfx .rc #catp .pg-d{background:#fbeceb;border:1px solid #f0cbc7}
-.pb.acf.acfx .rc #catp .pg-p{background:#fdf1e0;border:1px solid #f1d9b0}
-.pb.acf.acfx .rc #catp .pg-a{background:#f3edf8;border:1px solid #dccdea}
-.pb.acf.acfx .rc #catp .gl,.pb.acf.acfx .rc #catp .pgp .gl{color:#4a4a42;opacity:1;font-size:10.5px;margin:0 0 3px;letter-spacing:.06em}
-.pb.acf.acfx .rc #catp .gl2,.pb.acf.acfx .rc #catp .pgp .gl2{color:#6b6a62;font-size:10px;margin:2px 0 3px}
-.pb.acf.acfx .rc #catp .pg-a .gl:first-child,.pb.acf.acfx .rc #catp .cnlab{color:#4a4a42}
-.pb.acf.acfx .rc #catp .gl em{font-size:9.5px;padding:0 6px}
-.pb.acf.acfx .rc #catp .g2{gap:4px;margin:0 0 4px}
-.pb.acf.acfx .rc #catp .g2 button,.pb.acf.acfx .rc #catp .est,.pb.acf.acfx .rc #catp .prg button{background:#fff;color:#222;border:1.5px solid #e2ded2;border-radius:8px;min-height:28px;padding:3px 6px 3px 12px;font:500 12px "DM Sans",sans-serif;gap:4px;line-height:1.1;box-shadow:none}
-.pb.acf.acfx .rc #catp .g2 button::before{top:5px;bottom:5px}
-.pb.acf.acfx .rc #catp .g2 button small{color:#8a8578;opacity:1;font-size:10px;margin-left:4px}
-.pb.acf.acfx .rc #catp .g2 button:hover,.pb.acf.acfx .rc #catp .g2 button:focus-visible{background:#fff;border-color:#b9b39f;color:#222;outline:none}
-.pb.acf.acfx .rc #catp .g2 button.cur,.pb.acf.acfx .rc #catp .g2 button.on,.pb.acf.acfx .rc #catp .g2 button.acton,.pb.acf.acfx .rc #catp .vbtog.on,.pb.acf.acfx .rc #catp .vbtog.acton,.pb.acf.acfx .rc #catp .partog.on,.pb.acf.acfx .rc #catp .partog.acton{background:#e3efee;border-color:#3c7678;color:#173f40}
-.pb.acf.acfx .rc #catp .g2 button svg{width:12px;height:12px}
-.pb.acf.acfx .rc #catp .partog{color:#4a4a42;background:transparent;border:0;min-height:0;padding:2px 4px;font:700 11.5px "DM Sans",sans-serif;border-radius:8px}
-.pb.acf.acfx .rc #catp .partog:hover{background:#ece8dc;color:#222}
-.pb.acf.acfx .rc #catp .sinbar{margin:0 0 5px}
-.pb.acf.acfx .rc #catp .sinbar .srow{gap:3px;margin:0}
-.pb.acf.acfx .rc #catp .sinbar .syb,.pb.acf.acfx .rc #catp .sinbar .srow .syb{height:26px!important;font:700 13px "DM Sans",sans-serif!important;background:#fff;color:#222;border:1.5px solid #e2ded2;border-radius:7px;min-width:0;padding:0!important}
-.pb.acf.acfx .rc #catp .sinbar .syb.mais{flex:0 0 28px;background:#ece8dc;color:#222}
-.pb.acf.acfx .rc #catp .sinbar .syb.mais.on{background:#e3efee;border-color:#3c7678}
-.pb.acf.acfx .rc #catp .pg-p .g2.prg{margin-top:9px}
-.pb.acf.acfx .rc #catp .pg-p .g2.prg button{min-height:30px}
-.pb.acf.acfx .rc #catp .g2.acts{padding-top:5px;margin:5px 0 3px;border-top:1px solid #e2ded2;gap:4px}
-.pb.acf.acfx .rc #catp .g2.acts button{height:30px;min-height:30px;font-size:12.5px;padding:3px 6px;justify-content:center}
-.pb.acf.acfx .rc #catp .g2.acts .cmb{background:#dfe9f5;border-color:#c1d3ea;color:#1f4a7a}
-.pb.acf.acfx .rc #catp .g2.acts .rm{color:#b83a2a}
-.pb.acf.acfx .rc #catp .g2.acts .elb svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
-.pb.acf.acfx .rc #catp .fitb{border:1.5px dashed #b9d3d2!important;color:#3c7678;background:transparent!important;font:700 12px "DM Sans",sans-serif;padding:6px!important;margin:0 0 2px;min-height:0;border-radius:8px}
-.pb.acf.acfx .rc #catp .hint3{display:none}
-/* submenus (Parágrafo, Verbo, Vocabulário, Outros, Elemento) e as opções (Ortografia, Conectivo, Título…): no painel, claros */
-.pb.acf.acfx .rc #catpS.catps{position:absolute!important;left:8px!important;right:8px!important;bottom:auto!important;width:auto!important;overflow-y:auto;overflow-x:hidden;margin:0;border:1.5px solid #3c7678;border-radius:11px;box-shadow:0 8px 22px rgba(0,0,0,.22);flex:none;z-index:30;padding:7px 8px 8px;background:#fff!important;color:#222}
-.pb.acf.acfx .rc #catpS.catps.hide{display:none!important}
-.pb.acf.acfx .rc #catpS .g2 button,.pb.acf.acfx .rc #catpS .g2.parg button{min-height:30px;font:500 12.5px "DM Sans",sans-serif;border-radius:8px}
-.pb.acf.acfx .rc #catpS .orw,.pb.acf.acfx .rc #catpS input[type=text]{font-size:14px!important}
-.pb.acf.acfx .rc #catpS .g2 button,.pb.acf.acfx .rc #catpS .g2.parg button,.pb.acf.acfx .rc #catpS .orok,.pb.acf.acfx .rc #catpS button[data-cnstart],.pb.acf.acfx .rc #catpS .cnselb{min-height:30px!important;padding:4px 9px!important;font:500 12.5px "DM Sans",sans-serif!important;border-radius:8px!important}
-.pb.acf.acfx .rc #catpS .g2{gap:5px;margin-bottom:6px}
-.pb.acf.acfx .rc #catpS .cnt{padding:5px 9px!important;font-size:12.5px!important}
-.pb.acf.acfx .rc #catpS .cndd button{min-height:0!important;padding:6px 8px!important;font-size:12.5px!important}
-.pb.acf.acfx .rc #catpS .gl,.pb.acf.acfx .rc #catpS .gl2{font-size:10.5px}
-/* Observações adicionais rola junto com os critérios (antes ficava fixa no pé e cobria o critério) */
-.pb.acf .rc #cmBox{position:static;bottom:auto;z-index:auto;box-shadow:none;margin-bottom:0}
-.pb.acf .acfoot{display:none}
-/* AC fixo: tema escuro (o preto original do AC, com a identidade de cada seção); o claro fica como alternativa (localStorage arena_acf_tema = "claro") */
-.pb.acf:not(.claro) .acpane{background:#1c1c19;color:#fff}
-.pb.acf.acfx:not(.claro) .rc #catp{color:#fff}
-.pb.acf.acfx:not(.claro) .rc #catp .topo{border-bottom-color:rgba(255,255,255,.14)}
-.pb.acf.acfx:not(.claro) .rc #catp .ttl .lnst,.pb.acf.acfx:not(.claro) .rc #catp .ttl .lnst b{color:#fff}
-.pb.acf.acfx:not(.claro) .rc #catp .ln,.pb.acf.acfx:not(.claro) .rc #catp .pr button{background:rgba(255,255,255,.12);color:#fff}
-.pb.acf.acfx:not(.claro) .rc #catp .pr span{color:#bfa98f}
-.pb.acf.acfx:not(.claro) .rc #catp .pr button.on{background:#52989a;color:#fff;box-shadow:0 0 0 2px #fff inset}
-.pb.acf.acfx:not(.claro) .rc #catp .pg-e{background:rgba(60,118,120,.14);border-color:rgba(60,118,120,.7)}
-.pb.acf.acfx:not(.claro) .rc #catp .pg-d{background:rgba(214,40,40,.09);border-color:rgba(214,40,40,.55)}
-.pb.acf.acfx:not(.claro) .rc #catp .pg-p{background:rgba(240,131,0,.10);border-color:rgba(240,131,0,.55)}
-.pb.acf.acfx:not(.claro) .rc #catp .pg-a{background:rgba(120,70,160,.18);border-color:rgba(150,100,200,.6)}
-.pb.acf.acfx:not(.claro) .rc #catp .gl,.pb.acf.acfx:not(.claro) .rc #catp .pgp .gl{color:#e0ddd0}
-.pb.acf.acfx:not(.claro) .rc #catp .gl2,.pb.acf.acfx:not(.claro) .rc #catp .pgp .gl2{color:#e0ddd0;opacity:.8}
-.pb.acf.acfx:not(.claro) .rc #catp .pg-a .gl:first-child,.pb.acf.acfx:not(.claro) .rc #catp .cnlab{color:#e8e4d6}
-.pb.acf.acfx:not(.claro) .rc #catp .g2 button,.pb.acf.acfx:not(.claro) .rc #catp .est,.pb.acf.acfx:not(.claro) .rc #catp .prg button{background:rgba(255,255,255,.1);color:#fff;border:1.5px solid transparent}
-.pb.acf.acfx:not(.claro) .rc #catp .g2 button:hover,.pb.acf.acfx:not(.claro) .rc #catp .g2 button:focus-visible{background:#3c7678;color:#fff;border-color:transparent}
-.pb.acf.acfx:not(.claro) .rc #catp .g2 button.cur,.pb.acf.acfx:not(.claro) .rc #catp .g2 button.on,.pb.acf.acfx:not(.claro) .rc #catp .g2 button.acton,.pb.acf.acfx:not(.claro) .rc #catp .vbtog.on,.pb.acf.acfx:not(.claro) .rc #catp .vbtog.acton,.pb.acf.acfx:not(.claro) .rc #catp .partog.on,.pb.acf.acfx:not(.claro) .rc #catp .partog.acton{background:#3c7678;color:#fff;border-color:transparent}
-.pb.acf.acfx:not(.claro) .rc #catp .g2 button small{color:#fff;opacity:.6}
-.pb.acf.acfx:not(.claro) .rc #catp .g2 button svg{stroke:currentColor}
-.pb.acf.acfx:not(.claro) .rc #catp .partog{color:#d8d5c8;background:transparent;border:0}
-.pb.acf.acfx:not(.claro) .rc #catp .partog:hover{background:rgba(255,255,255,.12);color:#fff}
-.pb.acf.acfx:not(.claro) .rc #catp .sinbar .syb,.pb.acf.acfx:not(.claro) .rc #catp .sinbar .srow .syb{background:rgba(255,255,255,.12);color:#fff;border:0}
-.pb.acf.acfx:not(.claro) .rc #catp .sinbar .syb.mais{background:rgba(143,197,198,.25);color:#cfeeee}
-.pb.acf.acfx:not(.claro) .rc #catp .sinbar .syb.mais.on{background:rgba(255,255,255,.28);border:0}
-.pb.acf.acfx:not(.claro) .rc #catp .g2.acts{border-top-color:rgba(255,255,255,.14)}
-.pb.acf.acfx:not(.claro) .rc #catp .g2.acts .cmb{background:rgba(244,176,0,.3);color:#fff}
-.pb.acf.acfx:not(.claro) .rc #catp .g2.acts .cmb:hover{background:#f4b000;color:#1c1c19}
-.pb.acf.acfx:not(.claro) .rc #catp .g2.acts .rm{background:rgba(214,40,40,.35);color:#fff}
-.pb.acf.acfx:not(.claro) .rc #catp .g2.acts .rm:hover{background:#d62828}
-.pb.acf.acfx:not(.claro) .rc #catp .fitb{border:1.5px dashed rgba(255,255,255,.3)!important;color:#8fc5c6}
-.pb.acf.acfx:not(.claro) .rc #catp .rpgl,.pb.acf.acfx:not(.claro) .rc #catp .rpw label,.pb.acf.acfx:not(.claro) .rc #catp .rpw label small{color:#e0ddd0}
-.pb.acf.acfx:not(.claro) .rc #catp .rpin input{background:#2b2b27!important;color:#fff!important;border:1.5px solid #f08300!important}
-.pb.acf.acfx:not(.claro) .rc #catp .rpsh,.pb.acf.acfx:not(.claro) .rc #catp .rpsm{color:#bbb}
-.pb.acf.acfx:not(.claro) .rc #catp .rpsc,.pb.acf.acfx:not(.claro) .rc #catp .rpc2 button{background:#3a3a34!important;color:#fff!important}
-.pb.acf.acfx:not(.claro) .rc #catp .rpsc.on,.pb.acf.acfx:not(.claro) .rc #catp .rpc2 button.on{background:#2f855a!important}
-.pb.acf.acfx:not(.claro) .rc #catp .rpsmais{color:#aaa!important}
-.pb.acf.acfx:not(.claro) .rc #catp .rpgl .rptroca{color:#8fc5c6}
-
-.pb.acf.acfx .rc #catp.idle .fitb{display:none}
-.pb.acf.acfx .rc #catp .rpgl{color:#4a4a42;margin:2px 0 4px}.pb.acf.acfx .rc #catp .rpgl .rptroca{background:none;border:0;color:#3c7678;text-decoration:underline;font-size:11px;padding:0 4px}
-.pb.acf.acfx .rc #catp .rpw label,.pb.acf.acfx .rc #catp .rpw label small{color:#4a4a42;font:700 11.5px "DM Sans",sans-serif}
-.pb.acf.acfx .rc #catp .rpin{display:flex;gap:6px;margin:4px 0 6px}
-.pb.acf.acfx .rc #catp .rpin input{flex:1;background:#fff!important;color:#222!important;border:1.5px solid #3c7678!important;border-radius:8px;font:500 14px "DM Sans",sans-serif;padding:6px 9px;min-width:0}
-.pb.acf.acfx .rc #catp .rpok{background:#3c7678!important;color:#fff!important;border:0;border-radius:8px;padding:0 14px;font:700 13px "DM Sans",sans-serif;cursor:pointer}
-.pb.acf.acfx .rc #catp .rpsh,.pb.acf.acfx .rc #catp .rpsm{color:#6b6a62;font-size:11.5px;margin:2px 0 5px}
-.pb.acf.acfx .rc #catp .rpsc,.pb.acf.acfx .rc #catp .rpc2 button{background:#f1eee5!important;color:#222!important;border:0!important;border-radius:14px;padding:4px 10px!important;font:600 12px "DM Sans",sans-serif;min-height:0;cursor:pointer}
-.pb.acf.acfx .rc #catp .rpsc.on,.pb.acf.acfx .rc #catp .rpc2 button.on{background:#3c7678!important;color:#fff!important}
-.pb.acf.acfx .rc #catp .rpsmais{background:none!important;color:#3c7678!important;text-decoration:underline;font-size:11.5px}
-.pb.acf.acfx .rc #catp .rpc2,.pb.acf.acfx .rc #catp .rpsr{display:flex;flex-wrap:wrap;gap:5px;margin:4px 0}
-.pb.acf .acpane{padding-bottom:3px}
-/* telas mais baixas: o AC continua cabendo inteiro sem rolar */
-@media(min-width:901px) and (max-height:800px){
- .pb.acf.acfx .rc #catp .g2 button,.pb.acf.acfx .rc #catp .est,.pb.acf.acfx .rc #catp .prg button{min-height:26px;padding-top:2px;padding-bottom:2px;font-size:11.8px}
- .pb.acf.acfx .rc #catp .pg-p .g2.prg button{min-height:28px}
- .pb.acf.acfx .rc #catp .pgp{padding:4px 7px 1px;margin-top:3px}
- .pb.acf.acfx .rc #catp .g2{gap:3px;margin-bottom:3px}
- .pb.acf.acfx .rc #catp .sinbar .syb,.pb.acf.acfx .rc #catp .sinbar .srow .syb{height:23px!important}
- .pb.acf.acfx .rc #catp .g2.acts button{height:27px;min-height:27px}
- .pb.acf.acfx .rc #catp .topo{margin-bottom:3px;padding-bottom:3px}
- .pb.acf.acfx .rc #catp .fitb{padding:4px!important}
-}
-@media(min-width:901px) and (max-height:700px){
- .pb.acf.acfx .rc #catp .g2 button,.pb.acf.acfx .rc #catp .est,.pb.acf.acfx .rc #catp .prg button{min-height:23px;font-size:11.3px}
- .pb.acf.acfx .rc #catp .pg-p .g2.prg button{min-height:25px}
- .pb.acf.acfx .rc #catp .sinbar .syb,.pb.acf.acfx .rc #catp .sinbar .srow .syb{height:21px!important}
- .pb.acf.acfx .rc #catp .g2.acts button{height:24px;min-height:24px}
- .pb.acf.acfx .rc #catp .ln,.pb.acf.acfx .rc #catp .pr button{height:21px;width:22px}
- .pb.acf.acfx .rc #catp .gl,.pb.acf.acfx .rc #catp .pgp .gl{margin-bottom:2px}
- .pb.acf.acfx .rc #catp .pgp .gl2{margin:1px 0 2px}
-}
-.pb.acf.acfx .rc #catpS .srow .syb{height:30px;font:700 15px "DM Sans"!important}
-.pb.acf.acfx .rc #catpS.catps{background:#fff!important;color:#222;padding:10px 12px 12px}
-.pb.acf.acfx .rc #catpS .gl,.pb.acf.acfx .rc #catpS .gl2,.pb.acf.acfx .rc #catpS .qh{color:#6b6a62!important}
-.pb.acf.acfx .rc #catpS .g2 button,.pb.acf.acfx .rc #catpS .g2.parg button{background:#f7f5ee!important;color:#222!important;border:1.5px solid #e2ded2!important;border-radius:12px;min-height:46px;font:500 14px 'DM Sans',sans-serif}
-.pb.acf.acfx .rc #catpS .g2 button.cur,.pb.acf.acfx .rc #catpS .g2 button.on{background:#e3efee!important;border-color:#3c7678!important}
-.pb.acf.acfx .rc #catpS .g2 button.orok,.pb.acf.acfx .rc #catpS .orok{background:#3c7678!important;color:#fff!important;border-color:#3c7678!important;font-weight:700}
-.pb.acf.acfx .rc #catpS .orok:disabled{opacity:.45}
-.pb.acf.acfx .rc #catpS .g2 button::before{display:none!important}
-.pb.acf.acfx .rc #catpS .orw{background:#fff!important;color:#222!important;border:1.5px solid #3c7678!important;font-size:16px}
-.pb.acf.acfx .rc #catpS .orw::placeholder{color:#8a8578}
-.pb.acf.acfx .rc #catpS .orc,.pb.acf.acfx .rc #catpS .orsg{background:#f1eee5!important;color:#222!important}
-.pb.acf.acfx .rc #catpS .cnselb{border-color:#d8d3c4;background:#fff;color:#222}
-.pb.acf.acfx .rc #catpS .cnselb b{color:#222}.pb.acf.acfx .rc #catpS .cnselb small{color:#3c7678}
-.pb.acf.acfx .rc #catpS .cndd{background:#fff;border-color:#d8d3c4}
-.pb.acf.acfx .rc #catpS .cndd button{background:none!important;border:0!important;color:#222!important;min-height:0}
-.pb.acf.acfx .rc #catpS .cndd button.on,.pb.acf.acfx .rc #catpS .cndd button:hover{background:#e3efee!important}
-.pb.acf.acfx .rc #catpS .cndd button small{color:#7b7a70}
-.pb.acf.acfx .rc #catpS .cnwhy{color:#6b6a62}.pb.acf.acfx .rc #catpS .cnwhy button,.pb.acf.acfx .rc #catpS .cnmais{color:#3c7678;background:none!important;border:0!important;text-decoration:underline}
-.pb.acf.acfx .rc #catpS .cnt{background:#3c7678!important;color:#fff!important;border:0!important}
-.pb.acf.acfx .rc #catpS .cnlist.has .cnt:not(.on){background:#f1eee5!important;color:#444!important}
-.pb.acf.acfx .rc #catpS .cndesc{color:#4a4a42}.pb.acf.acfx .rc #catpS .cndesc b{color:#222}
-.pb.acf.acfx .rc #catpS .tihint,.pb.acf.acfx .rc #catpS .cnhint,.pb.acf.acfx .rc #catpS .cnvz{color:#6b6a62}
-.pb.acf.acfx .rc #catpS .cnbox input,.pb.acf.acfx .rc #catpS input[type=text]{background:#fff!important;color:#222!important;border:1.5px solid #d8d3c4!important;font-size:16px}
-
+/* abas: Critérios (níveis e comentários por critério) e Adicionais (observações adicionais para o aluno, sem rolar) */
+.pb.acf[data-acftab="cr"] #cmBox{display:none}
+.pb.acf[data-acftab="ad"] #fmb>*:not(#cmBox):not(#obs){display:none}
+.pb.acf[data-acftab="ad"] #cmBox{display:flex;flex:1 1 auto;min-height:0;position:static;box-shadow:none;margin-bottom:0;overflow:auto}
 .gh{padding:0}.ghbar{width:100%;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:none;border:0;padding:12px 18px;cursor:pointer;text-align:left;font-family:'DM Sans',sans-serif;color:inherit;border-radius:var(--r-lg)}
 .ghbar .ghk{margin:0}.ghbar .ghv{font-size:22px;line-height:1.1;margin:0}.ghbar .ghp{font-size:13px;color:#6a6a60}
 .ghbar .ghdet{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font:700 13px 'DM Sans',sans-serif;color:#3c7678}.ghbar .ghdet svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
@@ -1897,9 +1743,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="sbar" id="sbar"><span><b>Zoom</b> <span id="sbZ">60%</span></span><span><b>Linha</b> <span id="sbL">—</span></span><span class="sbh" id="sbH"></span></div>
     </div>
     <aside class="rc"><button type="button" class="pbtog" id="pbTog" aria-expanded="false"><span>Níveis e comentários</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg></button><button type="button" class="mmore" id="mMore" aria-label="Mais opções" aria-haspopup="true" aria-expanded="false">⋯</button><div class="mdr" id="mDr" data-s="closed"></div><div class="mbar" id="mBar"></div>
-    <div class="acft" id="acft" role="tablist" aria-label="Painel de correção"><button type="button" class="acftab on" role="tab" data-acf="ac" aria-selected="true">Ferramentas</button><button type="button" class="acftab" role="tab" data-acf="cr" aria-selected="false">Critérios</button><span class="acfsp"></span><button type="button" class="acfcol" id="acfCol" aria-label="Recolher o painel" title="Recolher o painel">›</button></div>
+    <div class="acft" id="acft" role="tablist" aria-label="Painel de correção"><button type="button" class="acftab on" role="tab" data-acf="cr" aria-selected="true">Critérios</button><button type="button" class="acftab" role="tab" data-acf="ad" aria-selected="false">Adicionais<span class="acfn" id="acfN"></span></button><span class="acfsp"></span><button type="button" class="acfcol" id="acfCol" aria-label="Recolher o painel" title="Recolher o painel">›</button></div>
     <div class="acfr" id="acfR"><button type="button" class="acfopen" id="acfOpen" aria-label="Abrir o painel" title="Abrir o painel">‹</button><div id="acfRc"></div></div>
-    <div class="acpane" id="acpane"><div class="acfoot" id="acFoot"></div></div>
     <form class="fm" id="fm">
       <div class="fmh"><div class="fmn"><h3 id="fNome"></h3><div class="sub" id="fSub"></div></div>
         <div class="tot"><div class="big" id="totV">—</div><div class="parc" id="totP"></div><div class="seg2" id="totSeg"></div></div></div>
@@ -2612,11 +2457,11 @@ window.__corr.syncGan=function(pacN,seed){var P=PACS.filter(function(x){return x
 window.xmIs=function(m){return (m.cat==='ac'||m.cat==='pt')&&!m.sinal&&m.inad!==false&&m.f!=='h'}; // acento/pontuação errados: o círculo vira um X compacto
 window.xmD=function(rx,ry){return Math.max(1.5,Math.min(rx,ry)*.5+.3)};
 window.xmSvg=function(cx,cy,rx,ry){var d=window.xmD(rx,ry),f=function(v){return Math.round(v*10)/10};return '<path class="xx" d="M'+f(cx-d)+','+f(cy-d)+'L'+f(cx+d)+','+f(cy+d)+'M'+f(cx+d)+','+f(cy-d)+'L'+f(cx-d)+','+f(cy+d)+'"/><ellipse class="xe" cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'"/>'};
-window.lnIs=function(m){return (m.cat==='mr'||m.cat==='pc')&&!m.sinal&&m.f!=='h'}; // linha curta e parágrafo curto: o círculo vira uma linha reta
+window.lnIs=function(m){return (m.cat==='mr'||m.cat==='pc')&&!m.sinal}; // linha curta e parágrafo curto: o círculo vira uma linha reta
 window.lnSvg=function(cx,cy,rx,ry){var f=function(v){return Math.round(v*10)/10};return '<path class="xx ln" d="M'+f(cx-rx)+','+f(cy)+'L'+f(cx+rx)+','+f(cy)+'"/><ellipse class="xe" cx="'+cx+'" cy="'+cy+'" rx="'+rx+'" ry="'+ry+'"/>'};
 window.MT=function(cx,cy,rx,ry){var h=ry>4?ry:ry*.88,f=function(v){return Math.round(v*10)/10};return '<rect class="mt" x="'+f(cx-rx)+'" y="'+f(cy-h)+'" width="'+f(2*rx)+'" height="'+f(2*h)+'" rx="1" ry="1"/>'};
 function marksSvg(marks,orig){var h='';(marks||[]).forEach(function(m){if(m.sinal)return;var nv=orig&&orig.indexOf(m.id)<0;
- if(m.t==='o')h+='<g class="xm'+(m.cat==='ca'?' cv ca':m.cat==='ce'?' cv':'')+(m.cat==='el'?' elg':'')+(m.cat==='or'&&m.cor?' cor':'')+(m.cat==='lac'?' lac':'')+(m.cat==='ele'?' ele':m.cat==='eli'?' eli':'')+(nv?' novo':'')+'">'+(m.f==='h'&&m.cat!=='ca'?MT(m.cx,m.cy,m.rx,m.ry):xmIs(m)?xmSvg(m.cx,m.cy,m.rx,m.ry):lnIs(m)?lnSvg(m.cx,m.cy,m.rx,m.ry):'<ellipse cx="'+m.cx+'" cy="'+m.cy+'" rx="'+m.rx+'" ry="'+m.ry+'"/>')+'<text class="cl" x="'+(xmIs(m)?m.cx+xmD(m.rx,m.ry):(m.cat==='or'&&m.cor)?m.cx:m.cx+4.4)+'" y="'+(xmIs(m)?m.cy-xmD(m.rx,m.ry)-.5:m.cy-3.4)+'">'+(m.cat?(m.cat==='rp'&&normP(m.pal)?rpLabel(m,marks):(m.cat==='or'&&m.cor)?esc2(m.cor):crN(m.cat)):'')+'</text>'+(m.cat==='ca'?'<text class="cg" x="'+m.cx+'" y="'+(m.cy+2.1)+'">C</text>':'')+'</g>';
+ if(m.t==='o')h+='<g class="xm'+(m.cat==='ca'?' cv ca':m.cat==='ce'?' cv':'')+(m.cat==='el'?' elg':'')+(m.cat==='or'&&m.cor?' cor':'')+(m.cat==='lac'?' lac':'')+(m.cat==='ele'?' ele':m.cat==='eli'?' eli':'')+(nv?' novo':'')+'">'+(lnIs(m)?lnSvg(m.cx,m.cy,m.rx,m.ry):m.f==='h'&&m.cat!=='ca'?MT(m.cx,m.cy,m.rx,m.ry):xmIs(m)?xmSvg(m.cx,m.cy,m.rx,m.ry):'<ellipse cx="'+m.cx+'" cy="'+m.cy+'" rx="'+m.rx+'" ry="'+m.ry+'"/>')+'<text class="cl" x="'+(xmIs(m)?m.cx+xmD(m.rx,m.ry):(m.cat==='or'&&m.cor)?m.cx:m.cx+4.4)+'" y="'+(xmIs(m)?m.cy-xmD(m.rx,m.ry)-.5:m.cy-3.4)+'">'+(m.cat?(m.cat==='rp'&&normP(m.pal)?rpLabel(m,marks):(m.cat==='or'&&m.cor)?esc2(m.cor):crN(m.cat)):'')+'</text>'+(m.cat==='ca'?'<text class="cg" x="'+m.cx+'" y="'+(m.cy+2.1)+'">C</text>':'')+'</g>';
  else if(m.t==='c')h+='<g class="pin'+(nv?' novo':'')+'"><circle cx="'+m.x+'" cy="'+m.y+'" r="3.7"/><text x="'+m.x+'" y="'+(m.y+1.25)+'">'+m.line+'</text></g>'});return h}
 function verCorrProf(d){var old=document.getElementById('pvw');if(old)old.remove();
  var C=COMPS,tot=function(a){return a.reduce(function(x,y){return x+y},0)/2},novos=d.orig?(d.marks||[]).filter(function(m){return !m.sinal&&d.orig.indexOf(m.id)<0}).length:0;
@@ -3033,7 +2878,7 @@ function drawMarks(tmp){
  srcM.forEach(function(m){
   if(m.t==='o'&&multi(m)){var rr2=rg(m),y0=lineY(rr2[0])-6.8+.8,hh=6.8*(rr2[1]-rr2[0]+1)-1.6;h+='<g class="rgb'+(ESTET[m.cat]?' est'+gcl(m.cat):'')+(m.cat==='cm'?' cmc':'')+'"><rect x="13.2" y="'+y0+'" width="1.3" height="'+hh+'"/><rect x="196" y="'+y0+'" width="1.3" height="'+hh+'"/></g>';}
   if(m.t==='o'&&m.sinal)h+='<g class="sg'+((catAtual&&catAtual.id===m.id)||selC===m?' sel':'')+'" data-id="'+m.id+'"><circle class="sgh" cx="'+m.cx+'" cy="'+m.cy+'" r="4"/><text x="'+m.cx+'" y="'+m.cy+'" font-size="'+(m.sym==='`'||m.sym==='´'||m.sym==='^'||m.sym==='~'?5.2:5.6)+'">'+String(m.sym).replace('&','&amp;')+'</text></g>';
-  else if(m.t==='o')h+='<g class="xm'+(ESTET[m.cat]?' est'+gcl(m.cat):'')+(m.cat==='rp'?' rp':(m.cat==='ce'||m.cat==='ca')?' cv':'')+(m.cat==='cm'?' cmc':'')+(m.cat==='el'?' elg':'')+(m.cat==='or'&&m.cor?' cor':'')+(m.cat==='lac'?' lac':'')+(m.cat==='ca'?' ca':'')+(m.cat==='ele'?' ele':m.cat==='eli'?' eli':'')+((catAtual&&catAtual.id===m.id)||selC===m?' sel':'')+'" data-id="'+m.id+'">'+(m.f==='h'&&m.cat!=='ca'?MT(m.cx,m.cy,m.rx,m.ry):xmIs(m)?xmSvg(m.cx,m.cy,m.rx,m.ry):lnIs(m)?lnSvg(m.cx,m.cy,m.rx,m.ry):'<ellipse cx="'+m.cx+'" cy="'+m.cy+'" rx="'+m.rx+'" ry="'+m.ry+'"/>')+''+((m.cat||m.par)?'<text class="cl" x="'+(xmIs(m)?m.cx+xmD(m.rx,m.ry):(m.cat==='or'&&m.cor)?m.cx:m.cx+m.rx*.55)+'" y="'+(xmIs(m)?m.cy-xmD(m.rx,m.ry)-.5:m.cy-m.ry-.5)+'">'+(m.cat?(m.cat==='rp'&&normP(m.pal)?rpLabel(m,srcM):(m.cat==='or'&&m.cor)?esc2(m.cor):crN(m.cat)):'')+(m.par?(m.cat?' ':'')+'¶'+m.par:'')+'</text>':'')+(m.cat==='ca'?'<text class="cg" x="'+m.cx+'" y="'+(m.cy+2.1)+'">C</text>':'')+'</g>';
+  else if(m.t==='o')h+='<g class="xm'+(ESTET[m.cat]?' est'+gcl(m.cat):'')+(m.cat==='rp'?' rp':(m.cat==='ce'||m.cat==='ca')?' cv':'')+(m.cat==='cm'?' cmc':'')+(m.cat==='el'?' elg':'')+(m.cat==='or'&&m.cor?' cor':'')+(m.cat==='lac'?' lac':'')+(m.cat==='ca'?' ca':'')+(m.cat==='ele'?' ele':m.cat==='eli'?' eli':'')+((catAtual&&catAtual.id===m.id)||selC===m?' sel':'')+'" data-id="'+m.id+'">'+(lnIs(m)?lnSvg(m.cx,m.cy,m.rx,m.ry):m.f==='h'&&m.cat!=='ca'?MT(m.cx,m.cy,m.rx,m.ry):xmIs(m)?xmSvg(m.cx,m.cy,m.rx,m.ry):'<ellipse cx="'+m.cx+'" cy="'+m.cy+'" rx="'+m.rx+'" ry="'+m.ry+'"/>')+''+((m.cat||m.par)?'<text class="cl" x="'+(xmIs(m)?m.cx+xmD(m.rx,m.ry):(m.cat==='or'&&m.cor)?m.cx:m.cx+m.rx*.55)+'" y="'+(xmIs(m)?m.cy-xmD(m.rx,m.ry)-.5:m.cy-m.ry-.5)+'">'+(m.cat?(m.cat==='rp'&&normP(m.pal)?rpLabel(m,srcM):(m.cat==='or'&&m.cor)?esc2(m.cor):crN(m.cat)):'')+(m.par?(m.cat?' ':'')+'¶'+m.par:'')+'</text>':'')+(m.cat==='ca'?'<text class="cg" x="'+m.cx+'" y="'+(m.cy+2.1)+'">C</text>':'')+'</g>';
   else if(!m.noPin)h+='<g class="pin" data-id="'+m.id+'"><circle cx="'+m.x+'" cy="'+m.y+'" r="3.7"/><text x="'+m.x+'" y="'+(m.y+1.25)+'">'+m.line+'</text></g>';
  });
  h+=rpSetas(srcM);
@@ -3097,7 +2942,7 @@ $('mk').addEventListener('click',function(e){
  var pn=e.target.closest('.pin');
  if(pn&&tool!=='x'){var m=coments().filter(function(c){return String(c.id)===pn.dataset.id})[0];if(m)abreLC(m.line,m.x,m.y,m.id);}
 });
-function fechaCat(){if(catAtual&&!(window.ACFX&&ACFX.ocioso())){catAtual._sub=null;catAtual._pal=null;catAtual=null;$('catp').classList.add('hide');$('catp').classList.remove('pal');drawMarks();}}
+function fechaCat(){if(catAtual){catAtual._sub=null;catAtual._pal=null;catAtual=null;$('catp').classList.add('hide');$('catp').classList.remove('pal');drawMarks();}}
 var catTab='tx';
 function abreCat(m,keep){
  if(!keep&&m.cat&&m.cat!=='cm')catTab=(ESTET[m.cat]&&!PROG[m.cat])?'es':'tx';
@@ -3129,10 +2974,7 @@ var cnRow=''; // Só marcar / Corrigir agora abrem no painel à direita
   '<div class="sidesrcs"><div class="sidesrc" data-for="par" data-t="Parágrafo"><div class="g2 parg">'+g4.join('')+'</div></div><div class="sidesrc" data-for="verbo" data-t="Verbo"><div class="g2 parg">'+gv+'</div></div><div class="sidesrc" data-for="ele" data-t="Elemento do gênero"><div class="g2 parg">'+g5.slice(0,2).join('')+'</div></div><div class="sidesrc" data-for="voc" data-t="Vocabulário"><div class="g2 parg"><button type="button" role="menuitem" data-cat="ol" title="Gíria, jeito de falar (tipo, né, a gente)" class="'+(m.cat==='ol'?'cur':'')+'"><span>Oralidade</span></button><button type="button" role="menuitem" data-cat="pr" title="Palavra correta, mas vaga ou genérica (ex.: coisa)" class="'+(m.cat==='pr'?'cur':'')+'"><span>Precisão</span></button></div></div><div class="sidesrc" data-for="out" data-t="Outros"><div class="g2 parg">'+gout+'</div></div><div class="sidesrc" data-for="cnx" data-t="Conectivo"></div><div class="sidesrc" data-for="tit" data-t="Título"></div><div class="sidesrc" data-for="ort" data-t="Ortografia"></div><div class="sidesrc" data-for="sin" data-t="Mais sinais"><div class="srow">'+SIN_RESTO.map(sinBtn).join('')+'</div></div></div>'+
   '<div class="g2 acts'+(m.cat==='rp'||m.cat==='pr'||ALUNOS[i].gancho?' so1':'')+'">'+(m.cat==='rp'||m.cat==='pr'||ALUNOS[i].gancho?'':'<button type="button" class="cmb" data-cat="cmt"><span>Comentar</span></button><button type="button" class="elb'+(m.cat==='el'?' cur':'')+'" data-cat="el" title="Elogio: marca com um ✓ um ponto forte da redação (não conta como desvio)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m8.2 12.4 2.6 2.6 5-5.4"/></svg><span>Elogio</span></button>')+'<button type="button" class="rm" data-cat="rm"><span>Remover</span></button></div><button type="button" class="fitb" data-cat="fit">Ajustar tamanho do círculo</button><div class="hint3">Arraste o círculo para mover e as alças para ajustar. Delete remove; Ctrl+Z desfaz.</div>';
  el.classList.remove('pal');el.classList.remove('pick');el.classList.toggle('rpc',rpCompact);el.classList.remove('hide');if(rpCompact&&normP(m.pal).length>1)rpSug(m);
- var s=$('mk'),p=s.createSVGPoint();p.x=m.cx;p.y=m.cy+m.ry+1.5;var q=p.matrixTransform(s.getScreenCTM());
- var w=el.offsetWidth,h=el.offsetHeight,left=Math.max(8,Math.min(innerWidth-w-8,q.x-w/2)),top=q.y+6;
- if(top+h>innerHeight-8){p.y=m.cy-m.ry-1.5;q=p.matrixTransform(s.getScreenCTM());top=Math.max(8,q.y-h-6);}
- el.style.left=left+'px';el.style.top=top+'px';
+ posCat(m);
 }
 var _sugTok=0;
 function selSin(m){var k=normP(m.pal),u=[];ALUNOS[i].marks.forEach(function(x){if(x.t==='o'&&x.cat===m.cat&&normP(x.pal)===k)(x.sin||[]).forEach(function(z){if(u.indexOf(z)<0)u.push(z)})});return u}
@@ -3148,9 +2990,15 @@ function pintaSug(m){var box=$('rpSug');if(!box)return;var gs=m._sugs||[],sel=se
 function toggleSin(m,x){var k=normP(m.pal),on=selSin(m).indexOf(x)>=0;reg({t:'mod',m:m,antes:{sin:(m.sin||[]).slice()}});
  if(on)ALUNOS[i].marks.forEach(function(y){if(y.t==='o'&&y.cat===m.cat&&normP(y.pal)===k)y.sin=(y.sin||[]).filter(function(z){return z!==x})});else m.sin=(m.sin||[]).concat([x]);
  pintaSug(m);aplicaAuto()}
-function posCat(m){var el=$('catp'),s=$('mk'),p=s.createSVGPoint();p.x=m.cx;p.y=m.cy+m.ry+1.5;var q=p.matrixTransform(s.getScreenCTM());
- var w=el.offsetWidth,h=el.offsetHeight,left=Math.max(8,Math.min(innerWidth-w-8,q.x-w/2)),top=q.y+6;
- if(top+h>innerHeight-8){p.y=m.cy-m.ry-1.5;q=p.matrixTransform(s.getScreenCTM());top=Math.max(8,q.y-h-6);}
+function posCat(m){var el=$('catp'),s=$('mk'),M=s.getScreenCTM();if(!M)return;
+ var P=function(x,y){var p=s.createSVGPoint();p.x=x;p.y=y;return p.matrixTransform(M)},
+  A=P(m.cx-m.rx,m.cy),B=P(m.cx+m.rx,m.cy),C=P(m.cx,m.cy),T=P(m.cx,m.cy-m.ry),D=P(m.cx,m.cy+m.ry),
+  w=el.offsetWidth,h=el.offsetHeight,g=18,left,top;
+ // o AC abre AO LADO da marca (à direita; à esquerda se faltar espaço), para o trecho marcado continuar à vista
+ if(B.x+g+w<=innerWidth-8){left=B.x+g;top=Math.max(8,Math.min(innerHeight-h-8,C.y-70))}
+ else if(A.x-g-w>=8){left=A.x-g-w;top=Math.max(8,Math.min(innerHeight-h-8,C.y-70))}
+ else{ // sem espaço dos lados: embaixo (ou em cima) da marca, como antes
+  left=Math.max(8,Math.min(innerWidth-w-8,C.x-w/2));top=D.y+6;if(top+h>innerHeight-8)top=Math.max(8,T.y-h-6)}
  el.style.left=left+'px';el.style.top=top+'px'}
 var maisPt=false;
 var SIN_PRIM=[['.','ponto final'],[',','vírgula'],[':','dois-pontos'],['´','acento agudo'],['`','acento grave'],['^','acento circunflexo'],['~','til'],['ç','cedilha']],SIN_RESTO=[[';','ponto e vírgula'],['?','interrogação'],['!','exclamação'],['"','aspas'],['…','reticências'],['(','abre parênteses'],[')','fecha parênteses'],['–','travessão'],['-','hífen'],["'",'apóstrofo']];
@@ -3195,7 +3043,7 @@ $('catp').addEventListener('click',function(e){
  var tb=e.target.closest('button[data-tab]');
  if(tb&&catAtual){catTab=tb.dataset.tab;abreCat(catAtual,true);return;}
  var pw=e.target.closest('button[data-pal]');
- if(pw&&catAtual){reg({t:'mod',m:catAtual,antes:{pal:catAtual.pal}});catAtual.pal=pw.dataset.pal;drawMarks();abreCat(catAtual);aplicaAuto();if(ACF.on){catAtual._pu=0;fechaCat()}return;}
+ if(pw&&catAtual){reg({t:'mod',m:catAtual,antes:{pal:catAtual.pal}});catAtual.pal=pw.dataset.pal;drawMarks();abreCat(catAtual);aplicaAuto();return;}
  var eb=e.target.closest('button[data-el]');if(eb&&catAtual){catAtual.el=+eb.dataset.el;catAtual._pick=false;lacComenta(catAtual);return}
  var b=e.target.closest('button[data-cat]');if(!b||!catAtual)return;
  var m=catAtual;
@@ -3351,7 +3199,7 @@ $('mk').addEventListener('pointerup',function(){
  if(d.mode==='new'){
   var ddx=Math.abs(d.e.x-d.s.x),ddy=Math.abs(d.e.y-d.s.y);
   if(ddx<4&&ddy<2){drawMarks();return;} // clique simples não cria círculo: é preciso arrastar sobre o trecho
-  var m=tool==='h'?hbox(d.s,d.e):elipse(d.s,d.e);m.id=mid++;m.t='o';m.cat=null;m.line=linhaDe(m.cy);aplicaFaixa(m);ALUNOS[i].marks.push(m);selC=m;reg({t:'add',m:m});drawMarks();abreCat(m);if(window.ACFX)ACFX.aplica(m);return;}
+  var m=tool==='h'?hbox(d.s,d.e):elipse(d.s,d.e);m.id=mid++;m.t='o';m.cat=null;m.line=linhaDe(m.cy);aplicaFaixa(m);ALUNOS[i].marks.push(m);selC=m;reg({t:'add',m:m});drawMarks();abreCat(m);return;}
  var m=d.m;
  if(!d.moved){if(m.sinal){abreSinal(m);return}m._nv=0;abreCat(m);return;} // clique simples sobre um círculo: seletor de tipo
  var op={t:'mod',m:m,antes:d.orig};
@@ -3378,7 +3226,6 @@ function criaCirculoAuto(p){
  var a=ALUNOS[i];if(tool!=='o'&&tool!=='h')setTool('o');
  var m={cx:cl(r1(p.x),9,201),cy:r1(p.y),rx:8,ry:2.9};if(tool==='h')m.f='h';m.cy=cl(m.cy,m.ry,297-m.ry);m.id=mid++;m.t='o';m.cat=null;m.line=linhaDe(m.cy);aplicaFaixa(m);m._nv=1;
  a.marks.push(m);selC=m;reg({t:'add',m:m});drawMarks();abreCat(m); // já abre os tipos; as alças continuam para ajustar o tamanho
- if(window.ACFX&&ACFX.aplica(m))return;
  if(!criaCirculoAuto.av){criaCirculoAuto.av=1;toast('Escolha o tipo. Para mudar o tamanho, arraste as alças do círculo.')}
 }
 $('mk').addEventListener('pointerdown',function(e){downInfo={t:Date.now(),x:e.clientX,y:e.clientY}},true);
@@ -3420,10 +3267,9 @@ document.addEventListener('keydown',function(e){
  if(!document.body.classList.contains('in-portal'))return;
  var tg=e.target.tagName;if(tg==='INPUT'||tg==='TEXTAREA'||tg==='SELECT')return;
  var k=e.key.toLowerCase();
- if(window.ACFX&&ACFX.tecla(e,k))return;
  if(catAtual&&catAtual._pick&&/^[1-5]$/.test(k)){var ek=+k-1;if(ek<elemPd().length){catAtual.el=ek;catAtual._pick=false;lacComenta(catAtual)}return}
  if(catAtual&&/^[0-9rmavuplei]$/.test(k)){var LK={p:'rp',r:'ra',m:'mr',a:'ma',u:'mi',l:'lac',e:'ele',i:'eli'},ix=/\d/.test(k)?VIS.findIndex(function(c){return c.k===DIGS[+k-1]}):VIS.findIndex(function(c){return c.k===LK[k]});if(VIS[ix]&&!catAtual.sinal){reg({t:'mod',m:catAtual,antes:{cat:catAtual.cat,inad:catAtual.inad}});catAtual.cat=VIS[ix].k;catAtual.inad=(catAtual.cat==='ac'||catAtual.cat==='pt');if(catAtual.cat==='ele'||catAtual.cat==='eli'){elPick(catAtual);return;}if(catAtual.cat==='lac'){lacComenta(catAtual);return;}catAtual=null;$('catp').classList.add('hide');drawMarks();return;}}
- if(e.key==='Escape'&&catAtual&&!(window.ACFX&&ACFX.ocioso())){fechaCat();return;}
+ if(e.key==='Escape'&&catAtual){fechaCat();return;}
  if((e.ctrlKey||e.metaKey)&&k==='z'){e.preventDefault();desfaz();return;}
  if(e.ctrlKey||e.metaKey||e.altKey)return;
  if((e.key==='Delete'||e.key==='Backspace')&&(tool==='o'||tool==='h')&&selAtiva()){e.preventDefault();var a2=ALUNOS[i],ix2=a2.marks.indexOf(selC);reg({t:'rem',m:selC,idx:ix2});a2.marks.splice(ix2,1);selC=null;fechaCat();drawMarks();toast('Círculo removido · Ctrl+Z desfaz');return;}
@@ -3926,80 +3772,38 @@ function setOrig(on){
 }
 $('origBtn').addEventListener('click',function(){setOrig(!verOrig)});
 window.__arena={FIN_PLANTAO:FIN_PLANTAO,FIN_NIVEL:FIN_NIVEL,RA_TXT:RA_TXT,SS_TXT:SS_TXT,MOT:MOT,f1:function(x){return x.toFixed(1).replace('.',',')},fraseReesc:fraseReesc,margemTxt:margemTxt,foto:foto,lineY:lineY,COMPS:COMPS,NIVEIS:NIVEIS,compoe:compoe,fmt:fmt};
-/* ===== AC fixo na lateral (computador) =====
-   O painel do AC fica sempre à direita (aba Ferramentas), ao lado da aba Critérios, e pode ser recolhido pela seta.
-   Sem marca selecionada o painel está "ocioso": escolher uma categoria deixa a ferramenta ativa e cada círculo desenhado já sai com o tipo.
-   Com uma marca selecionada ele funciona como o AC de sempre (trocar o tipo, opções, remover). Só em telas largas; no celular continua a gaveta.
-   Desligar: localStorage arena_acfixo = "0". */
-var ACF={on:false,layout:false,tool:null,tab:'ac',col:false,idle:{t:'o',_idle:true,cat:null,line:1,l1:1,l2:1,cx:0,cy:0,rx:1,ry:1,id:-1}};
+/* ===== Painel lateral do computador =====
+   Acima de 900 px o lado direito da tela do corretor tem duas abas, Critérios (níveis e comentários por critério; abre por padrão) e
+   Adicionais (observações adicionais para o aluno), e pode ser recolhido pela seta ›, deixando só a redação (faixa de 56 px com os chips I–V).
+   O AC é sempre o flutuante de sempre, junto da marca. Celular: gaveta, sem mudança. Desligar: localStorage arena_acfixo = "0". */
+var ACF={layout:false,tab:'cr',col:false};
 (function(){
- var pbEl=document.querySelector('.pb'),orig=null;
+ var pbEl=document.querySelector('.pb'),rc=document.querySelector('.rc');
  function can(){var ok=true;try{ok=localStorage.getItem('arena_acfixo')!=='0'}catch(e){}return ok&&innerWidth>900}
- function nomeTool(T){if(!T)return '';if(T.st)return T.st==='ort'?'Ortografia':'Título';if(T.sym)return 'Sinal “'+T.sym+'”';var c=catDe(T.cat);return c?(c.l||c.k):T.cat}
- function foot(){var f=$('acFoot');if(!f)return;f.className='acfoot';f.innerHTML='';return;if(ACF.tool){f.className='acfoot on';f.innerHTML='<span>Ativa: <b>'+esc2(nomeTool(ACF.tool))+'</b> · arraste na folha</span><button type="button" id="acfSolta" aria-label="Soltar a ferramenta" title="Soltar a ferramenta (Esc)">×</button>'}
-  else{f.className='acfoot';f.innerHTML='<span>Escolha e arraste na folha, ou arraste e escolha depois</span>'}}
- function achaBtn(T){var b=null;$('catp').querySelectorAll('button').forEach(function(x){if(b)return;var d=x.dataset;if(T.st?d.sidetog===T.st:T.sym?d.sym===T.sym:d.cat===T.cat)b=x});return b}
- function marcaUI(){var c=$('catp');c.querySelectorAll('.acton').forEach(function(x){x.classList.remove('acton')});var T=ACF.tool;
-  if(T&&catAtual===ACF.idle){var b=achaBtn(T);if(b){b.classList.add('acton');var src=b.closest('.sidesrc');if(src){var t=c.querySelector('[data-sidetog="'+src.dataset['for']+'"]');if(t)t.classList.add('acton')}}}
-  foot()}
- function idle(){if(!ACF.on||!document.body.classList.contains('in-portal'))return;ACF.idle.cat=null;abreCat(ACF.idle);var c=$('catp');c.classList.remove('hide');var b=c.querySelector('.lnst b');if(b)b.textContent='—';marcaUI()}
- function usaFerr(T){ACF.tool=(ACF.tool&&JSON.stringify(ACF.tool)===JSON.stringify(T))?null:T;if(ACF.tool&&tool!=='o'&&tool!=='h')setTool('o');marcaUI()}
- function tab(t){ACF.tab=t;if(pbEl)pbEl.setAttribute('data-acftab',t);document.querySelectorAll('.acftab').forEach(function(b){var on=b.dataset.acf===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});modo()}
- function colapsa(v){ACF.col=v;if(pbEl)pbEl.classList.toggle('acfc',v);var b=$('acfCol');if(b)b.setAttribute('aria-label',v?'Abrir o painel':'Recolher o painel');modo()}
+ function tab(t){ACF.tab=t;if(pbEl)pbEl.setAttribute('data-acftab',t);document.querySelectorAll('.acftab').forEach(function(b){var on=b.dataset.acf===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)})}
+ function colapsa(v){ACF.col=v;if(pbEl)pbEl.classList.toggle('acfc',v);var b=$('acfCol');if(b)b.setAttribute('aria-label',v?'Abrir o painel':'Recolher o painel')}
  function rail(){var r=$('acfRc');if(!r||!ACF.layout)return;var a=ALUNOS[i];if(!a||!a.niv)return;
   r.innerHTML=a.niv.map(function(v,k){return '<button type="button" class="acfchip" data-acfr="'+k+'" aria-label="Critério '+(COMPS[k]?COMPS[k].id:k+1)+', nível '+(v==null?'sem nível':v)+'">'+(COMPS[k]?COMPS[k].id:k+1)+'<small>'+(v==null?'—':v)+'</small></button>'}).join('')}
- // Dois modos: AC NA LATERAL (aba Ferramentas aberta: #catp/#catpS moram em #acpane) e AC FLUTUANTE (painel recolhido ou aba Critérios: o AC de sempre, junto da marca)
- function fixo(){return !!(ACF.layout&&ACF.tab==='ac'&&!ACF.col)}
- function modo(){var f=fixo();if(f===ACF.on)return;ACF.on=f;pbEl.classList.toggle('acfx',f);
-  if(f){if(!orig)orig={p:$('catp').parentNode};var pane=$('acpane'),fo=$('acFoot');pane.insertBefore($('catpS'),fo);pane.insertBefore($('catp'),fo);if(document.body.classList.contains('in-portal'))idle()}
-  else{ACF.tool=null;catAtual=null;var mb=$('mBar'),c=$('catp');if(orig){orig.p.insertBefore(c,mb);orig.p.insertBefore($('catpS'),mb)}c.classList.add('hide');c.classList.remove('idle','pal');$('catpS').classList.add('hide');drawMarks()}}
+ function conta(){var n=$('acfN'),l=$('cmL');if(!n||!l)return;var q=l.querySelectorAll('.cmempty').length?0:l.children.length;n.textContent=q?String(q):''}
  function sync(){var w=can();if(w===ACF.layout)return;ACF.layout=w;
-  if(w){if(!orig)orig={p:$('catp').parentNode};pbEl.classList.add('acf');try{pbEl.classList.toggle('claro',localStorage.getItem('arena_acf_tema')==='claro')}catch(e){}tab(ACF.tab);colapsa(false);rail();modo()}
-  else{pbEl.classList.remove('acf','acfc','acfx');pbEl.removeAttribute('data-acftab');ACF.on=true;ACF.tab='ac';ACF.col=false;modo()}}
- // categoria escolhida com o painel ocioso = ferramenta ativa (não age numa marca)
- $('catp').addEventListener('click',function(e){
-  if(!ACF.on||catAtual!==ACF.idle)return;var b=e.target.closest('button');if(!b)return;var d=b.dataset;
-  if(d.sidetog){if(d.sidetog==='ort'||d.sidetog==='tit'){e.stopPropagation();usaFerr({st:d.sidetog})}return}
-  if(d.cat){e.stopPropagation();if(!/^(rm|fit|voltar|mais|troca)$/.test(d.cat))usaFerr({cat:d.cat});return}
-  if(d.sym){e.stopPropagation();usaFerr({sym:d.sym});return}
-  if(d.par||d.ld||d.ln)e.stopPropagation()},true);
+  if(w){pbEl.classList.add('acf');tab(ACF.tab);colapsa(false);rail();conta()}
+  else{pbEl.classList.remove('acf','acfc');pbEl.removeAttribute('data-acftab')}}
  $('acft').addEventListener('click',function(e){var b=e.target.closest('[data-acf]');if(b){tab(b.dataset.acf);return}if(e.target.closest('#acfCol'))colapsa(true)});
  $('acfR').addEventListener('click',function(e){if(e.target.closest('#acfOpen')){colapsa(false);return}var c=e.target.closest('[data-acfr]');if(c){colapsa(false);tab('cr')}});
- $('acpane').addEventListener('click',function(e){if(e.target.closest('#acfSolta')){ACF.tool=null;marcaUI()}});
- // sempre que o AC "fecha" (aplicou, Esc, clicou fora) ele volta ao estado ocioso, que continua à vista
- new MutationObserver(function(){if(ACF.on&&$('catp').classList.contains('hide'))Promise.resolve().then(function(){if(ACF.on&&$('catp').classList.contains('hide'))idle()})}).observe($('catp'),{attributes:true,attributeFilter:['class']});
- var _a1=abreCat;abreCat=function(m,keep){var r=_a1(m,keep);$('catp').classList.toggle('idle',!!(m&&m._idle));return r};
- var _at=atualiza;atualiza=function(){var r=_at.apply(this,arguments);rail();return r};
- var _ab=abre;abre=function(){var r=_ab.apply(this,arguments);if(ACF.layout)rail();if(ACF.on)idle();return r};
  // os diálogos (Limpar correção, Falar com o professor, Anular, Guia, comentário…) abrem dentro da coluna do painel: com o painel recolhido (56 px) ficariam cortados.
  // Por isso, enquanto algum estiver aberto o painel se abre sozinho e, ao fechar o último, volta a recolher.
- (function(){var rc=document.querySelector('.rc'),volta=false;if(!rc)return;
+ (function(){var volta=false;if(!rc)return;
   function aberto(){return [].some.call(rc.querySelectorAll('.md'),function(d){return !d.classList.contains('hide')})}
   function ver(){if(!ACF.layout)return;if(aberto()){if(ACF.col){volta=true;colapsa(false)}}else if(volta){volta=false;colapsa(true)}}
   rc.querySelectorAll('.md').forEach(function(d){new MutationObserver(ver).observe(d,{attributes:true,attributeFilter:['class']})});
-  document.getElementById('acfCol').addEventListener('click',function(){volta=false},true);
+  $('acfCol').addEventListener('click',function(){volta=false},true);
  })();
- // as opções (Parágrafo, Verbo, Ortografia, Conectivo, Título…) abrem logo abaixo do critério a que pertencem, sobre o painel
- function posS(){var sd=$('catpS'),pane=$('acpane');if(!ACF.on||!sd||sd.classList.contains('hide'))return;
-  var k=sideCur,q=(k==='par'||k==='tit')?'.pg-e':k==='cnx'?'.pg-p':k==='ele'?'.pg-a':'.pg-d',sec=$('catp').querySelector(q);if(!sec)return;
-  var pr=pane.getBoundingClientRect(),sr=sec.getBoundingClientRect(),st=pane.scrollTop,H=pane.clientHeight;
-  sd.style.maxHeight=(H-8)+'px';var h=sd.offsetHeight,
-   top=Math.max(4,Math.min(sr.top-pr.top+22,H-h-4)); // abre sobre o próprio critério (logo abaixo do título) e sobe só o que for preciso para caber inteiro
-  sd.style.left='';sd.style.right='';sd.style.top=(top+st)+'px'}
- var _ss=sideSync;sideSync=function(){var r=_ss.apply(this,arguments);posS();return r};
- var _cp=cnPos;cnPos=function(){var r=_cp.apply(this,arguments);posS();return r};
- try{new ResizeObserver(function(){posS()}).observe($('catpS'))}catch(e){} // o conteúdo muda de altura (dicionário carregando, lista de funções aberta)
+ var _at=atualiza;atualiza=function(){var r=_at.apply(this,arguments);rail();conta();return r};
+ var _ab=abre;abre=function(){var r=_ab.apply(this,arguments);rail();conta();return r};
+ try{if($('cmL'))new MutationObserver(conta).observe($('cmL'),{childList:true})}catch(e){}
  addEventListener('resize',sync);
- window.ACFX={
-  aplica:function(m){var T=ACF.tool;if(!ACF.on||!T)return false;var b=achaBtn(T);if(!b)return false;b.click();return true},
-  ocioso:function(){return ACF.on&&catAtual===ACF.idle},
-  tecla:function(e,k){if(!ACF.on||catAtual!==ACF.idle)return false;
-   if(e.key==='Escape'){if(ACF.tool){ACF.tool=null;marcaUI();return true}return false}
-   if(e.ctrlKey||e.metaKey||e.altKey||!/^[1-9rmavuplei]$/.test(k))return false;
-   var LK={p:'rp',r:'ra',m:'mr',a:'ma',u:'mi',l:'lac',e:'ele',i:'eli'},ix=/\d/.test(k)?VIS.findIndex(function(c){return c.k===DIGS[+k-1]}):VIS.findIndex(function(c){return c.k===LK[k]});
-   if(!VIS[ix])return false;usaFerr({cat:VIS[ix].k});return true},
-  sync:sync,estado:function(){return ACF},dbg:function(){return {side:sideCur,cat:catAtual&&catAtual.cat,ocioso:catAtual===ACF.idle,por:!!(window.CN&&CN.por)}}};
- setTimeout(sync,0); // depois do bloco do celular, que também move #catp para dentro do .rc
+ window.ACFX={sync:sync,estado:function(){return ACF}};
+ setTimeout(sync,0);
 })();
 montaComps();
 /* ===== Celular: correção por critérios (I a V) ===== */

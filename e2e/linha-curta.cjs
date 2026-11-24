@@ -32,4 +32,12 @@ ok(await p.evaluate(()=>document.getElementById('lc').classList.contains('hide')
 // dois cliques no número da linha: abre o comentário (de propósito)
 await p.mouse.dblclick(nh[0],nh[1]);await p.waitForTimeout(500);
 ok(await p.evaluate(()=>!document.getElementById('lc').classList.contains('hide')),'dois cliques no número da linha abrem o comentário');
+// marca-texto: Linha curta também vira um traço (como no círculo)
+await p.keyboard.press('Escape');await p.waitForTimeout(300);
+if(await p.evaluate(()=>!document.getElementById('lc').classList.contains('hide')))await p.keyboard.press('Escape');
+await p.click('[data-tool="h"]');await arrasta(150,175);
+await p.locator('#catp button[data-cat="mr"]').click();await p.waitForTimeout(400);
+ok(await n('#mk .xm path.xx.ln')===3,'Linha curta no marca-texto: vira um traço, como no círculo');
+const sobraH=await p.evaluate(()=>document.querySelectorAll('#mk .xm.est .mt, #mk .xm.est rect.mt').length);
+ok(sobraH===0,'não sobrou o realce do marca-texto nessa marca');
 await b.close();console.log(falhas?'\n'+falhas+' falha(s)':'\nTudo certo');process.exit(falhas?1:0)})()
