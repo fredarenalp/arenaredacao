@@ -281,6 +281,7 @@ const ARENA = {
     const { data: al, error: e0 } = await supabase.from('alunos').select('id, nome, matricula, turmas(serie, nome)').eq('perfil_id', uid).maybeSingle()
     if (e0 || !al) throw e0 || new Error('Cadastro de aluno não vinculado')
     ARENA.aluno = al
+    if (al.matricula === '20260187') await supabase.rpc('reiniciar_demo_aluno_teste') // conta de teste: a correção da Proposta 3 volta a aparecer como nova a cada login
     const { data: props } = await supabase.from('propostas').select('*').order('bimestre').order('id')
     const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao,vista_em), marcacoes(dados)').eq('aluno_id', al.id)
     const { data: avs } = await supabase.from('avaliacoes_correcao').select('redacao_id, estrelas').eq('aluno_id', al.id)

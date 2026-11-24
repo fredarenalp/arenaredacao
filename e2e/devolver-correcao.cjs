@@ -30,6 +30,7 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   await k.click('.p[data-k=corretor]'); await k.fill('#email', 'teste'); await k.fill('#pwd', 'teste'); await k.click('#entrar')
   await k.waitForSelector('#phCards', { timeout: 20000 }); await k.waitForTimeout(1200)
   const cards = await k.locator('.pcd').count()
+  ok(await k.locator('.pcd .pkcN').count() > 0 && /Devolvido pela coordenação/.test(await k.locator('.pcd .pkcN').first().innerText()), 'o card do pacote, na tela inicial do corretor, mostra "Devolvido pela coordenação" com o recado')
   let achou = false
   for (let i = 0; i < cards && !achou; i++) {
     await k.locator('.pcd').nth(i).click(); await k.waitForTimeout(700)

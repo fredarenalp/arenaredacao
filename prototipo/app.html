@@ -1653,6 +1653,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dvm textarea{width:100%;min-height:96px;font:inherit;font-size:14px;border:1.5px solid #d8d3c4;border-radius:10px;padding:9px 11px;margin-top:8px;resize:vertical}
 .pcvf{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .pcvdev{font-size:11.5px;color:#8a2a1c;margin-top:2px}
+.pst.dev{background:#fbeceb;color:#8a2a1c}
+.pcd .pkcN{display:flex;flex-direction:column;gap:1px;background:#fbeceb;border:1px solid #f0cbc7;border-radius:10px;padding:7px 10px;font-size:12.5px;color:#8a2a1c;line-height:1.35}.pcd .pkcN b{font-size:12.5px}.pcd .pkcN span{color:#5a3a34;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pcd{position:relative}
 .pcd .pkcD{white-space:nowrap}
 /* pacote atrasado: mesma marcação do card de redação atrasada do aluno (borda âmbar, selo "!" e botão laranja) */
@@ -2559,13 +2561,15 @@ function homePacotes(){document.body.classList.remove('pk-list');renderGanho();r
  var fin=window.__fin&&window.__fin('marina','2026-11'),r1=fin?fin.r1:6.33;
  var html=PACS.map(function(P,k){
   var n=P.alunos.length,f=P.alunos.filter(feito).length,conc=pacConc(P);if((phTab==='co')!==conc)return '';
-  var st=conc?['ok','Corrigido']:f===0?['novo','Novo']:['em','Em correção'];
+  var nd=P.alunos.filter(function(a){return a.devolvida}).length,rec=nd?(P.alunos.filter(function(a){return a.devolvida})[0].devolvida.motivo||''):'';
+  var st=nd?['dev','Devolvido']:conc?['ok','Corrigido']:f===0?['novo','Novo']:['em','Em correção'];
   var dias=conc||P.atr?'':diasPrazo(P.prazo),late=!!dias&&/pkcV/.test(dias);
   var meta=P.atr?'<span>Sempre aberto</span>':conc?'<span>Devolvido em <b>'+(P.devolvido||P.prazo)+'</b></span><span>Rendeu <b>'+rsB(n*r1)+'</b></span>':'<span>Entregue em <b>'+P.entrega+'</b></span><span class="pkcD">Devolver até <b>'+P.prazo+'</b>'+(dias?' · '+dias:'')+'</span>';
   var tp=P.atr?['atr','Atrasadas']:/reescrit|2ª vers/i.test(P.prop)?['re','Reescrita']:/prova/i.test(P.prop+' '+P.serie)?['pv','Prova']:['v1','1ª versão'];
   var pend=P.alunos.filter(function(a){return a.fila==='pend'}).length;
   return '<button type="button" class="pcd t-'+tp[0]+(conc?' conc':'')+(late?' late':'')+'" data-p="'+k+'">'+(late?'<span class="pin2" title="Pacote atrasado" aria-label="Pacote atrasado">!</span>':'')+'<div class="pkcA"><span class="tipo">'+tp[1]+'</span><span class="tt2">'+(P.atr?'Pacote de atrasadas':'Pacote '+P.n)+'</span><span class="turma">'+P.serie+'</span><span class="pst '+st[0]+'">'+st[1]+'</span></div>'+
    '<div class="pr">'+P.prop+'</div>'+
+   (nd?'<div class="pkcN"><b>Devolvido pela coordenação'+(nd>1?' ('+nd+' redações)':'')+'</b>'+(rec?'<span>'+esc2(rec)+'</span>':'')+'</div>':'')+
    '<div class="pkcC"><div class="pkcL"><div class="meta2">'+meta+'<span><b>'+n+'</b> '+(n===1?'redação':'redações')+'</span></div>'+
    '<div class="pb2"><span>'+f+' de '+n+(pend?' · '+pend+' com o professor':'')+'</span><div class="bar"><i style="width:'+(n?f/n*100:0)+'%"></i></div></div></div>'+
    '<span class="go">'+(conc?'Rever pacote':f?'Continuar correção':'Começar correção')+'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></span></div></button>';
