@@ -1556,6 +1556,32 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  body:has(.pb.big) #mBackdrop{display:none!important}
  .pb.big .rc{top:calc(-1 * var(--kb,0px))}
 }
+
+/* celular, gaveta de corrigir: mesma paleta branca da gaveta dos critérios (o painel do AC continua escuro no desktop) */
+@media(max-width:640px){
+ .pb.big .rc #catpS.catps{background:#fff!important;color:#222;padding:10px 12px 12px}
+ .pb.big .rc #catpS .gl,.pb.big .rc #catpS .gl2,.pb.big .rc #catpS .qh{color:#6b6a62!important}
+ .pb.big .rc #catpS .g2 button,.pb.big .rc #catpS .g2.parg button{background:#f7f5ee!important;color:#222!important;border:1.5px solid #e2ded2!important;border-radius:12px;min-height:46px;font:500 14px 'DM Sans',sans-serif}
+ .pb.big .rc #catpS .g2 button.cur,.pb.big .rc #catpS .g2 button.on{background:#e3efee!important;border-color:#3c7678!important}
+ .pb.big .rc #catpS .g2 button.orok,.pb.big .rc #catpS .orok{background:#3c7678!important;color:#fff!important;border-color:#3c7678!important;font-weight:700}
+ .pb.big .rc #catpS .orok:disabled{opacity:.45}
+ .pb.big .rc #catpS .g2 button::before{display:none!important}
+ .pb.big .rc #catpS .orw{background:#fff!important;color:#222!important;border:1.5px solid #3c7678!important;font-size:16px}
+ .pb.big .rc #catpS .orw::placeholder{color:#8a8578}
+ .pb.big .rc #catpS .orc,.pb.big .rc #catpS .orsg{background:#f1eee5!important;color:#222!important}
+ .pb.big .rc #catpS .cnselb{border-color:#d8d3c4;background:#fff;color:#222}
+ .pb.big .rc #catpS .cnselb b{color:#222}.pb.big .rc #catpS .cnselb small{color:#3c7678}
+ .pb.big .rc #catpS .cndd{background:#fff;border-color:#d8d3c4}
+ .pb.big .rc #catpS .cndd button{background:none!important;border:0!important;color:#222!important;min-height:0}
+ .pb.big .rc #catpS .cndd button.on,.pb.big .rc #catpS .cndd button:hover{background:#e3efee!important}
+ .pb.big .rc #catpS .cndd button small{color:#7b7a70}
+ .pb.big .rc #catpS .cnwhy{color:#6b6a62}.pb.big .rc #catpS .cnwhy button,.pb.big .rc #catpS .cnmais{color:#3c7678;background:none!important;border:0!important;text-decoration:underline}
+ .pb.big .rc #catpS .cnt{background:#3c7678!important;color:#fff!important;border:0!important}
+ .pb.big .rc #catpS .cnlist.has .cnt:not(.on){background:#f1eee5!important;color:#444!important}
+ .pb.big .rc #catpS .cndesc{color:#4a4a42}.pb.big .rc #catpS .cndesc b{color:#222}
+ .pb.big .rc #catpS .tihint,.pb.big .rc #catpS .cnhint,.pb.big .rc #catpS .cnvz{color:#6b6a62}
+ .pb.big .rc #catpS .cnbox input,.pb.big .rc #catpS input[type=text]{background:#fff!important;color:#222!important;border:1.5px solid #d8d3c4!important;font-size:16px}
+}
 </style>
 <!--PONTE--></head>
 <body>
