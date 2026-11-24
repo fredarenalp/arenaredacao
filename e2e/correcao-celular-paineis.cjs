@@ -13,6 +13,8 @@ const cria=async(k,id)=>{for(let r=0;r<2&&!(await p.locator('#mDr [data-md="'+id
 await entra();await cria(2,'ce');
 let s1=await dentro('#catpS');ok(s1&&s1.visivel&&s1.dentro,'conectivo: a folha "Só marcar / Corrigir" aparece dentro da tela '+JSON.stringify(s1&&s1.rect));
 ok((await dentro('#catp')).visivel===false,'o AC inteiro fica escondido atrás da folha');
+ok(await p.evaluate(()=>getComputedStyle(document.getElementById('catpS')).position)==='static'&&await p.evaluate(()=>getComputedStyle(document.getElementById('mBackdrop')).display)==='none','o painel é uma gaveta no fluxo (sem flutuar e sem fundo escurecido)');
+ok(await p.evaluate(()=>{const a=document.getElementById('catpS').getBoundingClientRect(),b=document.getElementById('mBar').getBoundingClientRect();return a.bottom<=b.top+1}),'a gaveta fica logo acima da barra I a V');
 await p.click('[data-cnstart]');await p.waitForTimeout(1500);
 s1=await dentro('#catpS');ok(s1&&s1.visivel&&s1.dentro,'conectivo: depois de Corrigir, a folha com a função e os conectivos cabe na tela '+JSON.stringify(s1&&s1.rect));
 ok((await p.locator('#catpS .cnselb').innerText()).includes('Escolher função'),'conectivo: o campo começa em "Escolher função", sem função pré-selecionada');

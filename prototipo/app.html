@@ -1549,6 +1549,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  body:has(#catpS.catps:not(.hide)) #mBackdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:89}
 }
 .cnvz{color:#c9d6d6;font-weight:600}.cnhint{margin:6px 0 2px;font:500 12.5px 'DM Sans',sans-serif;color:#9aa8a8}
+
+/* celular, folha ampliada: o painel de corrigir (palavra, conectivo, título) sobe como a gaveta, no fluxo da barra de baixo, sem flutuar nem escurecer a tela */
+@media(max-width:640px){
+ .pb.big .rc #catpS.catps:not(.hide){position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto!important;max-height:min(50vh,calc(100dvh - 230px))!important;overflow-y:auto;margin:0;border-radius:0;box-shadow:none;border-top:1px solid #d8d3c4;flex-shrink:0;z-index:auto}
+ body:has(.pb.big) #mBackdrop{display:none!important}
+ .pb.big .rc{top:calc(-1 * var(--kb,0px))}
+}
 </style>
 <!--PONTE--></head>
 <body>
@@ -3750,6 +3757,7 @@ function mobPronto(outro){
 function mobNivel(k,n){var l=document.querySelectorAll('#comps .lv')[k],b=l&&l.querySelector('button[data-n="'+n+'"]');if(b)b.click()}
 function mobMenu(abre){var m=$('mMenu'),t=$('mMore'),rc=document.querySelector('.rc');m.hidden=!abre;t.setAttribute('aria-expanded',String(abre));if(abre){var r=rc.getBoundingClientRect();m.style.bottom=(innerHeight-r.top+6)+'px';var ia=m.querySelector('[data-mm="ia"]');if(ia)ia.style.display=(ALUNOS[i]&&ALUNOS[i].gancho)?'none':''}}
 // eventos
+(function(){var sd=$('catpS'),bar=$('mBar');if(sd&&bar&&bar.parentNode)bar.parentNode.insertBefore(sd,bar)})(); // o painel de corrigir fica na coluna da barra de baixo; no desktop segue fixo (position:fixed)
 $('mBar').addEventListener('click',function(e){
  if(e.target.closest('#mSalvar')){$('salvar').click();return}
  var c=e.target.closest('.mchip');if(!c)return;var k=+c.dataset.mc;
