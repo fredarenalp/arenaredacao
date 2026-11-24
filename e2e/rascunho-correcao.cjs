@@ -6,8 +6,8 @@ const ctx=await b.newContext({viewport:{width:1366,height:900},ignoreHTTPSErrors
 const abre=async()=>{const p=await ctx.newPage();p.on('pageerror',e=>{console.log('ERRO JS',e.message.slice(0,150));falhas++});p.on('dialog',d=>d.accept());
  await p.goto('http://localhost:4173');await p.waitForTimeout(500);await p.click('.p[data-k=corretor]');await p.fill('#email','teste');await p.fill('#pwd','teste');await p.click('#entrar');
  await p.waitForSelector('#phCards',{timeout:20000});await p.waitForTimeout(800);
- const cards=await p.locator('.pcd').allInnerTexts();const idx=cards.findIndex(t=>/1ª versão ·/.test(t));await p.locator('.pcd').nth(Math.max(idx,0)).click();await p.waitForTimeout(600);
- await p.locator('#plGo').click();await p.waitForTimeout(2000);return p};
+ if(!(await p.locator('.pcd').count())){await p.click('#phTabs [data-pt="co"]').catch(()=>{});await p.waitForTimeout(400)};const cards=await p.locator('.pcd').allInnerTexts();const idx=cards.findIndex(t=>/1ª versão ·/.test(t));await p.locator('.pcd').nth(Math.max(idx,0)).click();await p.waitForTimeout(600);
+ await (async()=>{if(await p.locator('#plGo').isEnabled().catch(()=>false))await p.locator('#plGo').click();else await p.locator('.plr').first().click()})();await p.waitForTimeout(2000);return p};
 // 1ª janela: marca e escolhe níveis, sem salvar
 let p=await abre();
 await p.evaluate(()=>{Object.keys(localStorage).filter(k=>k.startsWith('arena_rasc_')).forEach(k=>localStorage.removeItem(k))});

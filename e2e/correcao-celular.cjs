@@ -10,7 +10,7 @@ p.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource|favicon/.tes
 p.on('dialog',d=>d.dismiss().catch(()=>{}));
 await p.goto('http://localhost:4173');await p.waitForTimeout(500);await p.click('.p[data-k=corretor]');await p.fill('#email','teste');await p.fill('#pwd','teste');await p.click('#entrar');
 await p.waitForSelector('#phCards',{timeout:20000});await p.waitForTimeout(1200);
-await p.locator('.pcd').first().click();await p.waitForTimeout(800);await p.locator('#plGo').click();await p.waitForTimeout(2000);
+if(!(await p.locator('.pcd').count())){await p.click('#phTabs [data-pt="co"]').catch(()=>{});await p.waitForTimeout(400)};await p.locator('.pcd').first().click();await p.waitForTimeout(800);await (async()=>{if(await p.locator('#plGo').isEnabled().catch(()=>false))await p.locator('#plGo').click();else await p.locator('.plr').first().click()})();await p.waitForTimeout(2000);
 const n=(s)=>p.locator(s).count();
 const marcas=()=>p.evaluate(()=>document.querySelectorAll('#mk g.xm:not(.pv)').length);
 const vis=(s)=>p.locator(s).isVisible().catch(()=>false);

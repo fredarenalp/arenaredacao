@@ -8,7 +8,7 @@ p.on('pageerror',e=>{console.log('ERRO JS',e.message.slice(0,150));falhas++});
 const entra=async()=>{await p.goto('http://localhost:4173');await p.waitForTimeout(500);await p.click('.p[data-k=corretor]');await p.fill('#email','teste');await p.fill('#pwd','teste');await p.click('#entrar');
  await p.waitForSelector('#phCards',{timeout:20000});await p.waitForTimeout(1000);
  await p.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('arena_rasc_')).forEach(k=>localStorage.removeItem(k))); // sem rascunho de passos anteriores
- await p.locator('.pcd').first().click();await p.waitForTimeout(700);await p.locator('#plGo').click();await p.waitForTimeout(1800)};
+ if(!(await p.locator('.pcd').count())){await p.click('#phTabs [data-pt="co"]').catch(()=>{});await p.waitForTimeout(400)};await p.locator('.pcd').first().click();await p.waitForTimeout(700);await (async()=>{if(await p.locator('#plGo').isEnabled().catch(()=>false))await p.locator('#plGo').click();else await p.locator('.plr').first().click()})();await p.waitForTimeout(1800)};
 const abre=async(k,id)=>{for(let r=0;r<2&&!(await p.locator('#mDr [data-md="'+id+'"]').count());r++){await p.locator('.mchip').nth(k).click({force:true});await p.waitForTimeout(300)}await p.locator('#mDr [data-md="'+id+'"]').click();await p.waitForTimeout(900)};
 const marcas=()=>p.evaluate(()=>document.querySelectorAll('#mk g.xm:not(.pv)').length);
 const aberto=()=>p.evaluate(()=>['catp','catpS','lc'].some(i=>!document.getElementById(i).classList.contains('hide')));

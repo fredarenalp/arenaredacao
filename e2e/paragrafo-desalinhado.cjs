@@ -6,8 +6,8 @@ const p=await (await b.newContext({viewport:{width:1366,height:900},ignoreHTTPSE
 p.on('pageerror',e=>{console.log('ERRO JS',e.message.slice(0,150));falhas++});
 await p.goto('http://localhost:4173');await p.waitForTimeout(500);await p.click('.p[data-k=corretor]');await p.fill('#email','teste');await p.fill('#pwd','teste');await p.click('#entrar');
 await p.waitForSelector('#phCards',{timeout:20000});await p.waitForTimeout(800);
-const cards=await p.locator('.pcd').allInnerTexts();const idx=cards.findIndex(t=>/1ª versão ·/.test(t));await p.locator('.pcd').nth(Math.max(idx,0)).click();await p.waitForTimeout(600);
-await p.locator('#plGo').click();await p.waitForTimeout(2000);
+if(!(await p.locator('.pcd').count())){await p.click('#phTabs [data-pt="co"]').catch(()=>{});await p.waitForTimeout(400)};const cards=await p.locator('.pcd').allInnerTexts();const idx=cards.findIndex(t=>/1ª versão ·/.test(t));await p.locator('.pcd').nth(Math.max(idx,0)).click();await p.waitForTimeout(600);
+await (async()=>{if(await p.locator('#plGo').isEnabled().catch(()=>false))await p.locator('#plGo').click();else await p.locator('.plr').first().click()})();await p.waitForTimeout(2000);
 await p.click('[data-tool="o"]');await p.waitForTimeout(200);
 const svg=await p.evaluate(()=>{const r=document.querySelector('#mk').getBoundingClientRect();return [r.x,r.y,r.width,r.height]});
 const px=(u,v)=>[svg[0]+svg[2]*u/210,svg[1]+svg[3]*v/297];
