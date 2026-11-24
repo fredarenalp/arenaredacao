@@ -352,14 +352,14 @@ const ARENA = {
             if (p.sem_reescrita) return { ...base, g, t: rot, s: 'Esta proposta não tem reescrita', st: 'bl', l: 'Sem reescrita', kind: 'norew' }
             const c1 = lib(orig)
             if (!c1) return { ...base, g, t: rot, s: `Libera depois da correção da Proposta ${num}`, st: 'bl', l: 'Ainda não liberada', kind: 'block' }
-            return { ...base, g, t: rot, s: 'Aberta para envio', st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação' }
+            return { ...base, g, t: rot, s: 'Aberta para envio', st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação', dl: p.prazo2 || null }
           }
           const ind = (prazosInd ?? []).find((x) => x.proposta_id === p.id && x.ate >= hoje)
-          if (ind) return { ...base, g, t: rot, s: `Envio liberado até ${ind.ate.slice(8, 10)}/${ind.ate.slice(5, 7)}${ind.vale_nota ? '' : ' · não vale nota'}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação' }
+          if (ind) return { ...base, g, t: rot, s: `Envio liberado até ${ind.ate.slice(8, 10)}/${ind.ate.slice(5, 7)}${ind.vale_nota ? '' : ' · não vale nota'}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação', dl: ind.ate }
           const atrasada = p.prazo && p.prazo < hoje
           return atrasada
-            ? { ...base, g, t: rot, s: `Prazo encerrado em ${prazo}`, st: 'at', l: 'Atrasada · ainda dá para enviar', kind: 'late', cta: 'Enviar com atraso' }
-            : { ...base, g, t: rot, s: `Tema: ${p.titulo}${prazo ? ' · prazo ' + prazo : ''}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação' }
+            ? { ...base, g, t: rot, s: `Prazo encerrado em ${prazo}`, st: 'at', l: 'Atrasada · ainda dá para enviar', kind: 'late', cta: 'Enviar com atraso', dl: p.prazo }
+            : { ...base, g, t: rot, s: `Tema: ${p.titulo}${prazo ? ' · prazo ' + prazo : ''}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação', dl: p.prazo || null }
         }
         const c = lib(r)
         if (!c) {
