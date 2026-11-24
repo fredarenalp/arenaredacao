@@ -22,11 +22,11 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   const m = await p.evaluate(() => { const a = document.getElementById('acpane'); return { c: a.clientHeight, s: a.scrollHeight } })
   ok(m.s <= m.c + 1, `o AC cabe sem rolar em 1366×768 (conteúdo ${m.s} px, painel ${m.c} px)`)
   ok(await p.evaluate(() => document.querySelector('#catp .pg-d .sinbar') !== null), 'sinais que faltam dentro do critério II')
-  ok(await p.locator('#acFoot').innerText().then((t) => /arraste/.test(t)), 'rodapé orienta quando não há ferramenta')
+  ok(await p.locator('#acFoot').innerText().then((t) => t.trim() === ''), 'sem a frase de orientação no rodapé')
 
   // ferramenta ativa: escolhe Rasura e arrasta duas vezes
   await p.click('#catp button[data-cat="ra"]')
-  ok(/Rasura/.test(await p.innerText('#acFoot')), 'escolher Rasura deixa a ferramenta ativa (rodapé mostra "Ativa: Rasura")')
+  ok(await p.evaluate(() => document.querySelector('#catp button[data-cat="ra"]').classList.contains('acton')), 'escolher Rasura deixa a ferramenta ativa (botão destacado)')
   const n0 = await marcas()
   await arrasta(.2, .3, .45, .3)
   ok(await marcas() === n0 + 1, 'arrastar na folha cria a marca já com o tipo (sem balão)')
@@ -34,7 +34,7 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   await arrasta(.2, .4, .45, .4)
   ok(await marcas() === n0 + 2, 'a ferramenta continua ativa para o próximo erro')
   await p.keyboard.press('Escape')
-  ok(/Escolha e arraste/.test(await p.innerText('#acFoot')), 'Esc solta a ferramenta')
+  ok(await p.evaluate(() => !document.querySelector('#catp .acton')), 'Esc solta a ferramenta')
 
   // arrasta sem ferramenta: marca sem tipo selecionada; classifica depois
   await arrasta(.2, .5, .45, .5)
@@ -45,7 +45,7 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
 
   // Ortografia como ferramenta: abre as opções no painel
   await p.click('#catp [data-sidetog="ort"]')
-  ok(/Ortografia/.test(await p.innerText('#acFoot')), 'Ortografia pode ser a ferramenta ativa')
+  ok(await p.evaluate(() => document.querySelector('#catp [data-sidetog="ort"]').classList.contains('acton')), 'Ortografia pode ser a ferramenta ativa')
   await arrasta(.2, .6, .4, .6)
   ok(await p.locator('#catpS #orW').count() === 1 && await p.evaluate(() => document.getElementById('acpane').contains(document.getElementById('catpS'))), 'as opções de Ortografia abrem dentro do painel')
   await p.fill('#orW', 'exceção'); await p.click('#catpS [data-ortok="1"]'); await p.waitForTimeout(300)
@@ -53,18 +53,44 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   await p.keyboard.press('Escape')
 
   // as opções abrem logo abaixo do próprio critério (não no topo do painel)
-  const abaixo = async (sec) => p.evaluate((q) => { const s = document.getElementById('catpS').getBoundingClientRect(), c = document.querySelector('#catp ' + q).getBoundingClientRect(); return { ok: !document.getElementById('catpS').classList.contains('hide') && (Math.abs(s.top - (c.bottom + 3)) < 8 || Math.abs(s.bottom - (c.top - 3)) < 8), s: [Math.round(s.top), Math.round(s.bottom)], c: [Math.round(c.top), Math.round(c.bottom)] } }, sec)
+  const abaixo = async (sec) => p.evaluate((q) => { const sd = document.getElementById('catpS'), s = sd.getBoundingClientRect(), c = document.querySelector('#catp ' + q).getBoundingClientRect(), a = document.getElementById('acpane').getBoundingClientRect(); return { ok: !sd.classList.contains('hide') && s.top <= c.bottom && s.bottom >= c.top && s.top >= a.top - 1 && s.bottom <= a.bottom + 1, s: [Math.round(s.top), Math.round(s.bottom)], c: [Math.round(c.top), Math.round(c.bottom)] } }, sec)
   await arrasta(.2, .55, .4, .55); await p.click('#catp [data-sidetog="par"]'); await p.waitForTimeout(300)
-  const pp = await abaixo('.pg-e'); ok(pp.ok, 'Parágrafo abre logo abaixo da Estética ' + JSON.stringify(pp))
+  const pp = await abaixo('.pg-e'); ok(pp.ok, 'Parágrafo abre sobre a própria Estética, dentro do painel ' + JSON.stringify(pp))
   await p.keyboard.press('Escape'); await p.waitForTimeout(200)
   await arrasta(.2, .62, .4, .62); await p.click('#catp button[data-cat="ca"]'); await p.waitForTimeout(500)
-  const pc = await abaixo('.pg-p'); ok(pc.ok, 'Conectivo ausente abre junto da Progressão ' + JSON.stringify(pc))
+  const pc = await abaixo('.pg-p'); ok(pc.ok, 'Conectivo ausente abre sobre a própria Progressão, dentro do painel ' + JSON.stringify(pc))
+  // o balão do conectivo não pula nem estoura o painel quando o conteúdo cresce (Corrigir → Escolher função → lista)
+  const estavel = async () => p.evaluate(() => { const s = document.getElementById('catpS').getBoundingClientRect(), a = document.getElementById('acpane'), r = a.getBoundingClientRect(); return { dentro: s.top >= r.top - 1 && s.bottom <= r.bottom + 1, semRolar: a.scrollHeight <= a.clientHeight + 1, top: Math.round(s.top), bottom: Math.round(s.bottom) } })
+  await p.click('#catpS [data-cnstart]'); await p.waitForTimeout(900)
+  const e1 = await estavel(); await p.click('#catpS .cnselb'); await p.waitForTimeout(500)
+  const e2 = await estavel()
+  ok(e1.dentro && e1.semRolar && e2.dentro && e2.semRolar, 'balão do conectivo fica dentro do painel, sem rolar a tela ' + JSON.stringify([e1, e2]))
+  ok(e2.top <= e1.top + 1, 'balão do conectivo só cresce para cima/baixo sem pular para o outro lado')
   await p.keyboard.press('Escape'); await p.waitForTimeout(200)
+  // Repetição de palavra: escolher a palavra volta à ferramenta
+  await arrasta(.2, .35, .4, .35); await p.click('#catp button[data-cat="rp"]'); await p.waitForTimeout(500)
+  await p.fill('#rpW', 'arte'); await p.waitForTimeout(300)
+  const chip = p.locator('#catp .rpc2 button[data-pal]').first()
+  if (await chip.count()) { await chip.click(); await p.waitForTimeout(400); ok(await p.evaluate(() => document.getElementById('catp').classList.contains('idle')), 'escolher a palavra repetida volta para a tela da ferramenta') }
+  else { await p.click('#catp .rpok'); await p.waitForTimeout(300); ok(await p.evaluate(() => document.getElementById('catp').classList.contains('idle')), 'OK da palavra repetida volta para a tela da ferramenta') }
+  await p.keyboard.press('Escape')
   // teclas: R escolhe Rasura
   await p.keyboard.press('r'); await p.waitForTimeout(150)
-  ok(/Rasura/.test(await p.innerText('#acFoot')), 'tecla R escolhe Rasura')
-  await p.click('#acfSolta')
+  ok(await p.evaluate(() => document.querySelector('#catp button[data-cat="ra"]').classList.contains('acton')), 'tecla R escolhe Rasura')
+  await p.keyboard.press('Escape')
 
+  // três jeitos de trabalhar: AC na lateral, AC flutuante com a aba Critérios, AC flutuante com o painel recolhido
+  const flutuante = async () => p.evaluate(() => { const c = document.getElementById('catp'); return !document.getElementById('acpane').contains(c) && !c.classList.contains('hide') && getComputedStyle(c).position === 'fixed' })
+  await p.click('[data-acf="cr"]'); await p.waitForTimeout(300)
+  await p.click('[data-tool="o"]'); await arrasta(.55, .5, .75, .5); await p.waitForTimeout(300)
+  ok(await flutuante(), 'aba Critérios: o AC abre flutuante, como antes, ao criar um círculo')
+  await p.click('#catp button[data-cat="ac"]').catch(() => {}); await p.keyboard.press('Escape'); await p.waitForTimeout(200)
+  await p.click('#acfCol'); await p.waitForTimeout(300)
+  await p.click('[data-tool="o"]'); await arrasta(.55, .42, .75, .42); await p.waitForTimeout(300)
+  ok(await flutuante(), 'painel recolhido: o AC abre flutuante, como antes, ao criar um círculo')
+  await p.keyboard.press('Escape'); await p.waitForTimeout(200)
+  await p.click('#acfOpen'); await p.waitForTimeout(300); await p.click('[data-acf="ac"]'); await p.waitForTimeout(400)
+  ok(await p.evaluate(() => document.getElementById('acpane').contains(document.getElementById('catp'))), 'voltando para Ferramentas o AC volta para a lateral')
   // abas e recolher
   await p.click('[data-acf="cr"]'); await p.waitForTimeout(200)
   ok(await p.evaluate(() => document.querySelector('.pb').dataset.acftab === 'cr' && document.getElementById('acpane').offsetParent === null && document.getElementById('comps').offsetParent !== null), 'aba Critérios mostra os níveis e esconde o AC')
