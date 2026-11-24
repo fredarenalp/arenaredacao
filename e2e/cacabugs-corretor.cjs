@@ -88,6 +88,7 @@ async function rodar(b, nome, viewport) {
       await p.keyboard.press('Escape').catch(() => {})
     })
     await passo(`aba ${aba}: níveis 0 a 4 nos 5 critérios (sem salvar)`, async () => {
+      await p.click('[data-acf="cr"]', { timeout: 1000 }).catch(() => {}) // painel fixo: os níveis ficam na aba Critérios
       if (viewport.width < 700 && await p.evaluate(() => document.querySelector('.pb').classList.contains('big'))) { await p.click('#pbTog'); await p.waitForTimeout(500) } // no celular os níveis completos ficam atrás de "Níveis e comentários"
       for (let k = 0; k < 5; k++) for (const nv of [0, 1, 2, 3, 4]) {
         const bt = p.locator('.rc .lv').nth(k).locator(`button[data-n="${nv}"]`)
@@ -98,6 +99,7 @@ async function rodar(b, nome, viewport) {
       }
     })
     await passo(`aba ${aba}: Guia e (i) de cada critério`, async () => {
+      await p.click('[data-acf="cr"]', { timeout: 1000 }).catch(() => {})
       const gs = p.locator('.rc [class*=guia], .rc button:has-text("Guia")')
       const g = await gs.count()
       for (let i = 0; i < Math.min(g, 5); i++) { await gs.nth(i).click({ timeout: 2000 }).catch(() => {}); await p.waitForTimeout(250); await p.keyboard.press('Escape') }

@@ -3853,14 +3853,14 @@ var ACF={on:false,tool:null,tab:'ac',col:false,idle:{t:'o',_idle:true,cat:null,l
  function marcaUI(){var c=$('catp');c.querySelectorAll('.acton').forEach(function(x){x.classList.remove('acton')});var T=ACF.tool;
   if(T&&catAtual===ACF.idle){var b=achaBtn(T);if(b){b.classList.add('acton');var src=b.closest('.sidesrc');if(src){var t=c.querySelector('[data-sidetog="'+src.dataset['for']+'"]');if(t)t.classList.add('acton')}}}
   foot()}
- function idle(){if(!ACF.on)return;ACF.idle.cat=null;abreCat(ACF.idle);var c=$('catp');c.classList.remove('hide');var b=c.querySelector('.lnst b');if(b)b.textContent='—';marcaUI()}
+ function idle(){if(!ACF.on||!document.body.classList.contains('in-portal'))return;ACF.idle.cat=null;abreCat(ACF.idle);var c=$('catp');c.classList.remove('hide');var b=c.querySelector('.lnst b');if(b)b.textContent='—';marcaUI()}
  function usaFerr(T){ACF.tool=(ACF.tool&&JSON.stringify(ACF.tool)===JSON.stringify(T))?null:T;if(ACF.tool&&tool!=='o'&&tool!=='h')setTool('o');marcaUI()}
  function tab(t){ACF.tab=t;if(pbEl)pbEl.setAttribute('data-acftab',t);document.querySelectorAll('.acftab').forEach(function(b){var on=b.dataset.acf===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)})}
  function colapsa(v){ACF.col=v;if(pbEl)pbEl.classList.toggle('acfc',v);var b=$('acfCol');if(b)b.setAttribute('aria-label',v?'Abrir o painel':'Recolher o painel')}
  function rail(){var r=$('acfRc');if(!r||!ACF.on)return;var a=ALUNOS[i];if(!a||!a.niv)return;
   r.innerHTML=a.niv.map(function(v,k){return '<button type="button" class="acfchip" data-acfr="'+k+'" aria-label="Critério '+(COMPS[k]?COMPS[k].id:k+1)+', nível '+(v==null?'sem nível':v)+'">'+(COMPS[k]?COMPS[k].id:k+1)+'<small>'+(v==null?'—':v)+'</small></button>'}).join('')}
  function sync(){var w=can();if(w===ACF.on)return;ACF.on=w;
-  if(w){if(!orig)orig={p:$('catp').parentNode};pbEl.classList.add('acf');var pane=$('acpane'),f=$('acFoot');pane.insertBefore($('catpS'),f);pane.insertBefore($('catp'),f);tab(ACF.tab);colapsa(false);rail();idle()}
+  if(w){if(!orig)orig={p:$('catp').parentNode};pbEl.classList.add('acf');var pane=$('acpane'),f=$('acFoot');pane.insertBefore($('catpS'),f);pane.insertBefore($('catp'),f);tab(ACF.tab);colapsa(false);rail();if(document.body.classList.contains('in-portal'))idle()}
   else{pbEl.classList.remove('acf','acfc');pbEl.removeAttribute('data-acftab');var mb=$('mBar');orig.p.insertBefore($('catp'),mb);orig.p.insertBefore($('catpS'),mb);ACF.tool=null;catAtual=null;$('catp').classList.add('hide');$('catp').classList.remove('idle');$('catpS').classList.add('hide');drawMarks()}}
  // categoria escolhida com o painel ocioso = ferramenta ativa (não age numa marca)
  $('catp').addEventListener('click',function(e){
@@ -3876,6 +3876,7 @@ var ACF={on:false,tool:null,tab:'ac',col:false,idle:{t:'o',_idle:true,cat:null,l
  new MutationObserver(function(){if(ACF.on&&$('catp').classList.contains('hide'))Promise.resolve().then(function(){if(ACF.on&&$('catp').classList.contains('hide'))idle()})}).observe($('catp'),{attributes:true,attributeFilter:['class']});
  var _a1=abreCat;abreCat=function(m,keep){var r=_a1(m,keep);var id=!!(m&&m._idle);$('catp').classList.toggle('idle',id);if(ACF.on&&m&&!id){if(ACF.tab!=='ac')tab('ac');if(ACF.col)colapsa(false)}return r};
  var _at=atualiza;atualiza=function(){var r=_at.apply(this,arguments);rail();return r};
+ var _ab=abre;abre=function(){var r=_ab.apply(this,arguments);if(ACF.on){rail();idle()}return r};
  addEventListener('resize',sync);
  window.ACFX={
   aplica:function(m){var T=ACF.tool;if(!ACF.on||!T)return false;var b=achaBtn(T);if(!b)return false;b.click();return true},
@@ -3885,7 +3886,7 @@ var ACF={on:false,tool:null,tab:'ac',col:false,idle:{t:'o',_idle:true,cat:null,l
    if(e.ctrlKey||e.metaKey||e.altKey||!/^[1-9rmavuplei]$/.test(k))return false;
    var LK={p:'rp',r:'ra',m:'mr',a:'ma',u:'mi',l:'lac',e:'ele',i:'eli'},ix=/\d/.test(k)?VIS.findIndex(function(c){return c.k===DIGS[+k-1]}):VIS.findIndex(function(c){return c.k===LK[k]});
    if(!VIS[ix])return false;usaFerr({cat:VIS[ix].k});return true},
-  sync:sync,estado:function(){return ACF}};
+  sync:sync,estado:function(){return ACF},dbg:function(){return {side:sideCur,cat:catAtual&&catAtual.cat,ocioso:catAtual===ACF.idle,por:!!(window.CN&&CN.por)}}};
  setTimeout(sync,0); // depois do bloco do celular, que também move #catp para dentro do .rc
 })();
 montaComps();

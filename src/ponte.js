@@ -573,7 +573,7 @@ const ARENA = {
         supabase.from('conectivos').select('funcao, texto, ordem').order('ordem'),
         supabase.from('conectivos_funcoes').select('funcao, descricao, comentario'),
       ])
-      if (res.error) return {}
+      if (res.error || !(res.data ?? []).length) return {} // sem linhas (p.ex. sem sessão): não guarda no cache
       const por = {}
       for (const r of res.data ?? []) (por[r.funcao] ??= []).push(r.texto)
       por.__desc = Object.fromEntries((des.data ?? []).map((x) => [x.funcao, x.descricao]))

@@ -15,7 +15,7 @@ await p.click('[data-tool="o"]');
 const svg=await p.evaluate(()=>{const r=document.querySelector('#mk').getBoundingClientRect();return [r.x,r.y,r.width,r.height]});
 const px=(u,v)=>[svg[0]+svg[2]*u/210,svg[1]+svg[3]*v/297];
 for(const [u,v] of [[70,70],[90,110]]){const [x,y]=px(u,v);await p.mouse.move(x-16,y);await p.mouse.down();await p.mouse.move(x,y+4,{steps:4});await p.mouse.move(x+16,y+8,{steps:4});await p.mouse.up();await p.waitForTimeout(450);await p.click('#catp button[data-cat="ac"]');await p.waitForTimeout(300)}
-for(let k=0;k<5;k++)await p.locator('.rc .lv').nth(k).locator('button[data-n="3"]').click();
+await p.click('[data-acf="cr"]').catch(()=>{});for(let k=0;k<5;k++)await p.locator('.rc .lv').nth(k).locator('button[data-n="3"]').click();
 const antes=await p.evaluate(()=>({desv:document.getElementById('mkc').textContent,niv:[...document.querySelectorAll('.rc .lv')].map(l=>(l.querySelector('button.on,button.sel,button[aria-pressed="true"]')||{}).dataset?.n)}));
 console.log('   antes de fechar:',JSON.stringify(antes));
 await p.waitForTimeout(4000); // o rascunho é gravado a cada 3 s
