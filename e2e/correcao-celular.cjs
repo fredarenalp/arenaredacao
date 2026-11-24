@@ -62,7 +62,16 @@ for(const [k,ids] of lista)for(const id of ids){
   for(let r=0;r<2&&!(await bt.count());r++){await p.locator('.mchip').nth(k).click({timeout:3000,force:true}).catch(()=>{});await p.waitForTimeout(250)}
   if(!(await bt.count())){ok(false,'categoria '+id+': botão não existe na gaveta');continue}
   await bt.click();await p.waitForTimeout(250);
+  const OPT=['ti','or','pr','rp','ce','ca','ele','eli','lac'].includes(id);
   const faixa=await vis('#mDr .mslim');
+  if(OPT){ // categorias com opções: a marca nasce na hora, a alça aparece e as opções já abrem na gaveta (sem Pronto)
+    await p.waitForTimeout(300);
+    const tem=await marcas(),painel=await p.evaluate(()=>['catp','catpS','lc'].some(i=>!document.getElementById(i).classList.contains('hide')));
+    ok(faixa&&tem===a0+1&&painel&&await n('#mGrip')===1,'categoria '+id+': a marca nasce na hora, as opções abrem na gaveta e a alça aparece');
+    await p.click('#mCancela',{timeout:3000}).catch(()=>{});await p.waitForTimeout(350);
+    ok(await marcas()===a0,'categoria '+id+': × remove a marca criada');
+    continue;
+  }
   await p.click('#mPronto',{timeout:3000}).catch(()=>{});await p.waitForTimeout(450);
   const a1=await marcas();
   const rotulo=await p.evaluate(()=>{const g=[...document.querySelectorAll('#mk g.xm:not(.pv)')].pop();const t=g&&g.querySelector('text.cl');return t?t.textContent:''});

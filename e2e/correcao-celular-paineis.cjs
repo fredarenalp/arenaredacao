@@ -1,4 +1,4 @@
-// Celular (390x700): as perguntas seguintes de Conectivo e Ortografia aparecem numa folha embaixo, dentro da tela, e funcionam. Não grava no banco.
+// Celular (390x700): as opções de Conectivo e Ortografia aparecem direto na gaveta embaixo, dentro da tela, e funcionam. Não grava no banco.
 const { chromium } = require('playwright');
 let falhas=0;const ok=(c,m)=>{console.log(c?'ok   ':'FALHA',m);if(!c)falhas++};
 (async()=>{const b=await chromium.launch({proxy:{server:process.env.HTTPS_PROXY,bypass:'localhost,127.0.0.1'}});
@@ -8,14 +8,14 @@ const entra=async()=>{await p.goto('http://localhost:4173');await p.waitForTimeo
  await p.waitForSelector('#phCards',{timeout:20000});await p.waitForTimeout(1000);await p.locator('.pcd').first().click();await p.waitForTimeout(700);await p.locator('#plGo').click();await p.waitForTimeout(1800)};
 const dentro=(s)=>p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect(),cs=getComputedStyle(e);return {visivel:cs.display!=='none'&&cs.visibility!=='hidden'&&r.width>0,dentro:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight+1,rect:[r.x,r.y,r.width,r.height].map(Math.round)}},s);
 const cria=async(k,id)=>{for(let r=0;r<2&&!(await p.locator('#mDr [data-md="'+id+'"]').count());r++){await p.locator('.mchip').nth(k).click({force:true});await p.waitForTimeout(300)}
- await p.locator('#mDr [data-md="'+id+'"]').click();await p.waitForTimeout(300);await p.click('#mPronto');await p.waitForTimeout(800)};
+ await p.locator('#mDr [data-md="'+id+'"]').click();await p.waitForTimeout(900)};
 // --- conectivo errado: Corrigir
 await entra();await cria(2,'ce');
-let s1=await dentro('#catpS');ok(s1&&s1.visivel&&s1.dentro,'conectivo: a folha "Só marcar / Corrigir" aparece dentro da tela '+JSON.stringify(s1&&s1.rect));
+let s1=await dentro('#catpS');ok(s1&&s1.visivel&&s1.dentro,'conectivo: a gaveta com "Escolher função" aparece dentro da tela, sem o passo Só marcar/Corrigir '+JSON.stringify(s1&&s1.rect));
 ok((await dentro('#catp')).visivel===false,'o AC inteiro fica escondido atrás da folha');
 ok(await p.evaluate(()=>getComputedStyle(document.getElementById('catpS')).position)==='static'&&await p.evaluate(()=>getComputedStyle(document.getElementById('mBackdrop')).display)==='none','o painel é uma gaveta no fluxo (sem flutuar e sem fundo escurecido)');
 ok(await p.evaluate(()=>{const a=document.getElementById('catpS').getBoundingClientRect(),b=document.getElementById('mBar').getBoundingClientRect();return a.bottom<=b.top+1}),'a gaveta fica logo acima da barra I a V');
-await p.click('[data-cnstart]');await p.waitForTimeout(1500);
+await p.waitForTimeout(800);
 s1=await dentro('#catpS');ok(s1&&s1.visivel&&s1.dentro,'conectivo: depois de Corrigir, a folha com a função e os conectivos cabe na tela '+JSON.stringify(s1&&s1.rect));
 ok((await p.locator('#catpS .cnselb').innerText()).includes('Escolher função'),'conectivo: o campo começa em "Escolher função", sem função pré-selecionada');
 ok(await p.locator('#catpS .cnt').count()===0,'conectivo: nenhum conectivo aparece antes de escolher a função');
