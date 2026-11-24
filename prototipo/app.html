@@ -1540,6 +1540,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .mslim .mais{height:42px;padding:0 12px;border-radius:12px;border:1.5px solid #3c7678;background:#fff;color:#3c7678;font:700 13px 'DM Sans';cursor:pointer}
 .mk .mge,.mk .mgl,.mk .mgc{fill:none;stroke-linecap:round;pointer-events:none}.mk .mge{stroke-width:.9}.mk .mgl{stroke-width:1.3}.mk .mgc{stroke-width:.4;stroke-dasharray:1 1}
 .mgrip2{position:absolute;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:#fff;border:2.5px solid #d62828;box-shadow:0 2px 8px rgba(0,0,0,.35);touch-action:none;cursor:grab;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;-webkit-user-select:none;user-select:none}.mgrip2 i{display:block;width:18px;height:2px;border-radius:2px;background:#555}
+
+/* celular: o painel de Ortografia / Conectivo / Título vira uma folha embaixo da tela (o AC inteiro fica escondido atrás, com fundo escurecido; tocar fora fecha) */
+@media(max-width:640px){
+ #catpS.catps:not(.hide){position:fixed!important;left:8px!important;right:8px!important;top:auto!important;width:auto!important;bottom:calc(8px + var(--kb,0px))!important;max-height:min(64vh,calc(100dvh - var(--kb,0px) - 24px))!important;overflow-y:auto;z-index:90;box-shadow:0 -6px 24px rgba(0,0,0,.45)}
+ body:has(#catpS.catps:not(.hide)) #catp{visibility:hidden}
+ #mBackdrop{display:none}
+ body:has(#catpS.catps:not(.hide)) #mBackdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:89}
+}
 </style>
 <!--PONTE--></head>
 <body>
@@ -1728,7 +1736,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 </div>
 <input type="file" id="upF" accept="image/*" class="hide">
 <div class="pinprev hide" id="pinprev"></div>
-<div class="catp hide" id="catp" role="menu" aria-label="Tipo de desvio"></div><div class="catp catps hide" id="catpS" role="menu" aria-label="Entrada do parágrafo"></div>
+<div class="catp hide" id="catp" role="menu" aria-label="Tipo de desvio"></div><div id="mBackdrop" aria-hidden="true"></div><div class="catp catps hide" id="catpS" role="menu" aria-label="Entrada do parágrafo"></div>
 <div class="toast" id="toast"></div>
 </section>
 
@@ -3767,6 +3775,7 @@ document.addEventListener('touchmove',function(e){if(MOB.drag)e.preventDefault()
 // mantém barra e fantasma em dia
 var _drawMarks0=drawMarks;drawMarks=function(t){_drawMarks0(t);if(MOB.place)$('mk').insertAdjacentHTML('beforeend',mobGhost());mobGrip();mobPinta()};
 var _atualiza0=atualiza;atualiza=function(){_atualiza0();mobPinta()};
+if(window.visualViewport){var _vv=visualViewport,_kb=function(){document.documentElement.style.setProperty('--kb',Math.max(0,Math.round(innerHeight-_vv.height-_vv.offsetTop))+'px')};_vv.addEventListener('resize',_kb);_vv.addEventListener('scroll',_kb);_kb()}
 var _abre0=abre;abre=function(k,f){mobReset();var r=_abre0(k,f);mobPinta();return r};
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&MOB.place){MOB.place=null;drawMarks();mobPinta()}},true);
 $('pbTog').addEventListener('click',function(){setTimeout(function(){mobReset();mobPinta()},0)});
