@@ -70,6 +70,7 @@ O círculo que fica em cima do número da linha agora é selecionável (antes o 
 A correção só vai ao banco no botão **Salvar**. Até lá, o que o corretor faz (marcações, níveis, comentários, anulação) é guardado a cada 3 s no navegador (`localStorage`, chave `arena_rasc_<perfil>_<redação>`) e volta ao reabrir a redação, com o aviso "Rascunho recuperado"; fechar a janela com correção não salva pede confirmação. O rascunho some ao salvar com sucesso. É local ao navegador/computador (não aparece em outro aparelho). Teste: `node e2e/rascunho-correcao.cjs`.
 
 ## AC · Linha curta e Parágrafo curto viram linha reta; comentário da linha (IMPLEMENTADO)
+**Vale também no marca-texto** (decisão do dono): Linha curta/Parágrafo curto num marca-texto também viram o traço (`lnIs` não exclui mais `f:'h'`; na correção, no aluno e na impressão).
 Ao escolher Linha curta (`mr`) ou Parágrafo curto (`pc`), o círculo vira uma linha reta (como Acentuação/Pontuação viram X), na cor da categoria (`window.lnIs`/`lnSvg`; no aluno e na impressão pelo flag `ln` de `circ`). Um clique no número da linha NÃO abre mais a caixa de comentário (decisão do dono: abria sem querer); o comentário da linha abre com dois cliques no número ou pelo botão Comentar do AC. Teste: `node e2e/linha-curta.cjs`.
 
 ## Tela do corretor: regras confirmadas na varredura
@@ -85,7 +86,7 @@ No celular, as perguntas seguintes de Ortografia (palavra correta), Conectivo (f
 
 ## Computador: painel lateral recolhível, abas Critérios / Adicionais (decisão do dono, IMPLEMENTADO)
 Acima de 900 px o lado direito da tela do corretor (`.pb.acf`, 400 px) tem duas abas: **Critérios** (níveis 0–4, Guia e comentário por critério; **abre por padrão**) e **Adicionais** (as "Observações adicionais para o aluno", `#cmBox`, com um contador; antes ficavam no pé e obrigavam a rolar). A seta › (canto superior direito) **recolhe** a lateral para uma faixa de 56 px com chips I–V (nível de cada critério), deixando só a redação; ‹ ou um chip reabre. Diálogos (Limpar correção, Anular, Guia…) com o painel recolhido o reabrem sozinho e ele volta a recolher ao fechar.
-O **AC é sempre o flutuante de sempre**, junto da marca (a aba "Ferramentas" / AC fixo na lateral foi testada e **retirada a pedido do dono**: não gostou). Celular (≤900 px) não muda (gaveta). Código: bloco `ACF` no corretor (`prototipo/app.html`, antes de `montaComps()`), CSS "Painel lateral do computador". Desligar: `localStorage arena_acfixo = "0"`. Teste: `node e2e/ac-fixo.cjs`.
+O **AC é sempre o flutuante de sempre**, aberto **ao lado da marca** (à direita; à esquerda se faltar espaço; `posCat`), para o trecho marcado continuar à vista na hora de corrigir ortografia, conectivos etc. (a aba "Ferramentas" / AC fixo na lateral foi testada e **retirada a pedido do dono**: não gostou). Celular (≤900 px) não muda (gaveta). Código: bloco `ACF` no corretor (`prototipo/app.html`, antes de `montaComps()`), CSS "Painel lateral do computador". Desligar: `localStorage arena_acfixo = "0"`. Teste: `node e2e/ac-fixo.cjs`.
 Armadilha que ficou: a busca do dicionário de conectivos não pode rodar sem sessão (o resultado vazio ficava em cache); `ponte.js` agora não guarda dicionário vazio.
 
 ## Corretor: painel "Quanto você recebe" recolhível (IMPLEMENTADO)
