@@ -44,6 +44,9 @@ const parseObs = (txt) => {
   return out
 }
 
+// "Comentários adicionais" do corretor: linhas do comentário que não são o texto de um critério ("Comp. X –"), nem o texto final automático.
+const parseAdic = (txt) => String(txt || '').split('\n').map((l) => l.trim()).filter((l) => l && !/^(Comp\.|Final –|Redação anulada –)/.test(l)).map((l) => l.replace(/^Linha (\d+) – Ponto forte: /, 'Linha $1 · ponto forte: ').replace(/^Linha (\d+) – /, 'Linha $1: '))
+
 // Foto de celular (4–15 MB) → JPEG de no máx. 3000 px no lado maior: cabe no limite de 12 MB do servidor,
 // sobe mais rápido no 4G e aplica a rotação EXIF. Se algo falhar, envia o original.
 async function comprimirFoto(blob) {
@@ -371,7 +374,7 @@ const ARENA = {
         return {
           ...base, g, t: rot, s: `Entregue em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)} · corrigida`, st: 'ok',
           l: `Corrigida · nota ${novaNota(c.anulacao ? 0 : c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: c.anulacao ? [0, 0, 0, 0, 0] : [c.n1, c.n2, c.n3, c.n4, c.n5],
-          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario),
+          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario), adic: parseAdic(c.comentario),
           nota: c.anulacao ? 0 : Number(c.nota), anul: c.anulacao || null, rid: r.id, vista: !!c.vista_em, aval: (avs ?? []).find((x) => x.redacao_id === r.id)?.estrelas ?? null, liberadaEm: c.liberada_em ?? r.enviada_em,
         }
       }
