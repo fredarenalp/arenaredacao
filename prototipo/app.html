@@ -1038,7 +1038,7 @@ table.bt{border-collapse:collapse;width:100%;font-size:13px}.bt th{font:700 11px
 .crs-r b{font:800 14px Outfit,sans-serif;text-align:right}
 .crs-r:hover .nm{color:#3c7678}
 .crc.flash{box-shadow:0 0 0 2px #52989a}
-#crT1.one>*:not(.crc){display:none}#crT1.one>.crc:not(.sel){display:none}
+#crT1.one>*:not(.crc){display:none}#crT1.one>.crc:not(.crsel){display:none}
 .pc2{position:relative}
 .pc2.late{border-color:#e6cf9a}
 .pin2{position:absolute;top:-9px;left:-9px;width:26px;height:26px;border-radius:50%;background:#d9822b;color:#fff;font:800 15px/26px Outfit,sans-serif;text-align:center;box-shadow:0 2px 6px rgba(160,90,10,.35);border:2px solid #f5f4ef}
@@ -4522,7 +4522,7 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  function z(d){zoom=Math.max(50,Math.min(200,zoom+d));$('crPg').style.width=zoom+'%';$('crZ').textContent=zoom+'%';}
  $('crP').onclick=function(){z(15)};$('crM').onclick=function(){z(-15)};z(0);
  document.querySelectorAll('[data-pl]').forEach(function(b){b.onclick=function(){var l=+b.dataset.pl;if(sel!==l)foco(l);$('crPh').scrollIntoView({block:'nearest',behavior:'smooth'});};});
- document.querySelectorAll('[data-cj]').forEach(function(b){b.onclick=function(){var t=document.querySelector('.crtabs [data-tab="1"]');if(t)t.click();var j=+b.dataset.cj;document.querySelectorAll('#crT1 .crc').forEach(function(c,q){c.classList.toggle('sel',q===j)});$('crT1').classList.add('one')};});
+ document.querySelectorAll('[data-cj]').forEach(function(b){b.onclick=function(){var t=document.querySelector('.crtabs [data-tab="1"]');if(t)t.click();var j=+b.dataset.cj;document.querySelectorAll('#crT1 .crc').forEach(function(c,q){c.classList.toggle('crsel',q===j)});$('crT1').classList.add('one')};});
  function chips(){
   document.querySelectorAll('.crvm').forEach(function(b){var on=fj!==null&&+b.dataset.vm===fj;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
   var bar=$('crF');bar.classList.toggle('hide',fj===null);
@@ -4548,6 +4548,7 @@ var AI_CORTE=6;
 var AI_DICA=['Capriche na apresentação: parágrafos com recuo e margens respeitadas.','Leia o texto em voz alta e confira acentos e pontuação.','Organize o texto em 3 partes: começo, meio e fim.','Releia a proposta e confira se o texto tem todos os elementos do gênero.','Desenvolva cada ideia com um exemplo ou um argumento.'];
 var AI_FRASE=['Apresentação excelente','Quase lá','Em desenvolvimento','Precisa de atenção','Ainda não atende'];
 var AI_CATC={ra:0,mr:0,ma:0,pc:0,pe:0,pd:0,ac:1,pt:1,or:1,ss:1,cj:1,cn:1,rg:1,cr:1,ol:1,pr:1,tr:1,il:1,vi:1,mi:1,rp:2,ce:2,ca:2,ele:3,eli:3,lac:4};
+var AI_DESCR=['Capricho com a folha: letra legível, margens, parágrafos e título.','Domínio da norma culta e uso das expressões corretas.','Ideias bem encadeadas, com bons conectivos e sem repetições.','Cumpriu o que foi solicitado: o gênero e seus elementos.','Desenvolveu o tema por inteiro, explicando bem as ideias.'];
 var AI_CATN={ac:'Acentuação',pt:'Pontuação',or:'Ortografia',ss:'Translineação',cj:'Conjugação',cn:'Concordância',rg:'Regência',cr:'Crase',ol:'Oralidade',pr:'Precisão',tr:'Truncamento',il:'Ilegibilidade',vi:'Vírgula',mi:'Maiúscula',rp:'Repetição',ce:'Conectivo errado',ca:'Falta conectivo',ra:'Rasura',mr:'Linha curta',ma:'Passou da margem',pc:'Parágrafo curto',pe:'Parágrafo longo',pd:'Parágrafo desalinhado',ele:'Elemento ausente',eli:'Elemento insuficiente',lac:'Lacuna'};
 function aiEsc(x){return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function aiNome(){var n=($('alNm').textContent||'').split('·')[0].trim().split(/\s+/)[0];return n||'aluno'}
@@ -4576,11 +4577,11 @@ function aiSlides(k){
  var cart=[]; // cartões por critério (j) e as palavras para treinar (critério II): saem na ordem dos critérios
  if(tom==='baixa'){
   var fortes=ord.slice().sort(function(a,b){return b[0]-a[0]||a[1]-b[1]}).slice(0,2),fraco=ord.slice().sort(function(a,b){return a[0]-b[0]||a[1]-b[1]})[0];
-  S.push({c:'acr',h:'<div class="ai-tg d">Pontos fortes</div>'+eloB+fortes.map(function(x){return '<div class="ai-fc"><b>'+CRIT[x[1]]+'<em>'+x[0]+'/4</em></b><span>'+aiEsc(aiResumo(P.obsCrit&&P.obsCrit[x[1]],1)||AI_FRASE[4-x[0]])+'</span></div>'}).join('')+'<div class="ai-step"><small>Seu primeiro passo</small><p>'+aiEsc(AI_DICA[fraco[1]])+'</p></div>'});
+  S.push({c:'acr',h:'<div class="ai-tg d">Pontos fortes</div>'+eloB+fortes.map(function(x){return '<div class="ai-fc"><b>'+CRIT[x[1]]+'<em>'+x[0]+'/4</em></b><span>'+aiEsc(AI_DESCR[x[1]])+'</span></div>'}).join('')+'<div class="ai-step"><small>Seu primeiro passo</small><p>'+aiEsc(AI_DICA[fraco[1]])+'</p></div>'});
  } else {
   // (a lista 'Seus 5 critérios' em cartão foi retirada a pedido do dono: o gráfico único da última tela a substitui)
   var fts=ord.slice().sort(function(a,b){return b[0]-a[0]||a[1]-b[1]}).filter(function(x,q){return x[0]>=3||q===0}).slice(0,2);
-  S.push({c:'acr',h:'<div class="ai-tg d">Pontos fortes</div>'+eloB+fts.map(function(x){return '<div class="ai-fc"><b>'+CRIT[x[1]]+'<em>'+x[0]+'/4</em></b><span>'+aiEsc(aiResumo(P.obsCrit&&P.obsCrit[x[1]],1)||AI_FRASE[4-x[0]]||'')+'</span></div>'}).join('')});
+  S.push({c:'acr',h:'<div class="ai-tg d">Pontos fortes</div>'+eloB+fts.map(function(x){return '<div class="ai-fc"><b>'+CRIT[x[1]]+'<em>'+x[0]+'/4</em></b><span>'+aiEsc(AI_DESCR[x[1]])+'</span></div>'}).join('')});
   // um ponto por vez: os critérios abaixo de 4, do mais fraco ao mais forte (até 2)
   ord.filter(function(x){return x[0]<4}).sort(function(a,b){return a[0]-b[0]||a[1]-b[1]}).slice(0,2).forEach(function(x){var n=x[0],j=x[1],ls={};(P.circ||[]).forEach(function(c){if(AI_CATC[c.c]===j){(ls[c.c]=ls[c.c]||[]).push(c.l)}});
    var ch=Object.keys(ls).map(function(c){var a=ls[c].filter(function(l,q,A){return A.indexOf(l)===q});return '<span class="ai-chip d">'+AI_CATN[c]+' · '+aiLinhas(a)+'</span>'}).join('');
@@ -4593,7 +4594,14 @@ function aiSlides(k){
   else if(c.c==='pr')pal.push({k:'Palavra vaga',a:'<b>'+aiEsc(c.w)+'</b>',b:(c.s&&c.s.length?'Troque por: <u>'+c.s.map(aiEsc).join(' · ')+'</u>':'Procure uma palavra mais precisa.')});
   else if((c.c==='ce'||c.c==='ca')&&c.s&&c.s.length)pal.push({k:'Conectivo'+(c.f&&{adicao:'adição',conclusao:'conclusão',contexto:'continuidade',explicacao:'explicação',oposicao:'oposição',ordem:'ordem',causa:'causa',consequencia:'consequência',exemplo:'exemplificação',comparacao:'comparação',concessao:'concessão',finalidade:'finalidade',enfase:'ênfase',condicao:'condição',reformulacao:'reformulação',fala:'fala'}[c.f]?' de '+{adicao:'adição',conclusao:'conclusão',contexto:'continuidade',explicacao:'explicação',oposicao:'oposição',ordem:'ordem',causa:'causa',consequencia:'consequência',exemplo:'exemplificação',comparacao:'comparação',concessao:'concessão',finalidade:'finalidade',enfase:'ênfase',condicao:'condição',reformulacao:'reformulação',fala:'fala'}[c.f]:''),a:c.w?'<b>'+aiEsc(c.w)+'</b>':'<b>Faltou um conectivo</b>',b:'Experimente: <u>'+c.s.map(aiEsc).join(' · ')+'</u>'});
   else if(c.c==='rp')pal.push({k:'Repetida',a:'<b>'+aiEsc(c.w)+'</b>',b:(c.s&&c.s.length?'Que tal: <u>'+c.s.map(aiEsc).join(' · ')+'</u>':'Use sinônimos ou um pronome.')})});
- if(pal.length)cart.push({j:1.5,c:{c:'awh',h:'<div class="ai-tg d">Linguagem</div><div class="ai-h2" style="margin-bottom:6px">Palavras para treinar</div>'+(function(){var gv=0;return pal.slice(0,4).map(function(w){var t=w.b;if(w.k==='Grafia'){if(gv)t='';gv=1}return '<div class="ai-wd"><small>'+w.k+'</small>'+w.a+(t?'<span>'+t+'</span>':'')+'</div>'}).join('')})()}}); // palavras = critério II (Linguagem)
+ if(pal.length){var gr=[],rp=[],vg=[],cv=0,ex=[];pal.forEach(function(w){var nm=w.a.replace(/<[^>]+>/g,'');if(w.k==='Grafia')gr.push(nm);else if(w.k==='Repetida')rp.push(nm);else if(w.k==='Palavra vaga'){vg.push(nm);var m=/<u>(.*?)<\/u>/.exec(w.b);if(m)ex.push(nm+' → '+m[1])}else cv++});
+  var jn2=function(a){return a.length>1?a.slice(0,-1).join(', ')+' e '+a[a.length-1]:a[0]};
+  var fr=[];if(gr.length)fr.push('Revise a grafia de '+jn2(gr.slice(0,4))+'.');if(rp.length)fr.push('Evite repetir '+jn2(rp.slice(0,3))+'.');if(vg.length)fr.push('Troque '+jn2(vg.slice(0,3))+' por palavras mais precisas.');if(cv)fr.push('Varie os conectivos.');
+  var chs=[];if(gr.length)chs.push('Grafia · '+gr.slice(0,4).join(', '));if(rp.length)chs.push('Repetida · '+rp.slice(0,3).join(', '));ex.slice(0,2).forEach(function(e){chs.push('Exemplo · '+e)});
+  var chH=chs.map(function(c){return '<span class="ai-chip d">'+aiEsc(c)+'</span>'}).join(''),nv=P.niv[1];
+  var ix=-1;cart.forEach(function(x,q){if(x.j===1)ix=q});
+  if(ix>=0){var ho=cart[ix].c.h,mm=/<div class="ai-ch">([\s\S]*)<\/div>$/.exec(ho),pre=ho.slice(0,ho.indexOf('<div class="ai-h2">'));cart[ix].c.h=pre+'<div class="ai-h2">'+aiEsc(fr.join(' '))+'</div><div class="ai-ch">'+(mm?mm[1]:'')+chH+'</div>'}
+  else cart.push({j:1,c:{c:'ag',h:'<div class="ai-tg">Palavras para treinar</div><div class="ai-tg" style="font-size:15px;letter-spacing:.04em;margin-top:-2px">Linguagem</div><div class="ai-big m">'+nv+'<small>/4</small></div><div class="ai-h2">'+aiEsc(fr.join(' '))+'</div><div class="ai-ch">'+chH+'</div>'}})} // palavras = critério II (Linguagem), no mesmo cartão
  cart.sort(function(a,b){return a.j-b.j}).forEach(function(x){S.push(x.c)});
  if(false/*card "Sua opinião" retirado (decisão do dono): só faz sentido depois que o aluno vê a correção completa; fica guardado para outro momento*/&&!P.aval&&window.ARENA&&ARENA.avaliar)S.push({c:'ag',rate:1,h:'<div class="ai-tg">Sua opinião</div><div class="ai-h2" style="font-size:30px;margin-bottom:6px">Essa correção ajudou?</div><div class="ai-stars">'+[1,2,3].map(function(n){return '<button type="button" class="ai-star" data-ai="star" data-n="'+n+'"><i>★</i><small>'+['Mais ou menos','Ajudou','Ajudou muito'][n-1]+'</small></button>'}).join('')+'</div><p class="ai-p" style="font-size:14px;font-weight:700;margin:10px 0 6px">O que mais ajudou?</p><div class="ai-opts">'+[['comentarios','Os comentários'],['marcacoes','As marcações na foto'],['palavras','As palavras sugeridas'],['foco','As dicas de foco']].map(function(o){return '<button type="button" class="ai-opt" data-ai="chip" data-v="'+o[0]+'">'+o[1]+'</button>'}).join('')+'</div><textarea id="aiAvC" rows="2" maxlength="500" placeholder="Quer contar mais? (opcional)"></textarea><button type="button" class="ai-btn w" data-ai="avalenv" id="aiAvB" disabled>Enviar minha opinião</button><p class="ai-mini wh">Só o corretor e a coordenação veem. Não muda a sua nota.</p>'});
  var NMC=['Estética','Linguagem','Progressão','Proposta','Abordagem'],COLC=['#3c7678','#1a4888','#6a3a8a','#b07a10','#2f855a'];
