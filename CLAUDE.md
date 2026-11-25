@@ -170,3 +170,4 @@ Regra do dono, sem exceção: com o pacote liberado (`pacotes.liberado_em`) o co
 
 ## AC · comentário de repetição (Progressão)
 `repTxt(a)` monta uma frase por palavra repetida ("A palavra “X” aparece N vezes, nas linhas …." / "Já a palavra “Y” …") e a orientação "Procure sinônimos ou retome a ideia com um pronome." **uma única vez, no fim** (antes se repetia a cada palavra). Sinônimos escolhidos vão em "(por exemplo: …)" na frase da própria palavra.
+**Regra geral (dono):** a orientação final de um comentário automático aparece **uma vez**, não a cada item. Valia também para a Precisão (`prTxt`: "A palavra “X” é imprecisa …" / "Já a palavra “Y” …" + "Procure palavras mais específicas…" no fim). Revisados sem repetição: rasura, margem, acentuação/pontuação (`sinTxt`), desvios (`desTxt`), conectivos (`conTxt`), título, elementos e lacunas.
