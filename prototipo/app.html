@@ -427,7 +427,7 @@ button.pc{cursor:pointer}button.pc:hover{border-color:#3c7678;box-shadow:var(--s
 
 .vpw{max-width:640px}.vpk{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:#3c7678;font-weight:800}.vpw h2{margin:4px 0 12px;font-size:26px;letter-spacing:-.02em}.vpt{background:linear-gradient(165deg,#52989a,#3c7678);color:#fff;border-radius:18px;padding:16px 20px;margin:6px 0 14px}.vpt small{font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}.vpt b{display:block;font-size:21px;line-height:1.25;margin-top:4px}.vpw h4{margin:16px 0 6px;font-size:13px;color:#505048}.vpw p{margin:0 0 8px;font-size:15.5px;line-height:1.55}.vps{color:#505048;font-size:14px!important}
 .vpc{display:flex;flex-direction:column;gap:7px}.vpc span{background:#fff;border-radius:12px;padding:9px 13px;font-size:14.5px;font-weight:700;display:flex;align-items:center;gap:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}.vpc span:before{content:"✓";display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#d9ece4;color:#1f6a4c;font-size:13px}
-.pbtn.vpb{background:transparent;color:#2f5f61;border:2px solid #3c7678;margin-left:8px}.vpl{border:0;background:#e4eeee;color:#2f5f61;font:800 13.5px "DM Sans",sans-serif;border-radius:14px;padding:11px 14px;margin:6px 0 10px;cursor:pointer;width:100%;text-align:left}
+
 .pc2{position:relative}.cdw{display:flex;align-items:center;gap:8px;margin:10px 0 2px;padding:8px 12px;border-radius:12px;background:#eef5f5;color:#2f5f61;font:600 13px 'DM Sans',sans-serif}.cdw svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.cdw b{font:800 15px Outfit,sans-serif;font-variant-numeric:tabular-nums}.cdw.urg,.cdw.late{background:#fff1e0;color:#8a4b00}.cdsel{position:absolute;top:-9px;right:12px;background:#d9806f;color:#fff;font:700 10.5px 'DM Sans',sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:999px;z-index:2}
 /* boletim · bimestre atual */
 .bn-card{background:#fff;border:1px solid var(--borda);border-radius:16px;padding:14px 16px}.bn-lab{font:700 10.5px 'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6b6a62}
@@ -1457,8 +1457,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:640px){.right.caderno::before{left:14px}}
 
 /* "Ver proposta": botão de contorno em todos os estados (o hover genérico de .pbtn escurecia o fundo e sumia o texto) */
-.pc2 .pbtn.vpb,.pc2.feito .pbtn.vpb,.pc2.late .pbtn.vpb,.pc2.zero .pbtn.vpb{background:transparent;color:#2f5f61;border:2px solid #3c7678}
-.pc2 .pbtn.vpb:hover,.pc2.feito .pbtn.vpb:hover,.pc2.late .pbtn.vpb:hover,.pc2.zero .pbtn.vpb:hover{background:#e4eeee;color:#2f5f61}
 
 /* AC · conectivos (opção B) */
 .catp .cnq{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}.catp .cnq button{border:1.5px solid #cfd8d8;background:#fff;border-radius:8px;padding:8px 10px;font:700 12.5px "DM Sans",sans-serif;color:#2f5f61;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:4px}.catp .cnq .cnq2{background:#1f8a8c;color:#fff;border-color:#1f8a8c}.catp .cnq .cnq2 svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4}
@@ -4320,7 +4318,7 @@ function instrucoes(k,late){
  '<div class="al-grid"><div><div class="steps">'+PASSOS.map(function(p,k){return '<div class="stp"><div class="n">'+(k+1)+'</div><div style="flex:1"><b>'+p[1]+'</b><p>'+p[2]+'</p></div><div class="ill" aria-hidden="true">'+IL[p[0]]+'</div></div>'}).join('')+'</div>'+
  '<div class="cmp"><h3>Certo e errado</h3><div class="pairs">'+PARES.map(function(p){return '<div class="pair"><p class="lbl">'+p[0]+'</p><div class="two"><figure class="good">'+p[1]+'<figcaption>✓ '+p[3]+'</figcaption></figure><figure class="bad">'+p[2]+'<figcaption>✗ '+p[4]+'</figcaption></figure></div></div>'}).join('')+'</div></div></div>'+
  '<aside class="side"><h3>Sua folha de redação</h3><div class="thumb" id="alThumb" tabindex="0" role="button" aria-label="Ver a folha em tamanho grande">'+SHEET+'<div class="hint">Toque para ampliar</div></div>'+
- '<h3 style="margin-top:2px">Antes de enviar</h3>'+(P.prop?'<button type="button" class="vpl" id="alVp">Ver o que a proposta pede ›</button>':'')+
+ '<h3 style="margin-top:2px">Antes de enviar</h3>'+
  ['Li o texto na foto, palavra por palavra','Os 4 quadrados dos cantos aparecem','Não há sombra nem cortes','A folha está reta, em pé'].map(function(t,k){return '<label class="chk2"><input type="checkbox" class="ck"> '+t+'</label>'}).join('')+
  '<div id="alPrev"></div>'+
  '<button type="button" class="btn" id="alFoto" disabled>Tirar ou escolher a foto</button>'+
@@ -4328,8 +4326,7 @@ function instrucoes(k,late){
  '<input type="file" id="alFile" accept="image/*" capture="environment" class="hide">'+
  '<button type="button" class="btn hide" id="alEnv">Enviar redação</button></aside></div>';
  $('alVolta').onclick=lista;
- if($('alVp'))$('alVp').onclick=function(){verProposta(k)};
- $('alThumb').onclick=function(){$('alMs').innerHTML=SHEET;$('alMdl').classList.add('on');};
+  $('alThumb').onclick=function(){$('alMs').innerHTML=SHEET;$('alMdl').classList.add('on');};
  function ck(){var ok=[].every.call(document.querySelectorAll('.ck'),function(c){return c.checked});$('alFoto').disabled=!ok;if($('alDemo'))$('alDemo').disabled=!ok;}
  document.querySelectorAll('.ck').forEach(function(c){c.onchange=ck;});
  $('alFoto').onclick=function(){$('alFile').click()};
