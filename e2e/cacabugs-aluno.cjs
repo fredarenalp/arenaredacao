@@ -23,7 +23,7 @@ for(const k of ks){await passo('correção '+k+' (tela completa)',async()=>{if(!
   for(const t of ['txt','crit','cri','por']){}
   const abas=await p.locator('#alMain [data-tab],#alMain .vsw2 button,#alMain [role=tab]').count();
   for(let i=0;i<abas;i++){await p.locator('#alMain [data-tab],#alMain .vsw2 button,#alMain [role=tab]').nth(i).click({timeout:2000}).catch(()=>{});await p.waitForTimeout(150)}});
- await passo('correção '+k+' (análise em cartões)',async()=>{if(await p.locator('#alIntro:not(.hide)').count()){await p.click('.ai-skip',{timeout:3000}).catch(()=>{});await p.waitForTimeout(400)} /* 1ª vez (aluno de teste reinicia a cada login): os cartões já abrem sozinhos *//* o botão 'Ver análise em cartões' foi retirado: os cartões só abrem na 1ª vez */let n=0;while(await p.locator('.ai-peek[data-ai="prox"]').count()&&n<14){await p.click('.ai-peek');await p.waitForTimeout(250);n++}
+ await passo('correção '+k+' (análise em cartões)',async()=>{if(await p.locator('#alIntro:not(.hide)').count()){await p.click('.ai-skip',{timeout:3000}).catch(()=>{});await p.waitForTimeout(400)} /* 1ª vez (aluno de teste reinicia a cada login): os cartões já abrem sozinhos *//* o botão 'Ver análise em cartões' foi retirado: os cartões só abrem na 1ª vez *//* cartão único: sem a seta lateral */ if(await p.locator('.ai-peek').count())throw new Error('a seta lateral do cartão deveria ter saído');if(await p.locator('.aiq-t').count())throw new Error('os 5 quadrados deveriam ter saído do cartão inicial');
   if(await p.locator('[data-ai="duvida"]').isVisible().catch(()=>false)){await p.click('[data-ai="duvida"]');await p.waitForTimeout(500);for(const a of ['tabp','tabg']){await p.click('[data-ai="'+a+'"]').catch(()=>{});await p.waitForTimeout(200)}await p.click('[data-ai="plfecha"]').catch(()=>{})}
   await p.click('.ai-skip').catch(()=>{});await p.waitForTimeout(300)})}
 // injeção de marcas de todos os tipos novos na primeira correção
@@ -34,7 +34,7 @@ if(ks.length)await passo('injeção: marcas de todos os tipos',async()=>{await p
   const n=await p.locator('#alMain svg .xm').count();if(n<10)throw new Error('poucas marcas desenhadas: '+n);
   const xs=await p.locator('#alMain svg .xm path.xx').count();if(xs!==2)throw new Error('X esperado 2, achei '+xs);
   if(await p.locator('#alIntro:not(.hide)').count()){await p.click('.ai-skip');await p.waitForTimeout(400)} /* 1ª vez (aluno de teste reinicia a cada login): os cartões já abrem sozinhos */
-  let c=0;const vistos=[];while(c<14){vistos.push(await T('#aiCard'));if(!(await p.locator('.ai-peek[data-ai="prox"]').count()))break;await p.click('.ai-peek');await p.waitForTimeout(250);c++}
+  let c=0;const vistos=[];vistos.push(await T('#aiCard'));
   const all=vistos.join(' | ');for(const must of ['Conectivo','Experimente']){if(!all.includes(must))console.log('   (aviso) cartões não mostram "'+must+'"')}
   await p.click('.ai-skip').catch(()=>{})});
 await b.close()}
