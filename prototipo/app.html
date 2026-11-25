@@ -1704,6 +1704,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .gfp-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--borda);border-radius:14px;padding:11px 13px;margin-bottom:8px}.gfp-row.zr{background:#fbe9e6}
 .gfp-b{flex:1;min-width:0}.gfp-b>b{display:block;font-size:14px}.gfp-b small{display:block;font-size:12px;color:#6a6a60;margin-bottom:6px}.gfp-ch{display:flex;gap:4px}.gfp-nt{font:800 20px Outfit,'DM Sans',sans-serif}
 @media(min-width:641px){.gfc b{font-size:26px!important}.gfc em{font-size:12px}.gfc .gfd{font-size:12px!important}.gfc small{font-size:12px!important}}
+
+/* correção liberada ao aluno: o corretor só lê */
+#roBar{background:#e4eeee;border-color:#bcd3d3;color:#2f5f61}
+body.rc-ro #comps,body.rc-ro #cmBox,body.rc-ro #anBox,body.rc-ro #diagBox,body.rc-ro #mk,body.rc-ro #catp,body.rc-ro #catpS,body.rc-ro #lc,body.rc-ro [data-tool],body.rc-ro #upBtn,body.rc-ro #mkClear,body.rc-ro #mkUndo,body.rc-ro #duvBtn,body.rc-ro #salvar,body.rc-ro .msalvar,body.rc-ro .mcrit,body.rc-ro .mob{pointer-events:none!important;opacity:.55}
+body.rc-ro #salvar,body.rc-ro .msalvar{display:none!important}
 </style>
 <!--PONTE--></head>
 <body>
@@ -1819,6 +1824,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       <div class="fmh"><div class="fmn"><h3 id="fNome"></h3><div class="sub" id="fSub"></div></div>
         <div class="tot"><div class="big" id="totV">—</div><div class="parc" id="totP"></div><div class="seg2" id="totSeg"></div></div></div>
       <div class="fmb" id="fmb">
+        <div class="gcbar hide" id="roBar" role="status"><b>Correção liberada ao aluno</b><span>Somente leitura: o corretor não edita depois da liberação.</span></div>
         <div class="gcbar dvbar hide" id="devolBar" role="status"><b>Devolvida pela coordenação</b><span id="devolTxt"></span></div>
         <div class="gcbar hide" id="gcBar"><b>Redação gancho</b><span>Esta redação já tem a nota do professor. Corrija como as demais, sem comentários adicionais. Ao salvar, você vê como ficou em relação a ela.</span></div>
         <div class="rebar hide" id="reBar"></div>
@@ -2224,10 +2230,13 @@ function elPick(m){m._pick=true;catAtual=m;var N=elemPd(),el=$('catp');
  el.classList.remove('pal');el.classList.remove('rpc');el.classList.add('pick');el.classList.remove('hide');posCat(m)}
 function lacTxt(a){var L=[];(a.marks||[]).forEach(function(m){if(m.t==='o'&&m.cat==='lac'&&L.indexOf(m.line)<0)L.push(m.line)});if(!L.length)return [];L.sort(function(p,q){return p-q});return [(L.length===1?'Há uma lacuna na linha '+L[0]:'Há lacunas nas linhas '+lista2(L.map(String)))+': ideias que ficaram em aberto. Explique esses pontos em detalhes.']}
 function repTxt(a){
- var g=repGrupos(a),out=[];
+ // uma frase por palavra repetida ("A palavra …", "Já a palavra …") e a orientação "Procure sinônimos…" UMA vez, no fim
+ var g=repGrupos(a),out=[],n=0;
  Object.keys(g).sort().forEach(function(k){var ms=g[k];if(ms.length<2)return;var ls=[];ms.forEach(function(m){if(ls.indexOf(m.line)<0)ls.push(m.line)});ls.sort(function(x,y){return x-y});
   var lt=ls.length===1?'na linha '+ls[0]:'nas linhas '+(ls.length<2?ls[0]:ls.slice(0,-1).join(', ')+' e '+ls[ls.length-1]);
-  out.push('A palavra “'+(ms[0].pal||'').trim()+'” aparece '+ms.length+' vezes, '+lt+'. Procure sinônimos'+(function(){var sn=[];ms.forEach(function(m){(m.sin||[]).forEach(function(x){if(sn.indexOf(x)<0)sn.push(x)})});return sn.length?' (por exemplo: '+(sn.length<2?sn[0]:sn.slice(0,-1).join(', ')+' ou '+sn[sn.length-1])+')':''})()+' ou retome a ideia com um pronome.');});
+  var sn=[];ms.forEach(function(m){(m.sin||[]).forEach(function(x){if(sn.indexOf(x)<0)sn.push(x)})});
+  out.push((n++?'Já a':'A')+' palavra “'+(ms[0].pal||'').trim()+'” aparece '+ms.length+' vezes, '+lt+(sn.length?' (por exemplo: '+(sn.length<2?sn[0]:sn.slice(0,-1).join(', ')+' ou '+sn[sn.length-1])+')':'')+'.')});
+ if(out.length)out.push('Procure sinônimos ou retome a ideia com um pronome.');
  return out;
 }
 // frases que avaliam se o aluno alterou algo na reescrita (PROVISÓRIAS: a coordenação tem o conjunto oficial, usado na correção manual)
@@ -2444,6 +2453,7 @@ function abre(k,foco){
  verOrig=false;$('origBtn').classList.toggle('hide',!a.reesc);$('origBtn').classList.remove('on');$('origBtn').firstChild.textContent='Ver 1ª versão';$('foto').textContent='Foto 1 de 1';$('pg').classList.remove('orig');
  if(window.__celPinta)window.__celPinta();
  iaEstado();
+ document.body.classList.toggle('rc-ro',!!a.trancada);var rob=$('roBar');if(rob)rob.classList.toggle('hide',!a.trancada);
  var dvb=$('devolBar');if(dvb){dvb.classList.toggle('hide',!a.devolvida);if(a.devolvida)$('devolTxt').textContent=a.devolvida.motivo||'Revise a correção e salve de novo.'}
  var gb=$('gcBar');if(gb){gb.classList.toggle('hide',!a.gancho);}$('cmBox').classList.toggle('hide',!!a.gancho);$('anBtn').style.display=a.gancho?'none':'';
  var rbx=$('reBar');if(rbx){rbx.classList.toggle('hide',!a.reesc);if(a.reesc)rbx.innerHTML='Níveis iniciais = 1ª correção (ponto âmbar). Ajuste para cima ou para baixo.';}
@@ -2459,7 +2469,7 @@ function abre(k,foco){
 function toast(t,err){var e=$('toast');e.textContent=t;e.className='toast show'+(err?' err':'');clearTimeout(toast.t);toast.t=setTimeout(function(){e.className='toast'+(err?' err':'')},2000);}
 /* ===== Rascunho automático da correção: o que ainda não foi salvo fica guardado neste navegador e volta ao reabrir a redação ===== */
 var RASC_P='arena_rasc_';
-function rascKey(a){return (a&&a._rid&&window.ARENA&&ARENA.perfil&&!window.profMode)?RASC_P+ARENA.perfil.id+'_'+a._rid:null}
+function rascKey(a){return (a&&a._rid&&!a.trancada&&window.ARENA&&ARENA.perfil&&!window.profMode)?RASC_P+ARENA.perfil.id+'_'+a._rid:null}
 function rascEstado(a){var ob=(ALUNOS[i]===a&&$('obs'))?$('obs').value:(a.obs||'');var lim=function(k,v){return (k&&k.charAt(0)==='_')?undefined:v};
  return {niv:a.niv||null,marks:JSON.parse(JSON.stringify(a.marks||[],lim)),obs:ob,anul:a.anul||null,diag:a.diag==null?null:a.diag,cp:a.cp==null?null:a.cp,autoSet:a.autoSet||null,manual:a.manual||null,det:a.det||null,base:a.base||null,resp:a.resp||null,edt:a.edt||null,salt:a.salt||0}}
 function rascSig(a){return JSON.stringify(rascEstado(a))}
@@ -2485,6 +2495,7 @@ window.addEventListener('beforeunload',function(e){rascTudo();if(rascSujo()){e.p
 function temComentario(a){var ob=($('obs')?$('obs').value:(a.obs||'')).split('\n').filter(function(l){return l.trim()&&!/^Comp\. /.test(l)&&!/^Final – /.test(l)&&!/^Redação anulada – /.test(l)});return ob.length>0||(a.marks||[]).some(function(m){return m.t==='c'})}
 function salvar(){
  var a=ALUNOS[i];
+ if(a&&a.trancada){toast('Correção liberada ao aluno: somente leitura',1);return}
  if(window.profMode&&profMode.kind==='gan'){if(total(a)==null){toast('Selecione o nível das 5 competências',1);return}a.obs=$('obs').value;var cfg=profMode,r={niv:a.niv.slice(),marks:cpy(a.marks||[]),obs:a.obs};fechaProf();cfg.onSave(r);return}
  if(a.reesc&&!a.anul&&a.diag==null){toast('Escolha o diagnóstico da 2ª versão',1);$('diagBox').scrollIntoView({behavior:'smooth',block:'center'});$('diagBox').classList.add('pulse');setTimeout(function(){$('diagBox').classList.remove('pulse')},1400);return;}
  if(!a.anul&&total(a)==null){toast('Selecione o nível das 5 competências ou anule a redação',1);return;}

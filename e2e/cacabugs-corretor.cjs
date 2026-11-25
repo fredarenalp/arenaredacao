@@ -80,7 +80,7 @@ async function rodar(b, nome, viewport) {
       if (!(await p.locator('#mk').count())) throw new Error('a tela de correção (#mk) não abriu')
     })
     await passo(`aba ${aba}: nenhum botão das barras fica coberto por outro (primeira tela da correção)`, async () => {
-      const cob = await p.evaluate(() => [...document.querySelectorAll('.tb button, .zbar button')].filter((b) => b.offsetParent !== null).map((b) => { const r = b.getBoundingClientRect(); if (!r.width || r.x < 0 || r.x + r.width > innerWidth) return null; const e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return e && (e === b || b.contains(e)) ? null : (b.id || b.title || b.className).toString().slice(0, 40) }).filter(Boolean))
+      const cob = await p.evaluate(() => [...document.querySelectorAll('.tb button, .zbar button')].filter((b) => b.offsetParent !== null && !(document.body.classList.contains('rc-ro') && b.matches('[data-tool], #upBtn, #mkClear, #mkUndo, #duvBtn'))).map((b) => { const r = b.getBoundingClientRect(); if (!r.width || r.x < 0 || r.x + r.width > innerWidth) return null; const e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return e && (e === b || b.contains(e)) ? null : (b.id || b.title || b.className).toString().slice(0, 40) }).filter(Boolean))
       if (cob.length) throw new Error('botões cobertos: ' + cob.join(', '))
     })
     await passo(`aba ${aba}: zoom, girar, ajustar`, async () => {
@@ -88,6 +88,12 @@ async function rodar(b, nome, viewport) {
       await p.keyboard.press('Escape').catch(() => {})
     })
     await passo(`aba ${aba}: níveis 0 a 4 nos 5 critérios (sem salvar)`, async () => {
+      if (await p.evaluate(() => document.body.classList.contains('rc-ro'))) { // pacote liberado ao aluno: o corretor só lê
+        if (await p.locator('#roBar.hide').count()) throw new Error('pacote liberado sem o aviso de somente leitura')
+        const ok = await p.evaluate(() => { const b = document.querySelector('.rc .lv button[data-n="2"]'); return !b || getComputedStyle(b.closest('#comps') || b).pointerEvents === 'none' })
+        if (!ok) throw new Error('pacote liberado: os níveis ainda aceitam clique')
+        return
+      }
       await p.click('[data-acf="cr"]', { timeout: 1000 }).catch(() => {}) // painel fixo: os níveis ficam na aba Critérios
       if (viewport.width < 700 && await p.evaluate(() => document.querySelector('.pb').classList.contains('big'))) { await p.click('#pbTog'); await p.waitForTimeout(500) } // no celular os níveis completos ficam atrás de "Níveis e comentários"
       for (let k = 0; k < 5; k++) for (const nv of [0, 1, 2, 3, 4]) {

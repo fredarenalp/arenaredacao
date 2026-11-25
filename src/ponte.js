@@ -187,7 +187,7 @@ const ARENA = {
   async carregarCorretor() {
     const { data: pacs, error } = await supabase
       .from('pacotes')
-      .select('*, propostas(titulo, genero), redacoes(id, aluno_id, obs, foto_path, etapa, alunos(nome, matricula, turmas(serie, nome)), correcoes(n1,n2,n3,n4,n5,comentario,anulacao,diag,extras), marcacoes(dados))')
+      .select('*, propostas(titulo, genero), redacoes(id, aluno_id, obs, foto_path, etapa, alunos(nome, matricula, turmas(serie, nome)), correcoes(n1,n2,n3,n4,n5,comentario,anulacao,diag,extras,liberada), marcacoes(dados))')
       .eq('corretor_id', ARENA.perfil.id)
       .order('numero')
     if (error) throw error
@@ -211,6 +211,7 @@ const ARENA = {
         else if (prev) a.niv = prev.slice() // a reescrita começa com os níveis da 1ª versão
         if (c?.anulacao) a.anul = c.anulacao
         window.__corretor.iniA(a)
+        if (p.liberado_em || c?.liberada) a.trancada = true // pacote liberado ao aluno: o corretor só lê (o banco também barra)
         if (c) {
           if (c.comentario != null) a.obs = c.comentario
           if (c.diag != null) a.diag = c.diag
