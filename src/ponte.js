@@ -297,6 +297,7 @@ const ARENA = {
     const { data: gens } = await supabase.from('generos').select('*')
     const genDe = (nome) => (gens ?? []).find((g) => g.nome === nome)
     const { data: prazosInd } = await supabase.from('prazos_individuais').select('proposta_id, ate, vale_nota').eq('aluno_id', al.id)
+    const { data: avisosAt } = await supabase.from('avisos').select('proposta_id, tipo, motivo').eq('aluno_id', al.id).eq('tipo', 'atraso') // motivo do atraso (boletim)
     window.__real = true
     const turma = al.turmas ? `${al.turmas.serie}º ano ${al.turmas.nome}` : ''
     document.getElementById('alNm').textContent = `${al.nome} · ${turma}`.replace(/ · $/, '')
@@ -378,10 +379,17 @@ const ARENA = {
           nota: c.anulacao ? 0 : Number(c.nota), anul: c.anulacao || null, rid: r.id, vista: !!c.vista_em, aval: (avs ?? []).find((x) => x.redacao_id === r.id)?.estrelas ?? null, liberadaEm: c.liberada_em ?? r.enviada_em,
         }
       }
+      // dados do boletim: entregou com atraso? por quê? quando? e qual era o prazo
+      const dmx = (d) => (d ? `${String(d).slice(8, 10)}/${String(d).slice(5, 7)}` : '')
+      const motAtraso = (() => {
+        const m = String((avisosAt ?? []).find((x) => x.proposta_id === p.id)?.motivo ?? '').toLowerCase()
+        return /sa[uú]de/.test(m) ? 'saúde' : /viagem/.test(m) ? 'viagem' : /esqueci|perdi/.test(m) ? 'desorganização' : 'outros motivos'
+      })()
+      const bol = (o, r, v) => (r && r.fora_do_prazo ? { ...o, fora: true, motAt: motAtraso, entEm: dmx(r.enviada_em), prazoDm: dmx(v === 1 ? p.prazo : p.prazo2) } : o)
       const io = PROPS.length
-      PROPS.push(await item(orig, 1))
+      PROPS.push(bol(await item(orig, 1), orig, 1))
       const ir = PROPS.length
-      PROPS.push(await item(re, 2))
+      PROPS.push(bol(await item(re, 2), re, 2))
       ESSAYS.push({ n: num, g: p.genero, tema: p.titulo, o: io, r: ir })
     }
     window.__aluno.recalc()
