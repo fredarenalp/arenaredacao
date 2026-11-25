@@ -4271,7 +4271,7 @@ function boletim(){
   if(p.fora)hist.push({t:nm,m:'Atraso por '+(p.motAt||'outros motivos'),d:(p.entEm?'entregou em '+p.entEm:'')+(p.prazoDm?(p.entEm?' · ':'')+'prazo '+p.prazoDm:'')});
   if(p.semNota){lanc++;obs.push({t:nm,m:'zerada por atraso recusado'});return tile('z','0,0','Atraso recusado',dot)}
   if(n!=null){lanc++;
-   if(p.anul){var mo=A.MOT&&A.MOT[p.anul]?A.MOT[p.anul].l.charAt(0).toLowerCase()+A.MOT[p.anul].l.slice(1):(p.anul==='ia'?'uso de inteligência artificial':String(p.anul));obs.push({t:nm,m:'zerada por '+mo});return tile('z','0,0','Redação anulada',dot)}
+   if(p.anul){var mo=A.MOT&&A.MOT[p.anul]?A.MOT[p.anul].l.charAt(0).toLowerCase()+A.MOT[p.anul].l.slice(1):(p.anul==='ia'?'uso de inteligência artificial':String(p.anul));obs.push({t:nm,m:'zerada por '+mo});return tile('z','0,0','Anulada',dot)}
    soma+=n;return tile('n',f1(n),'',dot)}
   if(p.kind==='late'||p.kind==='closed'||p.kind==='warned'||(p.kind==='open'&&p.dl&&p.dl<hoje)){lanc++;return tile('r','0,0','Não entregue',dot)}
   return tile('p','—','',dot)};
