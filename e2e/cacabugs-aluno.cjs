@@ -13,9 +13,9 @@ const ruim=async(onde)=>{const t=(await T('body'));const m=t.match(RUIM);if(m)fa
 const passo=async(n,fn)=>{try{await fn();await ruim(n);ok(nome+' '+n)}catch(e){falha(nome+' '+n+' → '+String(e.message).split('\n')[0].slice(0,140))}};
 await p.goto('http://localhost:4173');await p.waitForTimeout(500);await p.click('.p[data-k=aluno]');await p.fill('#mat','0000');await p.fill('#pwd','teste');await p.click('#entrar');
 await p.waitForSelector('body.in-aluno',{timeout:25000});await p.waitForTimeout(1500);
-await passo('abas principais',async()=>{for(const k of ['lista','bol','crit','feed','lista']){await p.click('[data-al="'+k+'"]');await p.waitForTimeout(1500);if(k==='feed'){while(await p.locator('.ai-peek[data-ai="prox"]').count())await p.click('.ai-peek');await p.click('.ai-peek');await p.waitForTimeout(400)}}});
+await passo('abas principais',async()=>{for(const k of ['lista','bol','crit','prop','lista']){await p.click('[data-al="'+k+'"]');await p.waitForTimeout(800)}});
 await passo('boletim: subseções',async()=>{await p.click('[data-al="bol"]');await p.waitForTimeout(500);for(const k of ['at','evo','med','at']){await p.click('[data-bt="'+k+'"]');await p.waitForTimeout(300)}});
-await passo('destaques: abas',async()=>{await p.click('[data-al="feed"]');await p.waitForTimeout(2000);await p.click('.ai-skip').catch(()=>{});await p.waitForTimeout(300);for(const t of ['red','err','meu']){await p.click('[data-fd-t="'+t+'"]').catch(()=>{});await p.waitForTimeout(250)}});
+await passo('propostas: bimestres, detalhe e voltar',async()=>{await p.click('[data-al="prop"]');await p.waitForTimeout(500);for(const b of [1,2,4]){await p.click('[data-bim="'+b+'"]');await p.waitForTimeout(250)}await p.click('.pz-row[data-vp]');await p.waitForTimeout(400);await p.click('#vpVolta');await p.waitForTimeout(300);if(!(await p.locator('.pz-list').count()))throw new Error('voltar do detalhe não retornou à lista de Propostas');await p.click('[data-al="lista"]');await p.waitForTimeout(300);await p.click('.vpi');await p.waitForTimeout(400);await p.click('#vpVolta');await p.waitForTimeout(300)});
 // correções
 const ks=await p.evaluate(()=>window.__aluno.PROPS.map((q,k)=>({k,kind:q.kind,nota:q.nota})).filter(x=>x.kind==='corr').map(x=>x.k));
 console.log(nome,'correções do aluno:',ks.length);
