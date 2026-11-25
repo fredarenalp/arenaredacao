@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Arena Redação</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Reenie+Beanie&family=Outfit:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box}
 :root{--r-sm:8px;--r-md:10px;--r-lg:14px;--r-pill:20px;--sh1:0 1px 3px rgba(0,0,0,.08);--sh2:0 8px 24px rgba(0,0,0,.14);--sh3:0 24px 64px rgba(0,0,0,.25);--cor:#3c7678;--soft:rgba(60,118,120,.08);--txt:#1c1c19;--mut:#505048;--borda:#d8d6cc;--err:#b02818}
@@ -442,6 +442,16 @@ button.pc{cursor:pointer}button.pc:hover{border-color:#3c7678;box-shadow:var(--s
 .kn .kpt{display:block;font-size:10.5px;font-weight:600;opacity:.8}
 .ai-cn{background:rgba(255,255,255,.14);border-radius:22px;padding:14px 18px;margin:16px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:10px}.ai-cn .ai-big{font-size:58px}.ai-cmp{font:800 16px Outfit,sans-serif;text-align:right;line-height:1.15}
 .ai-gbars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;align-items:end;height:210px;margin:4px 0 0}.ai-bc{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;min-width:0}.ai-col{width:100%;border-radius:10px 10px 4px 4px;display:flex;align-items:flex-start;justify-content:center;min-height:26px}.ai-col b{font:800 16px Outfit,sans-serif;color:#16393a;padding-top:5px}.ai-bc span{font:700 min(10.5px,2.55vw) 'DM Sans',sans-serif;white-space:nowrap;letter-spacing:-.2px;color:#fff}.ai-cap{font:600 11.5px 'DM Sans',sans-serif;opacity:.85;margin:10px 2px 12px}
+/* nota em anel (cartão inicial do aluno) */
+.aiq-ring{position:relative;width:190px;height:190px;margin:18px auto 6px}.aiq-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.aiq-n{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.aiq-n b{font:800 66px/1 Outfit,sans-serif;letter-spacing:-.03em}.aiq-n small{font:600 15px 'DM Sans',sans-serif;opacity:.85;margin-top:2px}
+.aiq-fr{margin:4px auto 18px;max-width:290px;text-align:center;font:600 15px/1.3 'DM Sans',sans-serif;opacity:.96}
+.aiq{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 0 16px}
+.aiq-t{background:rgba(255,255,255,.13);border:1.5px solid rgba(255,255,255,.28);border-radius:12px;padding:8px 0 9px;text-align:center;min-width:0}.aiq-t.ab{border-color:#f2cf7a}
+.aiq-t i{display:block;width:22px;height:4px;border-radius:2px;margin:0 auto 4px}.aiq-t span{display:block;font:700 11px 'DM Sans',sans-serif;opacity:.85}
+.aiq-t b{display:block;font:800 24px/1.1 Outfit,sans-serif}.aiq-t b small{font:600 11px 'DM Sans',sans-serif;opacity:.7;color:#fff}
+.aiq-t em{display:block;font:700 min(9.5px,2.4vw) 'DM Sans',sans-serif;font-style:normal;margin-top:2px;letter-spacing:-.2px;white-space:nowrap}
+@media(max-height:720px){.aiq-ring{width:150px;height:150px;margin-top:8px}.aiq-n b{font-size:52px}.aiq-fr{margin-bottom:10px}}
 /* post-it (folha de caderno do tamanho de um post-it) no cartão inicial do aluno */
 .aip{position:relative;box-sizing:border-box;width:min(306px,100%);margin:14px auto 0;padding:24px 18px 22px 44px;color:#222;border-radius:3px 3px 5px 5px;transform:rotate(-2.2deg);background:linear-gradient(172deg,#fffdf6 0%,#faf7ee 100%);box-shadow:0 1px 1px rgba(0,0,0,.18),0 12px 18px -8px rgba(0,0,0,.5)}
 .aip:after{content:"";position:absolute;left:14px;right:-4px;bottom:-9px;height:20px;background:rgba(0,0,0,.34);filter:blur(9px);z-index:-1;transform:rotate(1.4deg)}
@@ -4616,9 +4626,14 @@ function aiHw(t,size,col,seed,slant){var x=(seed||7)%2147483646||7,r=function(){
  return '<span class="aihw" style="font-size:'+size+'px;color:'+col+'">'+String(t).split('').map(function(ch){if(ch===' ')return '<span style="width:.28em"></span>';
   return '<span style="transform:translateY('+(r()*3-1.5).toFixed(1)+'px) rotate('+(r()*7-3.5+(slant||0)).toFixed(1)+'deg) scale('+(.94+r()*.13).toFixed(2)+');opacity:'+(.84+r()*.16).toFixed(2)+';-webkit-text-stroke:'+(size>60?.9:size>30?.55:.35)+'px '+col+';text-shadow:0 0 .7px '+col+',.4px .3px .5px '+col+'55">'+aiEsc(ch)+'</span>'}).join('')+'</span>'}
 // frases do professor por faixa de nota (a caneta é azul da nota de corte para cima e vermelha abaixo)
-function aiFrase(n){var p='hora de visitar o plantão!';
- if(n>=10)return ['nota máxima!','uma redação exemplar, parabéns!'];if(n>=9)return ['excelente!','você mandou muito bem'];if(n>=8)return ['muito bem!','continue assim, o caminho é esse'];if(n>=7)return ['bom trabalho!','dá para ir ainda mais longe'];
- if(n>=6)return ['na média!','bom caminho, continue assim!'];if(n>=5)return ['quase lá!',p];if(n>=3)return ['vamos melhorar!',p];return ['vamos conversar?',p]}
+function aiFrase(n){ // frase pequena sob a nota (decisão do dono)
+ if(n>=10)return 'Uma redação exemplar, parabéns!';if(n>=9)return 'Sensacional! Você escreveu muito bem!';if(n>=8)return 'Excelente! Continue assim, o caminho é esse!';if(n>=7)return 'Bom trabalho! Bastam apenas alguns ajustes!';
+ if(n>=6)return 'Você está na média! Agora, vamos avançar!';if(n>=5)return 'Quase lá! Ainda temos trabalho pela frente!';if(n>=3)return 'Não desanime! Vamos superar esse texto juntos!';return 'Calma, sempre é tempo de recomeçar!'}
+// cartão inicial = NOTA EM ANEL (decisão do dono): anel de progresso, frase pequena e os 5 critérios
+function aiAnel(P){var NM=['Estética','Linguagem','Progressão','Proposta','Abordagem'],RM=['I','II','III','IV','V'],TN=['#bfe3e4','#9db8ee','#d1b3ea','#f2cf7a','#a6e0bf'],nota=P.nota==null?0:P.nota,C=2*Math.PI*64;
+ var anel='<div class="aiq-ring" role="img" aria-label="Nota '+aiF1(nota)+' de 10"><svg viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="64" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="12"/><circle cx="75" cy="75" r="64" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-Math.max(0,Math.min(10,nota))/10)).toFixed(1)+'"/></svg><div class="aiq-n"><b>'+aiF1(nota)+'</b><small>de 10</small></div></div>';
+ var tiles='<div class="aiq">'+NM.map(function(n,j){var v=(P.niv&&P.niv[j])||0;return '<div class="aiq-t'+(v<3?' ab':'')+'"><i style="background:'+TN[j]+'"></i><span>'+RM[j]+'</span><b style="color:'+TN[j]+'">'+v+'<small>/4</small></b><em>'+n+'</em></div>'}).join('')+'</div>';
+ return anel+'<p class="aiq-fr">'+aiEsc(aiFrase(nota))+'</p>'+tiles}
 function aiPostit(P){var A=window.__arena||{},NV=A.NIVEIS||['Inadequado','Irregular','Regular','Moderado','Adequado'],NM=['Estética','Linguagem','Progressão','Proposta','Abordagem'],RM=['I','II','III','IV','V'];
  var nota=P.nota==null?0:P.nota,corte=(window.__regras&&window.__regras.corte!=null)?window.__regras.corte:6,pc=nota>=corte?'#1a3fb8':'#c9201a',sd=(((P._pid||'')+'').split('').reduce(function(a,c){return a*31+c.charCodeAt(0)},17)+Math.round(nota*10))>>>0,fr=aiFrase(nota);
  var COL=function(v){return v<=1?'#d3221a':v===2?'#e8780a':'#52a9f7'};
@@ -4683,7 +4698,7 @@ function aiSlides(k){
  var corte=(window.__regras&&window.__regras.corte!=null)?window.__regras.corte:6,cmp=P.nota==null?'':(P.nota<corte?'Abaixo da média':P.nota>corte?'Acima da média':'Na média');
  s0.h=s0.h.replace(/<div class="ai-big">([^<]*)<small>\/10<\/small><\/div>/,function(m,n){return '<div class="ai-cn"><div class="ai-big m" style="margin:0">'+n+'<small>/10</small></div>'+(cmp?'<div class="ai-cmp">'+cmp+'</div>':'')+'</div>'});
  // um cartão só (decisão do dono): post-it com a nota (sempre visível), ficha dos critérios e botões
- s0.h='<div class="ai-tg">Novidade</div><div class="ai-h1" style="font-size:30px;margin-bottom:6px">Sua redação voltou,<br>'+aiEsc(nm)+'!</div>'+aiPostit(P)+aiBtn('w','Ver a correção completa','correcao')+(P.nota<AI_CORTE?aiBtn('gh','Pedir uma conversa','plantao'):aiBtn('gh','Ir para o menu','menu'));delete s0.nota;
+ s0.h='<div class="ai-tg">Novidade</div><div class="ai-h1" style="font-size:30px;margin-bottom:6px">Sua redação voltou,<br>'+aiEsc(nm)+'!</div>'+aiAnel(P)+aiBtn('w','Ver a correção completa','correcao')+(P.nota<AI_CORTE?aiBtn('gh','Pedir uma conversa','plantao'):aiBtn('gh','Ir para o menu','menu'));delete s0.nota;
  return [s0]
  return S}
 function aiSlidesSem(){
