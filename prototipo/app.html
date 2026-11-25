@@ -1159,7 +1159,7 @@ select.sel,.ct select.sel{height:auto;min-height:0;line-height:1.25;padding:6px 
 .gfs{margin:18px 0 6px}.gfcs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 0 12px}
 .gfc{display:flex;flex-direction:column;gap:3px;text-align:left;background:#fff;border:1.5px solid var(--borda);border-radius:10px;padding:10px 12px;cursor:pointer;border-top:4px solid var(--c);font-family:'DM Sans',sans-serif}
 .gfc small{font:700 12px 'DM Sans',sans-serif;color:#505048}.gfc b{font:800 22px Outfit,sans-serif;color:#1c1c19}.gfc b i{font:500 12px 'DM Sans',sans-serif;font-style:normal;color:#6a6a60}
-.gfc.on{box-shadow:0 0 0 2px var(--c) inset}.gfd{font-size:12px;line-height:1.3}.gfd.up{color:#2d7a4f}.gfd.dn{color:#b83030}.gfd.eq{color:#6a6a60}.gfsp{width:84px;height:26px;margin-top:2px}
+.gfc.on{box-shadow:0 0 0 2px var(--c) inset}.gfd{font-size:12px;line-height:1.3}.gfd.up{color:#2d7a4f}.gfd.dn{color:#b83030}.gfd.eq{color:#6a6a60}
 .gfbox{background:#fff;border:1px solid var(--borda);border-radius:10px;padding:10px 10px 8px;margin:0 0 12px}.gfsvg{width:100%;height:auto;display:block}
 .gfband{fill:#e3f1e6;opacity:.7}.gfgr{stroke:#e4e2d8;stroke-width:1}.gfgr.es{stroke:#2d7a4f;stroke-dasharray:4 3}.gfyl{font:12px 'DM Sans',sans-serif;fill:#6a6a60}.gfesp{font:11px 'DM Sans',sans-serif;fill:#2d7a4f}
 .gfcol{fill:transparent}.gfcol.on{fill:#3c7678;opacity:.07}.gfxl{font:700 12px 'DM Sans',sans-serif;fill:#1c1c19}.gfxl.fu{fill:#9a9a92}.gfxs{font:11px 'DM Sans',sans-serif;fill:#6a6a60}.gfxs.z{fill:#b83030;font-weight:700}
@@ -1692,6 +1692,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .ghbar .ghdet{margin-left:auto;display:inline-flex;align-items:center;gap:4px;font:700 13px 'DM Sans',sans-serif;color:#3c7678}.ghbar .ghdet svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
 .gh.ab .ghdet svg{transform:rotate(180deg)}.ghbar:hover{background:#faf9f4}.ghbar:focus-visible{outline:3px solid #3c7678;outline-offset:-3px}
 .ghdb{padding:0 18px 14px;border-top:1px solid #ebe9e0}.ghdb[hidden]{display:none}.ghdb .ghh{margin:10px 0}
+
+/* Boletim · Evolução (opção B): quadrados I–V, gráfico de linhas, produções em cartões */
+.gfcs{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important}
+.gfc{align-items:center!important;text-align:center!important;padding:9px 2px 8px!important;gap:1px!important;border-radius:12px!important}
+.gfc small{font:700 11px 'DM Sans',sans-serif!important;letter-spacing:0!important;color:#6a6a60!important}
+.gfc b{font:800 19px Outfit,'DM Sans',sans-serif!important;line-height:1.1}
+.gfc em{font:500 9.5px 'DM Sans',sans-serif;font-style:normal;color:#6a6a60;max-width:100%;overflow:hidden;white-space:nowrap}
+.gfc .gfd{font:800 10.5px 'DM Sans',sans-serif!important;margin-top:1px}
+.gfp-h{font:700 12px 'DM Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#6a6a60;margin:16px 0 8px}
+.gfp-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--borda);border-radius:14px;padding:11px 13px;margin-bottom:8px}.gfp-row.zr{background:#fbe9e6}
+.gfp-b{flex:1;min-width:0}.gfp-b>b{display:block;font-size:14px}.gfp-b small{display:block;font-size:12px;color:#6a6a60;margin-bottom:6px}.gfp-ch{display:flex;gap:4px}.gfp-nt{font:800 20px Outfit,'DM Sans',sans-serif}
+@media(min-width:641px){.gfc b{font-size:26px!important}.gfc em{font-size:12px}.gfc .gfd{font-size:12px!important}.gfc small{font-size:12px!important}}
 </style>
 <!--PONTE--></head>
 <body>
@@ -4196,16 +4208,14 @@ function prodsBim(b){var o=[];
  return o}
 function bimCrit(b){var P=prodsBim(b);if(!P.length)return null;return [0,1,2,3,4].map(function(k){var t=0;P.forEach(function(x){t+=x.niv[k]});return t/P.length})}
 function mediaGeral(P){if(!P.length)return null;var t=0;P.forEach(function(x){t+=x.niv.reduce(function(a,b){return a+b},0)/5});return t/P.length}
-function cpSpark(vals,col){var w=84,h=26,pts=vals.map(function(v,i){return v==null?null:[4+i*(w-8)/2,h-3-v*(h-6)/4]}).filter(Boolean);
- return '<svg class="gfsp" viewBox="0 0 '+w+' '+h+'" aria-hidden="true"><polyline points="'+pts.map(function(p){return p[0].toFixed(1)+','+p[1].toFixed(1)}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'+pts.map(function(p,i){return '<circle cx="'+p[0].toFixed(1)+'" cy="'+p[1].toFixed(1)+'" r="'+(i===pts.length-1?3:2)+'" fill="'+col+'"/>'}).join('')+'</svg>'}
 function cpGrafico(M,Z){
- var am=document.getElementById('alMain'),cw=am?am.clientWidth-44:640,W=Math.max(560,Math.min(1000,cw||640)),H=Math.round(300+Math.max(0,W-640)*.14),L=40,R=64,T=16,B=48,xs=function(b){return L+(b-1)*(W-L-R)/3},ys=function(v){return T+(4-v)*(H-T-B)/4},s='';
+ var am=document.getElementById('alMain'),cw=am?am.clientWidth-28:640,W=Math.max(300,Math.min(1000,cw||640)),nr=W<480,H=nr?210:Math.round(300+Math.max(0,W-640)*.14),L=nr?24:40,R=nr?12:64,T=16,B=nr?30:48,xs=function(b){return L+(b-1)*(W-L-R)/3},ys=function(v){return T+(4-v)*(H-T-B)/4},s='';
  s+='<rect x="'+L+'" y="'+ys(4)+'" width="'+(W-L-R)+'" height="'+(ys(3)-ys(4))+'" class="gfband"/>';
  for(var g=0;g<=4;g++)s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+ys(g)+'" y2="'+ys(g)+'" class="gfgr'+(g===3?' es':'')+'"/><text x="'+(L-8)+'" y="'+(ys(g)+4)+'" class="gfyl" text-anchor="end">'+g+'</text>';
- s+='<text x="'+(W-R-4)+'" y="'+(ys(4)+13)+'" class="gfesp" text-anchor="end">nível esperado (3 ou mais)</text>';
- [1,2,3,4].forEach(function(b){var on=b===GB;s+='<rect x="'+(xs(b)-52)+'" y="'+T+'" width="104" height="'+(H-T-B+30)+'" class="gfcol'+(on?' on':'')+'" data-gb="'+(b<=BATU?b:'')+'"'+(b<=BATU?' style="cursor:pointer"':'')+'/>';
-  s+='<text x="'+xs(b)+'" y="'+(H-B+18)+'" class="gfxl'+(b>BATU?' fu':'')+'" text-anchor="middle">'+b+'º bimestre</text>';
-  s+='<text x="'+xs(b)+'" y="'+(H-B+33)+'" class="gfxs'+(Z[b]?' z':'')+'" text-anchor="middle">'+(b>BATU?'começa em '+BINI[b]:Z[b]?Z[b]+(Z[b]===1?' produção zerada':' produções zeradas'):b===BATU?'em andamento':'')+'</text>'});
+ s+='<text x="'+(W-R-4)+'" y="'+(ys(4)+13)+'" class="gfesp" text-anchor="end">'+(nr?'esperado (3)':'nível esperado (3 ou mais)')+'</text>';
+ [1,2,3,4].forEach(function(b){var on=b===GB;var hw=(W-L-R)/6;s+='<rect x="'+(xs(b)-hw)+'" y="'+T+'" width="'+(hw*2)+'" height="'+(H-T-B+30)+'" class="gfcol'+(on?' on':'')+'" data-gb="'+(b<=BATU?b:'')+'"'+(b<=BATU?' style="cursor:pointer"':'')+'/>';
+  s+='<text x="'+xs(b)+'" y="'+(H-B+18)+'" class="gfxl'+(b>BATU?' fu':'')+'" text-anchor="middle">'+b+(nr?'º':'º bimestre')+'</text>';
+  if(!nr)s+='<text x="'+xs(b)+'" y="'+(H-B+33)+'" class="gfxs'+(Z[b]?' z':'')+'" text-anchor="middle">'+(b>BATU?'começa em '+BINI[b]:Z[b]?Z[b]+(Z[b]===1?' produção zerada':' produções zeradas'):b===BATU?'em andamento':'')+'</text>'});
  for(var k=0;k<5;k++){var col=CCOL[k],pts=[1,2,3,4].filter(function(b){return M[b]}).map(function(b){return [xs(b),ys(M[b][k]),b]}),dim=GC>=0&&GC!==k;
   s+='<g class="gfln'+(dim?' dim':'')+'"><polyline points="'+pts.map(function(p){return p[0]+','+p[1].toFixed(1)}).join(' ')+'" fill="none" stroke="'+col+'" stroke-width="'+(GC===k?2.4:1.5)+'" stroke-linejoin="round" stroke-linecap="round"/>'+
   pts.map(function(p){var par=p[2]===BATU;return '<circle cx="'+p[0]+'" cy="'+p[1].toFixed(1)+'" r="3.4" fill="'+(par?'#fff':col)+'" stroke="'+col+'" stroke-width="1.5"><title>'+CRIT[k]+' · '+p[2]+'º bimestre: '+fmt1(M[p[2]][k]).replace('.',',')+(par?' (parcial)':'')+'</title></circle>'}).join('')+'</g>'}
@@ -4213,19 +4223,20 @@ function cpGrafico(M,Z){
 function cpInner(){
  var BS=[1,2,3,4].filter(function(b){return b<=BATU}),M={},Z={},P={};BS.forEach(function(b){M[b]=bimCrit(b);P[b]=prodsBim(b);Z[b]=P[b].filter(function(x){return x.nota===0}).length});
  var PB=null,qq;for(qq=BATU-1;qq>=1;qq--){if(P[qq]&&P[qq].length){PB=qq;break}}var CUR=M[BATU]||[0,0,0,0,0],PRV=PB?M[PB]:CUR;
- var cards=CRIT.map(function(n,k){var cur=CUR[k],prev=PRV[k],d=cur-prev,cls=Math.abs(d)<.05?'eq':d>0?'up':'dn',tx=!PB?'primeiro bimestre com nota':cls==='eq'?'igual ao '+PB+'º bimestre':(d>0?'subiu ':'caiu ')+fmt1(Math.abs(d))+' desde o '+PB+'º bimestre';
-  return '<button type="button" class="gfc'+(GC===k?' on':'')+'" data-gc="'+k+'" style="--c:'+CCOL[k]+'" aria-pressed="'+(GC===k)+'"><small>'+n+'</small><b>'+fmt1(cur)+'<i> de 4</i></b><span class="gfd '+cls+'">'+tx+'</span>'+cpSpark(BS.slice(-3).map(function(b){return M[b]?M[b][k]:null}),CCOL[k])+'</button>'}).join('');
+ var ROM=['I','II','III','IV','V'],cards=CRIT.map(function(n,k){var cur=CUR[k],prev=PRV[k],d=cur-prev,cls=Math.abs(d)<.05?'eq':d>0?'up':'dn',tx=!PB?'':cls==='eq'?'=':(d>0?'▲':'▼')+fmt1(Math.abs(d)),ttl=!PB?'primeiro bimestre com nota':cls==='eq'?'igual ao '+PB+'º bimestre':(d>0?'subiu ':'caiu ')+fmt1(Math.abs(d))+' desde o '+PB+'º bimestre';
+  return '<button type="button" class="gfc'+(GC===k?' on':'')+'" data-gc="'+k+'" style="--c:'+CCOL[k]+'" aria-pressed="'+(GC===k)+'" title="'+n+': '+ttl+'"><small>'+ROM[k]+'</small><b>'+fmt1(cur)+'</b><em>'+n+'</em><span class="gfd '+cls+'">'+(tx||'&nbsp;')+'</span></button>'}).join('');
  var legend=CRIT.map(function(n,k){return '<span class="gflg"><i style="background:'+CCOL[k]+'"></i>'+n+'</span>'}).join('');
- var tabs=BS.map(function(b){return '<button type="button" data-gb="'+b+'" class="'+(GB===b?'on':'')+'">'+b+'º bimestre'+(Z[b]?' <em>'+Z[b]+' zerada'+(Z[b]>1?'s':'')+'</em>':'')+'</button>'}).join('');
- var Q=P[GB],rows=Q.map(function(x){var chips=x.niv.map(function(v,k){return '<td class="n"><span class="lvc '+(v===0?'l0':v>=3?'ok':'lo')+'" title="'+CRIT[k]+'">'+v+'</span></td>'}).join('');
-  return '<tr class="'+(x.nota===0?'zr':'')+'"><td><b>Proposta '+x.n+' · '+x.v+'ª versão</b><div class="sm">'+x.g+(x.z?' · <b class="zt">Nota 0: '+x.z+'</b>':'')+'</div></td>'+chips+'<td class="n"><b>'+fmt1(x.nota)+'</b></td></tr>'}).join('');
+ var tabs=BS.map(function(b){return '<button type="button" data-gb="'+b+'" class="'+(GB===b?'on':'')+'">'+b+'º'+(Z[b]?' <em>'+Z[b]+' zerada'+(Z[b]>1?'s':'')+'</em>':'')+'</button>'}).join('');
+ var Q=P[GB],rows=Q.map(function(x){var chips=x.niv.map(function(v,k){return '<span class="lvc '+(v===0?'l0':v>=3?'ok':'lo')+'" title="'+CRIT[k]+'">'+v+'</span>'}).join('');
+  return '<div class="gfp-row'+(x.nota===0?' zr':'')+'"><div class="gfp-b"><b>Proposta '+x.n+' · '+x.v+'ª versão</b><small>'+x.g+(x.z?' · <b class="zt">Nota 0: '+x.z+'</b>':'')+'</small><div class="gfp-ch">'+chips+'</div></div><div class="gfp-nt">'+fmt1(x.nota)+'</div></div>'}).join('');
  var mg=mediaGeral(Q),nz=Q.filter(function(x){return x.nota>0}),mgz=mediaGeral(nz),zc=Z[GB];
- var note=zc?'<div class="gfnt z"><b>As '+zc+' produções com nota 0 entram na média.</b> Com elas, a média dos critérios neste bimestre é <b>'+fmt1(mg)+'</b>. Sem elas seria '+fmt1(mgz)+'. Todas as produções contam, inclusive a 1ª versão quando não há reescrita.</div>':'<div class="gfnt">Todas as produções do bimestre contam na média, inclusive a 1ª versão quando não há reescrita.'+(GB===BATU?' Aqui aparecem as '+Q.length+' produções já corrigidas de '+QTD_BOL+'; as outras entram quando forem corrigidas.':'')+'</div>';
+ var note=zc?'<div class="gfnt z"><b>As '+zc+' produções com nota 0 entram na média.</b> Com elas, a média dos critérios neste bimestre é <b>'+fmt1(mg)+'</b>. Sem elas seria '+fmt1(mgz)+'. Todas as produções contam, inclusive a 1ª versão quando não há reescrita.</div>':'<div class="gfnt">Todas as produções do bimestre contam na média, inclusive a 1ª versão quando não há reescrita.'+(GB===BATU?' Aqui '+(Q.length===1?'aparece 1 produção já corrigida':'aparecem as '+Q.length+' produções já corrigidas')+' de '+QTD_BOL+'; as outras entram quando forem corrigidas.':'')+'</div>';
  var cur=CUR,prv=PRV,am=function(f){var b=0;for(var q=1;q<5;q++)if(f(q)>f(b))b=q;return b},forte=am(function(q){return cur[q]}),sobe=am(function(q){return cur[q]-prv[q]}),baixo=am(function(q){return -cur[q]});
  var resumo='<p class="gfres">Neste bimestre, seu critério mais forte é <b>'+CRIT[forte]+'</b> ('+fmt1(cur[forte])+' de 4). '+((cur[sobe]-prv[sobe])>=.05?'O que mais subiu desde o '+PB+'º bimestre foi <b>'+CRIT[sobe]+'</b> (+'+fmt1(cur[sobe]-prv[sobe])+'). ':'')+(cur[baixo]<3?'Atenção para <b>'+CRIT[baixo]+'</b> ('+fmt1(cur[baixo])+'): está abaixo do esperado, que é 3.':'Todos os critérios estão no nível esperado.')+'</p>';
- return '<h3 class="bol-h3">Seus critérios ao longo do ano</h3><p class="sm" style="margin:0 0 10px">Média do nível de cada critério (de 0 a 4) em todas as produções do bimestre. Cada bimestre trabalha um gênero diferente, então Proposta e Abordagem podem variar de um bimestre para outro.</p>'+
- '<div class="gfcs">'+cards+'</div><div class="gfbox">'+cpGrafico(M,Z)+'<div class="gflgs">'+legend+'<span class="gflg"><i class="ho"></i>bimestre em andamento (parcial)</span></div></div>'+
- resumo+'<div class="gftabs" role="tablist">'+tabs+'</div><div class="bol-t"><table class="bt gft"><thead><tr><th>Produção</th>'+CRIT.map(function(n,k){return '<th class="n" title="'+n+'">'+['Est.','Ling.','Prog.','Prop.','Abor.'][k]+'</th>'}).join('')+'<th class="n">Nota</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+note}
+ var temG=BS.filter(function(b){return M[b]}).length>=2;
+ return '<h3 class="bol-h3">Sua evolução</h3><p class="sm" style="margin:0 0 10px">Média do nível de cada critério (0 a 4) no bimestre.'+(temG?' Toque num quadrado para destacar a linha no gráfico.':'')+'</p>'+
+ '<div class="gfcs">'+cards+'</div>'+(temG?'<div class="gfbox">'+cpGrafico(M,Z)+'<div class="gflgs">'+legend+'<span class="gflg"><i class="ho"></i>bimestre em andamento (parcial)</span></div></div>':'')+
+ resumo+'<h4 class="gfp-h">Produções do bimestre</h4><div class="gftabs" role="tablist">'+tabs+'</div><div class="gfp">'+rows+'</div>'+note}
 $('alMain').addEventListener('click',function(e){var b=e.target.closest('[data-k]');if(b&&PROPS[+b.dataset.k]&&PROPS[+b.dataset.k].nova)PROPS[+b.dataset.k].nova=false});
 document.addEventListener('click',function(e){if(e.target.closest('#alPdfBim')&&window.__imprimeBimestre)window.__imprimeBimestre()});
 function cpHtml(){return '<section class="gfs" id="gfSec">'+cpInner()+'</section>'}
