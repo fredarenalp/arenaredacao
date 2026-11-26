@@ -355,8 +355,13 @@ const ARENA = {
     for (const k of Object.keys(BINI)) delete BINI[k]
 
     // bimestre atual: cartões
-    for (const p of props.filter((x) => x.bimestre === bimAtual && x.status !== 'rascunho').sort((x, y) => x.numero - y.numero)) {
+    // Conta de demonstração (Aluno Teste, usada pelos gestores): cenário fixo, sem depender da data de hoje nem do estado real das propostas.
+    // Proposta 1 sempre vence amanhã, Proposta 2 sempre aberta para enviar com atraso, Proposta 4 não aparece.
+    const demo = al.matricula === '20260187'
+    const amanha = (() => { const d = new Date(hoje + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + 1); return d.toISOString().slice(0, 10) })()
+    for (const p of props.filter((x) => x.bimestre === bimAtual && x.status !== 'rascunho' && !(demo && x.numero === 4)).sort((x, y) => x.numero - y.numero)) {
       const num = p.numero
+      if (demo && num === 1) { p.prazo = amanha; p.status = 'aberta' }
       const orig = reds.find((r) => r.proposta_id === p.id && r.versao === 1)
       const re = reds.find((r) => r.proposta_id === p.id && r.versao === 2)
       const item = async (r, versao) => {
@@ -374,6 +379,7 @@ const ARENA = {
             if (!indRe && (p.status === 'encerrada' || p.status === 'fechada' || (p.prazo2 && hoje > fimDe(p.prazo2)))) return { ...base, g, t: rot, s: 'Prazo encerrado. Procure a coordenação.', st: 'at', l: 'Envio fechado', kind: 'closed' }
             return { ...base, g, t: rot, s: 'Aberta para envio', st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação', dl: p.prazo2 || null }
           }
+          if (demo && num === 2) return { ...base, g, t: rot, s: `Prazo encerrado em ${prazo}`, st: 'at', l: 'Atrasada · ainda dá para enviar', kind: 'late', cta: 'Enviar com atraso', dl: p.prazo }
           const ind = (prazosInd ?? []).find((x) => x.proposta_id === p.id && x.ate >= hoje)
           if (ind) return { ...base, g, t: rot, s: `Envio liberado até ${ind.ate.slice(8, 10)}/${ind.ate.slice(5, 7)}${ind.vale_nota ? '' : ' · não vale nota'}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação', dl: ind.ate }
           // fechada/encerrada pela coordenação, ou passou da sexta da semana do prazo (REGRA DO DONO): o envio acabou, só a coordenação libera

@@ -1710,6 +1710,12 @@ body.rc-ro #salvar,body.rc-ro .msalvar{display:none!important}
 .cogrid>*{min-width:0}.cogrid>.card{overflow-x:auto}.card:has(table.ct){overflow-x:auto}.ct td.acs{white-space:normal;min-width:150px}.ct td.acs .cobtn{margin:2px 4px 2px 0}#anCrit{overflow-x:auto}.ct .sel{min-width:130px}.ct td{padding-left:10px;padding-right:10px}.ct td:last-child,.ct th:last-child{padding-right:14px}
 @media(max-width:1100px){.cogrid[style*="1.5fr 1fr"]{grid-template-columns:minmax(0,1fr)!important}}
 @media(max-width:640px){.cosub,.coseg{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;max-width:100%}.cosub button,.coseg button{flex:none}}
+/* aluno, computador: a nota final vira uma linha só, e o cartão "Seus 5 critérios" sobe até a altura do topo da foto (pedido do dono) */
+@media(min-width:900px){#alMain .cr-right .cr-nota{padding:0 4px;border:0;background:transparent;height:24px;min-height:0}
+#alMain .cr-right .cr-nota>div:first-child{display:flex;align-items:baseline;gap:8px}
+#alMain .cr-right .cr-nota .lab{margin:0!important}
+#alMain .cr-right .cr-nota .cr-big{font-size:20px}#alMain .cr-right .cr-nota .cr-big small{font-size:12px}
+#alMain .cr-right .cr-nota .cr-pill{padding:2px 10px}}
 </style>
 <!--PONTE--></head>
 <body>
@@ -4560,6 +4566,7 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  function crUm(q){var T=$('crT1'),cs=[].slice.call(document.querySelectorAll('#crT1 .crc')),c=cs[q];if(!c)return;var ja=T.classList.contains('one')&&c.classList.contains('crsel');cs.forEach(function(x){x.classList.toggle('crsel',!ja&&x===c)});T.classList.toggle('one',!ja)} // 1 toque mostra só aquele quadro; outro toque no mesmo volta a mostrar todos
  var adb=$('crAdBtn');if(adb)adb.onclick=function(){crUm(5)};
  document.querySelectorAll('[data-cj]').forEach(function(b){b.onclick=function(){crUm(+b.dataset.cj)};});
+ crUm(0); // decisão do dono: a correção já abre com o critério I selecionado (toque no I de novo mostra todos)
  function chips(){
   document.querySelectorAll('.crvm').forEach(function(b){var on=fj!==null&&+b.dataset.vm===fj;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
   var bar=$('crF');bar.classList.toggle('hide',fj===null);
