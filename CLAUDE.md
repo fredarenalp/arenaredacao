@@ -174,3 +174,6 @@ Regra do dono, sem exceção: com o pacote liberado (`pacotes.liberado_em`) o co
 
 ## Aluno: cartão da 1ª vez, ainda mais enxuto (decisão do dono, IMPLEMENTADO)
 O cartão inicial (nota em anel) **não tem mais os 5 quadrados dos critérios** nem a **seta lateral** (`.ai-peek`); só "Sua redação voltou, <nome>!", o anel com a nota, a frase da faixa e os botões "Ver a correção completa" / "Ir para o menu" (ou "Pedir uma conversa" abaixo da nota de corte). Os 5 quadrados continuam na tela "Ver a correção". O botão `?` Dúvida desligado (`false&&`) também foi removido do código. Teste: `e2e/primeira-vez-cartoes.cjs`.
+
+## Login: liso no celular (decisão do dono, IMPLEMENTADO)
+Depois de várias simulações (capa em tela cheia, folha inclinada, versão laranja), o dono **desistiu de tudo isso** e quis manter a tela de login como ela é: seletor Corretor/Aluno, matrícula/senha, "Lembrar", "Esqueci a senha", "Primeiro acesso…", "Área restrita". **Só mudou o fundo no celular (≤640 px): sem as linhas de caderno e sem a margem rosa** (`.right.caderno` com `background-image:none` e `::before` oculto). **No computador a folha de caderno continua.** Não implementar de novo: capa com "Entrar →", só-aluno, área restrita laranja, lembrete de data de nascimento.
