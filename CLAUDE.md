@@ -212,3 +212,7 @@ O aviso "As competências … estão no nível 0 ou 1 e não há nenhum comentá
 
 ## Aluno: setas de repetição e parágrafo desalinhado (26/11)
 Na tela do aluno e na impressão/PDF, os círculos de **Repetição** (`rp`, mesma palavra) agora são ligados por setas tracejadas laranja na ordem da leitura (`window.rpSetasCirc`, marcador `#rpHa`; os círculos `rp` ficaram laranja como no corretor). O **Parágrafo desalinhado** já tinha a linha roxa (`pdLinhaSvg`). Teste: `e2e/cacabugs-aluno.cjs` (2 setas para 3 círculos da mesma palavra, tela e impressão).
+
+## Aluno: tocar num círculo da folha mostra o que ele significa (decisão do dono, 26/11)
+Na tela "Ver a correção" do aluno, tocar/clicar em qualquer círculo (não só os que têm comentário) abre um balão (`#crPop`) com o tipo e o critério ("Ortografia · critério II"), uma frase do significado (`catD`/`catDesc`) e, quando há, a palavra certa, as sugestões ou a palavra repetida. Cada círculo é um `<g class="cxh" data-ci>` com área de toque maior; × ou Esc fecham. Teste: `e2e/cacabugs-aluno.cjs`.
+Pendente (aguardando aprovação do dono): trocar os rótulos vermelhos "Ortografia 4"/"Linhas: …" por rótulos por extenso e neutros ("4 erros de ortografia", "Nas linhas 2, 6, 11…").

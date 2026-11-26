@@ -31,6 +31,10 @@ if(ks.length)await passo('injeção: marcas de todos os tipos',async()=>{await p
   const pdl=await p.evaluate(()=>({tela:document.querySelectorAll('#crK .pdl').length,pontos:document.querySelectorAll('#crK .pdn').length}));if(pdl.tela!==1||pdl.pontos!==2)throw new Error('Parágrafo desalinhado na tela do aluno: '+JSON.stringify(pdl));
   const rps=await p.evaluate(()=>document.querySelectorAll('#crK .rpar').length);if(rps!==2)throw new Error('Setas de repetição na tela do aluno: '+rps+' (esperado 2, para 3 círculos da mesma palavra)');
   const rpi=await p.evaluate(()=>{window.__arenaImp&&window.__arenaImp();return document.querySelectorAll('#printArea .rpar').length});if(rpi!==2)throw new Error('Setas de repetição na impressão: '+rpi);
+  // clicar num círculo (qualquer tipo, com ou sem comentário) abre o balão com o significado
+  const nCx=await p.locator('#crK .cxh').count();if(nCx<10)throw new Error('poucas áreas de toque nos círculos: '+nCx);
+  for(let i=0;i<nCx;i++){await p.evaluate((i)=>document.querySelectorAll('#crK .cxh')[i].dispatchEvent(new MouseEvent('click',{bubbles:true})),i);await p.waitForTimeout(60);const r=await p.evaluate(()=>{const po=document.getElementById('crPop');return {vis:!po.classList.contains('hide'),t:po.innerText}});if(!r.vis||!r.t.trim())throw new Error('balão do círculo '+i+' não abriu');if(/undefined|\[object/.test(r.t))throw new Error('texto ruim no balão: '+r.t)}
+  await p.evaluate(()=>document.querySelector('#crPop .px').click());if(!(await p.evaluate(()=>document.getElementById('crPop').classList.contains('hide'))))throw new Error('o × não fechou o balão');
   const imp=await p.evaluate(()=>{window.__arenaImp&&window.__arenaImp();return document.querySelectorAll('#printArea .pdl').length});if(imp!==1)throw new Error('Parágrafo desalinhado na impressão: '+imp+' linha(s)');
   const t=await T('#alMain');if(/undefined/.test(t))throw new Error('undefined na correção com marcas injetadas');
   const n=await p.locator('#alMain svg .xm').count();if(n<10)throw new Error('poucas marcas desenhadas: '+n);

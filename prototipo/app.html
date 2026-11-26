@@ -674,6 +674,7 @@ body{-webkit-font-smoothing:antialiased}
 .an .ico{font-size:14px}
 .anb{padding:8px 12px;font-size:13px}
 .crpop{position:absolute;z-index:6;width:min(240px,62%);background:#fff;color:#1c1c19;border-radius:var(--r-md);padding:10px 12px 11px;box-shadow:var(--sh2);transform:translate(10px,-50%);font-size:13px;line-height:1.45;border:1.5px solid #b02818}
+.crk .cxh{cursor:pointer}.crpop b.cw{text-transform:none;letter-spacing:0;color:#1c1c19;font:800 13px 'DM Sans'}.crk .cxh .hit{fill:transparent;stroke:none;pointer-events:all}.crpop .cw{color:#1c1c19;font:700 13px 'DM Sans';display:inline}
 .crpop.esq{transform:translate(calc(-100% - 10px),-50%)}
 .crpop b{display:block;color:#b02818;font:800 11px 'DM Sans';letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;padding-right:18px}
 .crpop .px{position:absolute;right:6px;top:5px;border:0;background:none;font-size:16px;line-height:1;color:#6a6a60;cursor:pointer;width:22px;height:22px;border-radius:var(--r-sm)}
@@ -4553,23 +4554,32 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  '<h3>Comentários por linha</h3><div id="crC">'+cmts.map(function(c){return '<button type="button" class="crcm" data-l="'+c.l+'"><b>'+(c.par?'Parágrafo '+c.par:c.l2?'Parágrafo (linhas '+c.l+' a '+c.l2+')':'Linha '+c.l)+'</b><span>'+c.t+'</span></button>'}).join('')+'</div></div></aside></div>';
  $('crImg').src=(P.fotoUrl||A.foto(P.fseed||11));
  if(semFoto){var cl=document.querySelector('.cr-left');if(cl){cl.classList.add('semfoto');cl.insertAdjacentHTML('afterbegin','<div class="crsf"><b>A foto desta redação foi arquivada.</b><span>A escola guarda só a nota e os comentários. Eles continuam aqui ao lado.</span></div>')}}
+var selK=null;
+ var catD={ac:'Falta o acento, ou ele está errado, nesta palavra.',pt:'Falta um sinal de pontuação, ou ele está no lugar errado.',or:'Palavra escrita de forma diferente da norma da língua.',cj:'A forma do verbo não está correta.',cn:'O verbo não concorda com o sujeito da frase.',rg:'A preposição que o verbo pede não está correta.',cr:'Uso incorreto do acento grave (crase).',ol:'Expressão de fala usada em um texto que pede escrita formal.',pr:'Palavra imprecisa. Procure uma palavra mais específica.',tr:'Palavra escrita pela metade (truncada). Escreva por inteiro.',il:'Letra difícil de ler. Capriche na letra para o trecho poder ser lido.',vi:'Vírgula faltando ou no lugar errado.',mi:'Letra maiúscula faltando ou usada onde não era necessária.',ra:'Rasura. Em vez de riscar ou circular, faça um traço simples sobre a palavra.',ce:'Conectivo usado de forma incorreta neste ponto.',ca:'Falta um conectivo aqui para ligar as ideias.',mg:'Desrespeito às margens da folha.',mr:'Linha curta: a escrita parou antes do fim da linha. Escreva até o final.',ma:'A escrita passou da margem da folha.',pc:'Parágrafo curto: o parágrafo ficou com poucas linhas.',pe:'Parágrafo longo: considere dividir em mais de um.',pd:'Parágrafo desalinhado: o recuo no início do parágrafo não segue o mesmo padrão dos outros.',ss:'Separação de sílabas incorreta no fim da linha.',el:'Elogio: um ponto forte do seu texto.',lac:'Lacuna: falta explicar melhor esta ideia para o leitor.',ele:'Elemento do gênero ausente: a proposta pede algo que não aparece.',eli:'Elemento do gênero insuficiente: aparece, mas precisa ser mais completo.',rp:'Repetição de palavra. Use um sinônimo ou retome a ideia com um pronome.',ti:'Título ausente ou insuficiente.'};
+ var catDesc=function(c){var k=c.c,t=(catN[k]||k)+' · '+(k==='el'?'ponto forte':'critério '+['I','II','III','IV','V'][critDe(k)]),d=catD[k]||'Marcação do corretor.';
+  if(k==='or'&&c.w)d+=' A forma correta é <b class="cw">“'+esc(c.w)+'”</b>.';
+  if(k==='rp'&&c.w)d='A palavra <b class="cw">“'+esc(c.w)+'”</b> se repete no texto. As setas laranja ligam as repetições. Use um sinônimo ou retome a ideia com um pronome.';
+  if(k==='pr'&&c.w)d='A palavra <b class="cw">“'+esc(c.w)+'”</b> é imprecisa.'+((c.s||[]).length?' Sugestões: '+esc(c.s.join(', '))+'.':' Procure uma mais específica.');
+  if((k==='ce'||k==='ca')&&(c.s||[]).length)d+=' Sugestões: '+esc(c.s.join(', '))+'.';
+  return {t:t,d:d}};
  function desenha(){
   var h='';if(sel){var cs=cmts.filter(function(c){return c.l===sel})[0],ext=(cs&&cs.l2)?cs.l2-sel+1:1;h+='<rect class="hl" x="26.6" y="'+(A.lineY(sel)-6.8)+'" width="156.8" height="'+(6.8*ext)+'"/>';}
   cmts.forEach(function(c){if(c.l2&&okC(c)){var y0=A.lineY(c.l)-6.8+.8,hh=6.8*(c.l2-c.l+1)-1.6;h+='<g class="rgb"><rect x="13.2" y="'+y0+'" width="1.3" height="'+hh+'"/><rect x="196" y="'+y0+'" width="1.3" height="'+hh+'"/></g>';}});
   h+=pdLinhaSvg(circ.filter(function(c){return c.c==='pd'&&okF('pd')}).map(function(c){return {x:c.x,y:A.lineY(c.l)-2.4,l:c.l,yn:A.lineY(c.l)-3.4}}));
-  circ.forEach(function(c){if(!okF(c.c))return;h+=gX(c,A.lineY(c.l)-2.4)});
+  circ.forEach(function(c,ix){if(!okF(c.c))return;var cyH=A.lineY(c.l)-2.4;h+='<g class="cxh" data-ci="'+ix+'">'+gX(c,cyH)+'<ellipse class="hit" cx="'+c.x+'" cy="'+cyH+'" rx="10" ry="4.6"/></g>'});
   h+=window.rpSetasCirc(circ.filter(function(c){return okF(c.c)}),A.lineY);
   cmts.forEach(function(c){if(!okC(c))return;var y=A.lineY(c.l)-3.4;h+='<g class="pin" data-l="'+c.l+'" tabindex="0" role="button" aria-label="Ver comentário: '+rot(c)+'"><circle cx="'+c.x+'" cy="'+y+'" r="3.7"/><text x="'+c.x+'" y="'+(y+1.25)+'">'+(c.par?'¶'+c.par:c.l)+'</text></g>';});
   var po=$('crPop'),cc=sel?cmts.filter(function(c){return c.l===sel})[0]:null;
   if(po){if(cc){po.innerHTML='<button type="button" class="px" aria-label="Fechar">×</button><b>'+rot(cc)+'</b><span>'+cc.t+'</span>';po.style.left=(cc.x/210*100)+'%';po.style.top=((A.lineY(cc.l)-3.4)/297*100)+'%';po.classList.toggle('esq',cc.x>105);po.classList.remove('hide');}else po.classList.add('hide');}
+  if(po&&selK!==null&&circ[selK]){var ck=circ[selK],cyK=A.lineY(ck.l)-2.4,dK=catDesc(ck);po.innerHTML='<button type="button" class="px" aria-label="Fechar">×</button><b>'+esc(dK.t)+'</b><span>'+dK.d+'</span>';po.style.left=(ck.x/210*100)+'%';po.style.top=(cyK/297*100)+'%';po.classList.toggle('esq',ck.x>105);po.classList.remove('hide')}
   $('crK').innerHTML=h;
   document.querySelectorAll('.crcm').forEach(function(b){b.classList.toggle('on',+b.dataset.l===sel)});
  }
  function foco(l){sel=sel===l?null:l;desenha();if(sel){var pg=$('crPg'),ph=$('crPh'),y=(A.lineY(sel)/297)*pg.offsetHeight,vis=y>ph.scrollTop+100&&y<ph.scrollTop+ph.clientHeight-100;if(!vis)ph.scrollTo({top:Math.max(0,y-ph.clientHeight/2),behavior:'smooth'});var it=document.querySelector('.crcm.on');if(it&&it.scrollIntoView)it.scrollIntoView({block:'nearest',behavior:'smooth'});}}
- $('crK').addEventListener('click',function(e){var p=e.target.closest('.pin');if(p)foco(+p.dataset.l);else if(sel){sel=null;desenha();}});
+ $('crK').addEventListener('click',function(e){var p=e.target.closest('.pin');if(p){selK=null;foco(+p.dataset.l);return}var cx=e.target.closest('.cxh');if(cx){sel=null;selK=selK===+cx.dataset.ci?null:+cx.dataset.ci;desenha();return}if(sel||selK!==null){sel=null;selK=null;desenha();}});
  $('crK').addEventListener('keydown',function(e){var p=e.target.closest('.pin');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();foco(+p.dataset.l);}});
- $('crPop').addEventListener('click',function(e){if(e.target.closest('.px')){sel=null;desenha();}});
- document.addEventListener('keydown',function esc(e){if(!$('crPop')){document.removeEventListener('keydown',esc);return;}if(e.key==='Escape'&&sel){sel=null;desenha();}});
+ $('crPop').addEventListener('click',function(e){if(e.target.closest('.px')){sel=null;selK=null;desenha();}});
+ document.addEventListener('keydown',function esc(e){if(!$('crPop')){document.removeEventListener('keydown',esc);return;}if(e.key==='Escape'&&(sel||selK!==null)){sel=null;selK=null;desenha();}});
  $('crC').addEventListener('click',function(e){var b=e.target.closest('.crcm');if(b)foco(+b.dataset.l);});
  function z(d){zoom=Math.max(50,Math.min(200,zoom+d));$('crPg').style.width=zoom+'%';$('crZ').textContent=zoom+'%';}
  $('crP').onclick=function(){z(15)};$('crM').onclick=function(){z(-15)};z(0);
