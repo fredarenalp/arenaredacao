@@ -179,7 +179,7 @@ O cartão inicial (nota em anel) **não tem mais os 5 quadrados dos critérios**
 Depois de várias simulações (capa em tela cheia, folha inclinada, versão laranja), o dono **desistiu de tudo isso** e quis manter a tela de login como ela é: seletor Corretor/Aluno, matrícula/senha, "Lembrar", "Esqueci a senha", "Primeiro acesso…", "Área restrita". **Só mudou o fundo no celular (≤640 px): sem as linhas de caderno e sem a margem rosa** (`.right.caderno` com `background-image:none` e `::before` oculto). **Atualização: no computador também (linhas e margem removidas); só a folha inclinada do painel verde continua.** Não implementar de novo: capa com "Entrar →", só-aluno, área restrita laranja, lembrete de data de nascimento.
 
 ## Aluno: ordem das abas (decisão do dono, IMPLEMENTADO)
-Redações · **Critérios** · **Boletim** · Propostas (Critérios e Boletim trocaram de lugar). Só a ordem; os `data-al` não mudaram.
+Ordem atual: **Redações · Boletim · Propostas · Critérios** (decisão mais recente do dono). Só a ordem; os `data-al` não mudaram.
 
 ## Varredura geral (26/11): decisões e armadilhas (IMPLEMENTADO)
 - **Banco:** Destaques foi apagado de vez (tabela, funções, coluna); migração 0041. O corretor lê só o próprio perfil (`perfis_leitura`); `nomes_perfis` (id, nome) dá o nome completo sem e-mail.
