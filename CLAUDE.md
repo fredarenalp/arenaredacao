@@ -177,3 +177,6 @@ O cartão inicial (nota em anel) **não tem mais os 5 quadrados dos critérios**
 
 ## Login: liso no celular (decisão do dono, IMPLEMENTADO)
 Depois de várias simulações (capa em tela cheia, folha inclinada, versão laranja), o dono **desistiu de tudo isso** e quis manter a tela de login como ela é: seletor Corretor/Aluno, matrícula/senha, "Lembrar", "Esqueci a senha", "Primeiro acesso…", "Área restrita". **Só mudou o fundo no celular (≤640 px): sem as linhas de caderno e sem a margem rosa** (`.right.caderno` com `background-image:none` e `::before` oculto). **No computador a folha de caderno continua.** Não implementar de novo: capa com "Entrar →", só-aluno, área restrita laranja, lembrete de data de nascimento.
+
+## Aluno: ordem das abas (decisão do dono, IMPLEMENTADO)
+Redações · **Critérios** · **Boletim** · Propostas (Critérios e Boletim trocaram de lugar). Só a ordem; os `data-al` não mudaram.
