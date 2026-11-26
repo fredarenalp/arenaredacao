@@ -308,3 +308,84 @@ Resultado: níveis 0 a 2 = 4 × 4 = 16 combinações; nível 3 = 5 × 5 = 25; n�
 1. Tom: está bom, mais próximo do aluno, ou prefere mais formal?
 2. Os fechos "(sem fecho)" deixam o comentário só com o elogio. Mantenho, como no critério II?
 3. Alguma frase que você não usaria?
+
+---
+---
+
+# MAIS VARIAÇÕES (2 novas em cada lista, para somar às de cima)
+
+Com elas, cada lista passa de 4 para 6 frases (níveis 3 e 4: de 5 para 7). Combinações: níveis 0 a 2 = 6 × 6 = 36; nível 3 = 7 × 7 = 49; nível 4 = 7 × 6 = 42.
+
+## I · Estética
+
+**Nível 0 · Aberturas:** 5. Antes de pensar no conteúdo, a folha precisa de organização: título, parágrafos e sem rasuras. / 6. Do jeito que está, a apresentação dificulta a leitura e esconde o que você quis dizer.
+**Nível 0 · Orientações:** 5. Separe as ideias em blocos e comece cada bloco com recuo, para o leitor ver onde um parágrafo termina e outro começa. / 6. Reserve a primeira linha para o título e confira, ao final, se a folha está limpa.
+
+**Nível 1 · Aberturas:** 5. A organização da folha já começou, e ainda falta consistência no título, nos parágrafos e nas rasuras. / 6. Alguns cuidados de apresentação estão faltando, e eles pesam na leitura.
+**Nível 1 · Orientações:** 5. Passe o texto a limpo com atenção: um parágrafo de cada vez, com recuo e sem riscos desnecessários. / 6. Se o texto ficou em um bloco só, marque no rascunho onde cada ideia nova começa e separe os parágrafos.
+
+**Nível 2 · Aberturas:** 5. A apresentação está quase organizada, e pequenos descuidos de título, parágrafos ou rasuras ainda aparecem. / 6. A folha tem uma boa base, e a regularidade dos parágrafos e do título pode melhorar.
+**Nível 2 · Orientações:** 5. Use o mesmo recuo em todos os parágrafos e confira o título antes de entregar. / 6. Faça uma última leitura só da aparência da folha: título, recuos e rasuras.
+
+**Nível 3 · Elogios:** 6. Seu texto tem uma apresentação organizada, com título e parágrafos consistentes. / 7. Folha bem apresentada: o leitor encontra o título e os parágrafos sem esforço.
+**Nível 3 · Orientações:** 6. Evite as últimas rasuras relendo cada frase antes de escrevê-la. / 7. Um passo a mais de cuidado na limpeza da folha deixa a apresentação perfeita.
+
+**Nível 4 · Elogios:** 6. Folha limpa, bem organizada e fácil de ler. Parabéns pelo cuidado! / 7. Apresentação exemplar: título, parágrafos e limpeza no ponto.
+**Nível 4 · Fechos:** 5. Leve esse capricho para todas as suas produções. / 6. É assim que se entrega um texto: organizado e limpo.
+
+## III · Progressão
+
+**Nível 0 · Aberturas:** 5. O texto ainda parece uma lista de frases soltas: falta ligar uma ideia à outra. / 6. Sem conectivos e com palavras repetidas, o leitor se perde ao longo do texto.
+**Nível 0 · Orientações:** 5. Depois de escrever cada parágrafo, pergunte: como ele se liga ao anterior? E escreva o conectivo que mostra essa ligação. / 6. Sublinhe as palavras que se repetem e procure outra forma de dizer a mesma coisa.
+
+**Nível 1 · Aberturas:** 5. O texto já tenta ligar as ideias, e os conectivos aparecem pouco ou sempre os mesmos. / 6. As repetições e a pouca variedade de conectivos deixam a leitura cansativa.
+**Nível 1 · Orientações:** 5. Monte uma lista pessoal de conectivos (para somar, contrapor, explicar, concluir) e use-a na próxima redação. / 6. Releia procurando as palavras que voltam muito perto e substitua algumas por pronomes.
+
+**Nível 2 · Aberturas:** 5. A ligação entre as ideias existe, e a variedade de conectivos ainda é pequena. / 6. As repetições e os sinônimos escolhidos nem sempre ajudam o texto a fluir.
+**Nível 2 · Orientações:** 5. Troque os conectivos que você mais usa por alternativas que mostrem melhor a relação entre as ideias. / 6. Ao trocar uma palavra por sinônimo, confira se o sentido continua o mesmo.
+
+**Nível 3 · Elogios:** 6. As ideias avançam com naturalidade, e os conectivos ajudam a leitura. / 7. Boa costura entre os parágrafos: o texto tem começo, meio e fim bem ligados.
+**Nível 3 · Orientações:** 6. Procure os últimos trechos em que a mesma palavra se repete e varie. / 7. Reveja os conectivos mais comuns e escolha, onde der, os mais precisos.
+
+**Nível 4 · Elogios:** 6. Progressão muito bem conduzida: o texto flui sem tropeços. / 7. Coesão afiada e vocabulário variado: dá gosto ler.
+**Nível 4 · Fechos:** 5. Siga usando conectivos e sinônimos com essa precisão. / 6. Essa fluidez é um grande trunfo: mantenha-a nas próximas redações.
+
+**Frases quando não há repetição marcada (só conectivos), mais 1 por nível:**
+- Nível 0: "Escolha conectivos para abrir cada parágrafo e ligar as frases dentro dele."
+- Nível 1: "Use mais de um tipo de conectivo, para somar, contrapor e concluir."
+- Nível 2: "Capriche nos conectivos que ligam um parágrafo ao outro."
+- Nível 3: "Confira se cada conectivo mostra a relação certa entre as ideias."
+
+## IV · Proposta
+
+**Nível 0 · Aberturas:** 5. Falta ao texto a estrutura que a proposta pede para esse gênero. / 6. O texto não segue o modelo do gênero indicado na proposta.
+**Nível 0 · Orientações:** 5. Observe como o gênero costuma começar, se desenvolver e terminar, e siga esse roteiro. / 6. Releia os exemplos de elementos do gênero na aba Propostas antes de escrever.
+
+**Nível 1 · Aberturas:** 5. O texto tem poucos elementos do gênero, e a estrutura ainda não aparece completa. / 6. Alguns elementos essenciais do gênero já aparecem, e muitos estão ausentes.
+**Nível 1 · Orientações:** 5. Escreva o texto seguindo a ordem dos elementos do gênero, um por um. / 6. Antes de entregar, risque na lista de elementos o que já está no texto e complete o que sobrou.
+
+**Nível 2 · Aberturas:** 5. O texto tem boa parte dos elementos, e ainda deixa alguns de fora. / 6. A estrutura do gênero está parcialmente presente.
+**Nível 2 · Orientações:** 5. Identifique os elementos que faltam e escolha onde encaixá-los no texto. / 6. Releia a proposta procurando o que o gênero pede além do que você já escreveu.
+
+**Nível 3 · Elogios:** 6. Você cumpriu a estrutura do gênero, com todos os elementos no texto. / 7. Todos os elementos pedidos pelo gênero estão ali, e isso mostra que você leu a proposta com atenção.
+**Nível 3 · Orientações:** 6. Cuide da forma como cada elemento aparece: completo, claro e na ordem esperada. / 7. Reforce os elementos que ficaram mais curtos, para equilibrar a estrutura.
+
+**Nível 4 · Elogios:** 6. Estrutura do gênero impecável, com cada elemento no seu lugar. / 7. Você escreveu exatamente o gênero que a proposta pediu.
+**Nível 4 · Fechos:** 5. Continue consultando a proposta antes de escrever, como fez aqui. / 6. Essa atenção à estrutura vai ajudar em qualquer gênero.
+
+## V · Abordagem
+
+**Nível 0 · Aberturas:** 5. O texto não trata do assunto pedido, e as partes principais não estão desenvolvidas. / 6. Falta ao texto um foco claro no tema da proposta.
+**Nível 0 · Orientações:** 5. Antes de escrever, anote três ideias que a proposta pede e dê um parágrafo a cada uma. / 6. Releia a proposta e, a cada parágrafo, confira se ele fala do tema.
+
+**Nível 1 · Aberturas:** 5. O tema aparece de forma vaga, e o texto se desenvolve pouco. / 6. Há um começo de abordagem, e a maior parte do texto ainda foge do assunto ou é curta.
+**Nível 1 · Orientações:** 5. Escolha o que você quer dizer sobre o tema e sustente com explicações ou exemplos. / 6. Complete as partes que ficaram curtas, escrevendo ao menos um parágrafo para cada uma.
+
+**Nível 2 · Aberturas:** 5. O tema está presente, e o desenvolvimento está incompleto. / 6. Há boas ideias, e elas ainda precisam de explicação para o leitor entender tudo.
+**Nível 2 · Orientações:** 5. Pergunte "por quê?" e "como?" a cada ideia principal e responda no texto. / 6. Complete a parte que ficou mais curta, usando um exemplo ou um dado.
+
+**Nível 3 · Elogios:** 6. O tema foi bem tratado, e o texto tem desenvolvimento em todas as partes. / 7. Você abordou o assunto com clareza, do começo ao fim.
+**Nível 3 · Orientações:** 6. Acrescente uma explicação nos poucos trechos em que a ideia aparece só afirmada. / 7. Releia pensando no leitor: o que ele ainda não entenderia? Escreva isso.
+
+**Nível 4 · Elogios:** 6. Abordagem completa: o tema é tratado com profundidade e sem lacunas. / 7. Um texto que desenvolve bem cada parte, sem deixar dúvida para o leitor.
+**Nível 4 · Fechos:** 5. Continue explicando as ideias com esse cuidado. / 6. Esse desenvolvimento completo é o caminho para textos ainda mais fortes.
