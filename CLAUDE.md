@@ -180,3 +180,9 @@ Depois de várias simulações (capa em tela cheia, folha inclinada, versão lar
 
 ## Aluno: ordem das abas (decisão do dono, IMPLEMENTADO)
 Redações · **Critérios** · **Boletim** · Propostas (Critérios e Boletim trocaram de lugar). Só a ordem; os `data-al` não mudaram.
+
+## Varredura geral (26/11): decisões e armadilhas (IMPLEMENTADO)
+- **Banco:** Destaques foi apagado de vez (tabela, funções, coluna); migração 0041. O corretor lê só o próprio perfil (`perfis_leitura`); `nomes_perfis` (id, nome) dá o nome completo sem e-mail.
+- **Armadilha:** em gatilhos que valem para várias tabelas, não use `new.id` (a tabela `correcoes` não tem `id`, a chave é `redacao_id`): leia por `to_jsonb(coalesce(new, old))`. Foi o bug de `trg_trava_liberada` (migração 0040, corrigida).
+- **Testes que gravam no banco de teste** (limpam o que criam): `liberar-pacote-real.mjs`, `ciclo-real.mjs`, `devolver-correcao.cjs`, `avisos-real.mjs` (o aviso fica gravado como recusado; apagar com o SQL que ele imprime), `aee-real.mjs`, `apagar-imagens-real.mjs`, `seguranca-real.mjs`, `pessoas-real.mjs`. O `devolver-correcao` precisa de um pacote não liberado com correção salva e etapa `corrigida` (monte com SQL, como no relatório).
+- Pendente de decisão do dono: **trava de envio do aluno** por estado da proposta (`docs/PENDENTE-trava-de-envio-do-aluno.sql`). Relatório completo: `docs/RELATORIO-VARREDURA.md`.

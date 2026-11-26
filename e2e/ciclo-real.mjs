@@ -45,16 +45,14 @@ ok(dep?.nota === 8, `aluno vê a nota após liberar (nota ${dep?.nota})`)
 const { data: marcDep } = await aluno.from('marcacoes').select('*').eq('redacao_id', red.id)
 ok(marcDep.length === 1, 'aluno vê as marcações após liberar')
 
-// nota 10 é retida: o corretor NÃO libera; coordenação libera
-await corretor.from('correcoes').update({ n1: 4, n2: 4, n3: 4, n4: 4, n5: 4, liberada: false }).eq('redacao_id', red.id)
-await corretor.from('correcoes').update({ liberada: true }).eq('redacao_id', red.id)
-const { data: dez } = await coord.from('correcoes').select('liberada').eq('redacao_id', red.id).single()
-ok(dez?.liberada === false, 'corretor NÃO libera nota 10 (retida)')
-const { data: ret } = await aluno.from('correcoes').select('liberada').eq('redacao_id', red.id)
-ok(ret.length === 0, 'aluno não vê a nota retida')
-await coord.from('correcoes').update({ liberada: true }).eq('redacao_id', red.id)
+// REGRA DO DONO: depois de liberada ao aluno, o corretor NÃO altera nada (nem a nota); a coordenação pode
+const { error: eDez } = await corretor.from('correcoes').update({ n1: 4, n2: 4, n3: 4, n4: 4, n5: 4 }).eq('redacao_id', red.id)
+ok(!!eDez, 'corretor NÃO altera a correção depois de liberada')
+const { data: ainda } = await aluno.from('correcoes').select('nota').eq('redacao_id', red.id)
+ok(ainda[0]?.nota === 8, 'a nota que o aluno vê continua 8')
+await coord.from('correcoes').update({ n1: 4, n2: 4, n3: 4, n4: 4, n5: 4 }).eq('redacao_id', red.id)
 const { data: ret2 } = await aluno.from('correcoes').select('nota').eq('redacao_id', red.id)
-ok(ret2[0]?.nota === 10, 'coordenação libera a nota retida')
+ok(ret2[0]?.nota === 10, 'a coordenação consegue alterar a correção liberada (nota 10)')
 
 await coord.from('correcoes').update({ n1: 3 }).eq('redacao_id', red.id)
 const { data: ev } = await coord.from('eventos').select('*').eq('redacao_id', red.id).eq('acao', 'nota_alterada')

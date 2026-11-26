@@ -15,7 +15,8 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   await c.locator('#coBar [data-top="corretores"]').click(); await c.waitForTimeout(800)
   ok(await c.locator('[data-x-vercorr]').count() > 0, 'Pacotes: botão "Ver correções" nas linhas com correção salva')
   ok(await c.locator('[data-x-devpac]').count() > 0, 'Pacotes: botão "Devolver pacote" ao lado de "Liberar pacote"')
-  await c.locator('[data-x-vercorr]').first().click(); await c.waitForSelector('.pcvr', { timeout: 10000 })
+  const nPac = await c.locator('tr:has([data-x-devpac]) [data-x-vercorr]').first().getAttribute('data-n')
+  await c.locator('tr:has([data-x-devpac]) [data-x-vercorr]').first().click(); await c.waitForSelector('.pcvr', { timeout: 10000 })
   ok(await c.locator('.pcvr .pcvc').count() >= 5, 'a lista mostra aluno, níveis I–V e situação de cada redação')
   await c.locator('[data-pcv]').first().click(); await c.waitForSelector('#pvw img', { timeout: 10000 })
   ok(await c.evaluate(() => !!document.querySelector('#pvw img').src && document.querySelectorAll('#pvw svg').length > 0), '"Ver correção" abre a folha com a foto e as marcações do corretor')
@@ -33,6 +34,7 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   ok(await k.locator('.pcd .pkcN').count() > 0 && /Devolvido pela coordenação/.test(await k.locator('.pcd .pkcN').first().innerText()), 'o card do pacote, na tela inicial do corretor, mostra "Devolvido pela coordenação" com o recado')
   let achou = false
   for (let i = 0; i < cards && !achou; i++) {
+    if (!/ortografia da linha 3/.test(await k.locator('.pcd').nth(i).innerText())) continue // só o pacote devolvido por este teste
     await k.locator('.pcd').nth(i).click(); await k.waitForTimeout(700)
     if (await k.locator('.pltg:has-text("Devolvida pela coordenação")').count()) { achou = true; break }
     await k.locator('a, button').filter({ hasText: /Meus pacotes/ }).first().click(); await k.waitForTimeout(600)
@@ -50,11 +52,11 @@ const ok = (c, m) => { if (c) console.log('ok   ', m); else { falhas.push(m); co
   await c2.click('#restrBtn'); await c2.fill('#email', 'teste@arena.com'); await c2.fill('#pwd', 'teste'); await c2.click('#entrar')
   await c2.waitForSelector('body.in-coord', { timeout: 25000 }); await c2.waitForTimeout(1500)
   await c2.locator('#coBar [data-top="corretores"]').click(); await c2.waitForTimeout(800)
-  await c2.locator('[data-x-vercorr]').first().click(); await c2.waitForSelector('.pcvr', { timeout: 10000 })
+  await c2.locator(`[data-x-vercorr][data-n="${nPac}"]`).first().click(); await c2.waitForSelector('.pcvr', { timeout: 10000 })
   ok(await c2.locator('.pcvr:has-text("Devolvida ao corretor")').count() > 0, 'a coordenação vê a redação como "Devolvida ao corretor"')
   await c2.locator('[data-pcvc]').first().click(); await c2.waitForTimeout(1500)
   await c2.locator('#coBar [data-top="corretores"]').click().catch(() => {}); await c2.waitForTimeout(600)
-  await c2.locator('[data-x-vercorr]').first().click(); await c2.waitForSelector('.pcvr', { timeout: 10000 })
+  await c2.locator(`[data-x-vercorr][data-n="${nPac}"]`).first().click(); await c2.waitForSelector('.pcvr', { timeout: 10000 })
   ok(await c2.locator('.pcvr:has-text("Devolvida ao corretor")').count() === 0, 'Cancelar devolução desfaz (e deixa o banco de teste como estava)')
   await b.close()
   console.log(falhas.length ? `\n${falhas.length} falha(s)` : '\nTudo certo')

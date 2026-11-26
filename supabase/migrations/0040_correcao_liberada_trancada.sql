@@ -36,10 +36,12 @@ revoke execute on function public.trg_correcoes() from public, anon, authenticat
 -- nem salvar correção nova, nem alterar nota/marcações/comentários, nem apagar. Coordenação e professor não são afetados.
 create or replace function public.trg_trava_liberada() returns trigger
 language plpgsql security definer set search_path = public as $$
-declare rid bigint;
+declare rid bigint; j jsonb;
 begin
   if public.meu_tipo() is distinct from 'corretor' then return coalesce(new, old); end if;
-  rid := case when tg_table_name = 'redacoes' then coalesce(new.id, old.id) else coalesce(new.redacao_id, old.redacao_id) end;
+  -- lê o id por jsonb: a tabela correcoes não tem coluna "id" (a chave é redacao_id)
+  j := to_jsonb(coalesce(new, old));
+  rid := case when tg_table_name = 'redacoes' then (j->>'id')::bigint else (j->>'redacao_id')::bigint end;
   if exists (select 1 from public.redacoes r join public.pacotes p on p.id = r.pacote_id where r.id = rid and p.liberado_em is not null)
      or exists (select 1 from public.correcoes c where c.redacao_id = rid and c.liberada) then
     raise exception 'Este pacote já foi liberado ao aluno: o corretor não pode mais alterar a correção';

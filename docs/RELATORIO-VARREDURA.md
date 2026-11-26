@@ -20,14 +20,13 @@ Método: testes automáticos em navegador (celular 320/390, tablet 768, notebook
 - A tela chamada "Corretores" (que o menu chama de "Pacotes") agora se chama "Pacotes e corretores".
 - Sub-abas rolam no celular. Teste `smoke` ajustado ao menu novo (itens dentro de Consultar/Ajustes).
 
-## O que precisa da sua decisão (NÃO apliquei)
-1. **Envio do aluno em proposta fechada/encerrada/rascunho (importante).** O banco deixa o aluno enviar redação em proposta `rascunho`, `fechada` ou `encerrada`, e em proposta de outra série. E a tela do aluno ignora o estado da proposta (só olha as datas). Ou seja, "Fechar" e "Encerrar" na coordenação **não valem para o aluno**. Hoje as 4 propostas do 4º bimestre estão `encerrada` no banco (a coordenação mostra "Encerrada"), enquanto o aluno vê a Proposta 1 aberta. Conserto pronto em `docs/PENDENTE-trava-de-envio-do-aluno.sql` (+ ajuste da tela do aluno descrito no fim do arquivo). Antes de aplicar, é preciso reabrir as propostas que devem receber envios.
-2. **Corretor enxerga o cadastro de todos os perfis.** A regra `perfis_leitura` deixa corretor, professor e coordenação lerem nome e e-mail de todos os perfis (incluindo outros corretores e alunos). Provavelmente basta o corretor ler o próprio. Não mexi porque pode haver tela que usa isso.
-3. **Tabelas e funções de Destaques seguem no banco** (`destaques`, `feed_*`, `responder_destaque`), sem uso. Posso apagar se confirmar (apagar dados é irreversível).
-4. **Proteção contra senhas vazadas desligada** no Supabase Auth (aviso do conselheiro). Liga-se no painel do Supabase, sem código.
-5. **Teste `devolver-correcao`** só roda se existir pacote não liberado com correção salva e não devolvida. Hoje o pacote 6 já está devolvido.
+## Decisões do dono e o que foi feito depois
+- **Corretor vê só o nome completo dos outros perfis:** feito (migração 0041). O corretor lê só o próprio perfil; existe a visão `nomes_perfis` (id e nome, sem e-mail) para quando uma tela precisar do nome.
+- **Destaques removido do banco:** feito (0041): tabela `destaques` (estava vazia), funções `feed_*`/`responder_destaque` e a coluna `alunos.autoriza_destaque`.
+- **Proteção contra senhas vazadas:** NÃO consegui ligar daqui (as ferramentas disponíveis não alteram configurações de Auth). Caminho no painel do Supabase: Authentication → Sign In / Providers (ou Policies) → Password security → ativar "Prevent use of leaked passwords". Sem código.
+- **Fluxos que gravam no banco de teste:** agora verificados de ponta a ponta com dados de teste criados e removidos: liberar pacote (corretor não libera, coordenação libera), ciclo completo de devolução e cancelamento, ciclo aluno→corretor→coordenação→aluno, aviso de atraso (aluno cria, coordenação aceita e recusa), AEE, apagar imagens, segurança por perfil.
+- **Bug meu achado por esses testes e já corrigido (migração 0040 atualizada):** a trava do corretor dava erro ao salvar QUALQUER correção ("record new has no field id"). Os testes de bloqueio que eu tinha feito antes passaram pelo erro, não pelo motivo certo. Agora o corretor salva normalmente antes da liberação e é bloqueado depois, e a coordenação continua podendo alterar.
+- **Relatórios no celular:** corrigido (os seletores rolam por dentro; a página não estoura mais).
 
-## Limites / não verificado
-- Fluxos que gravam no banco real (Liberar pacote, Liberar todos, Aceitar/Recusar, enviar redação) não foram acionados de propósito.
-- Coordenação em tela de celular (390 px) ainda tem pequenos estouros na aba Relatórios; não é o uso principal.
-- Com dados reais só o 4º bimestre tem nota; o gráfico de linhas da Evolução só foi visto com dados de demonstração.
+## Ainda aguardando a sua resposta
+**Envio do aluno em proposta fechada/encerrada** (explicado na conversa; SQL pronto em `docs/PENDENTE-trava-de-envio-do-aluno.sql`).
