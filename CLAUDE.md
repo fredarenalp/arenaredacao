@@ -205,4 +205,4 @@ Cada correção no PDF do bimestre deve ocupar 2 páginas (texto + folha com mar
 
 ## Corretor: marcas já feitas só eram clicáveis com a ferramenta Círculo; texto de oralidade (26/11)
 Ao abrir uma redação a ferramenta é a "mão" (`tool='pan'`) e, nela, clicar numa marca existente não fazia nada (a marca virava "parte da imagem"; só funcionava depois de escolher Círculo/O). Agora, no computador, clicar numa marca com a mão a seleciona e troca para Círculo/Marca-texto (no celular não muda: gestos de arrastar a folha e a gaveta). Não era problema do rascunho.
-Oralidade (`desTxt`): "Há uma marca de oralidade na linha N, ou seja, você acabou escrevendo da mesma maneira que fala." (plural: "Há marcas de oralidade nas linhas N e M, …"); as outras categorias seguem "Há desvio de …".
+Oralidade (`desTxt`): "Há uma marca de oralidade na linha N, ou seja, você acabou escrevendo da mesma maneira que fala." (plural: "Há marcas de oralidade nas linhas N e M, …"), seguida de "Troque a expressão por uma forma própria da escrita formal."; as outras categorias seguem "Há desvio de …".
