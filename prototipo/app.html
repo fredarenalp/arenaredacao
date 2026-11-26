@@ -3579,8 +3579,8 @@ function alertasDe(a){
   if(a.diag===4&&dns.length)push('DG-dn-'+dns.join(''),null,'warn','Você marcou “todas atendidas”, mas desceu o nível de: '+nm(dns)+'.',null);
   if(a.diag===4&&!ups.length&&!dns.length)push('DG-todas',null,'info','Você marcou “todas atendidas”, mas nenhum nível subiu.',null);
  }
- // nível baixo sem comentário por linha
- var baixos=[];n.forEach(function(v,k){if(v!=null&&v<=1)baixos.push(COMPS[k].id)});
+ // nível baixo (só IV e V) sem comentário por linha
+ var baixos=[];n.forEach(function(v,k){if(k>=3&&v!=null&&v<=1)baixos.push(COMPS[k].id)}); // só IV e V: nos critérios I a III as próprias marcações já mostram o motivo
  var temCmt=a.marks.some(function(m){return m.t==='c'&&(m.txt||'').trim()});
  if(baixos.length&&!temCmt)push('sem-cmt-'+baixos.join(''),null,'info',(baixos.length>1?'As competências ':'A competência ')+baixos.join(', ')+(baixos.length>1?' estão':' está')+' no nível 0 ou 1 e não há nenhum comentário por linha. Aponte exemplos no texto para o aluno entender o motivo.',null);
  return L;
