@@ -456,7 +456,7 @@ button.pc{cursor:pointer}button.pc:hover{border-color:#3c7678;box-shadow:var(--s
 /* nota em anel (cartão inicial do aluno) */
 .aiq-ring{position:relative;width:190px;height:190px;margin:18px auto 6px}.aiq-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
 .aiq-n{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.aiq-n b{font:800 66px/1 Outfit,sans-serif;letter-spacing:-.03em}.aiq-n small{font:600 15px 'DM Sans',sans-serif;opacity:.85;margin-top:2px}
-.aiq-fr{margin:4px auto 18px;text-align:center;font:600 min(15px,4.1vw)/1.35 'DM Sans',sans-serif;opacity:.96}.aiq-fr span{display:block;white-space:nowrap}
+.aiq-fr{margin:4px auto 18px;text-align:center;font:600 min(15px,4.1vw)/1.35 'DM Sans',sans-serif;opacity:.96}.aiq-fr span{display:block;white-space:nowrap}.aiq-fr.dg{max-width:300px;font-size:min(14px,3.8vw)}.aiq-fr.dg span{white-space:normal}
 @media(max-height:720px){.aiq-ring{width:150px;height:150px;margin-top:8px}.aiq-n b{font-size:52px}.aiq-fr{margin-bottom:10px}}
 .ai-rail{position:absolute;right:14px;bottom:96px;z-index:6;border:0;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}.ai-rail i{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font:800 20px "DM Sans",sans-serif;font-style:normal;color:#fff}.ai-rail small{font:700 10.5px "DM Sans",sans-serif;color:#fff}.ai-wrap:has(.ai-card:not(.ag)) .ai-rail i{background:rgba(0,0,0,.07);color:#2f5f61}.ai-wrap:has(.ai-card:not(.ag)) .ai-rail small{color:#505048}
 .ai-sh.tall{max-height:80%;overflow:auto}.ai-tb{display:flex;background:#eeece2;border-radius:20px;padding:3px;margin-bottom:12px}.ai-tb b{flex:1;text-align:center;font-size:13px;padding:8px;border-radius:16px;color:#6b6b62;cursor:pointer}.ai-tb b.on{background:#fff;color:#2f5f61;box-shadow:0 1px 3px rgba(0,0,0,.12)}
@@ -4595,9 +4595,12 @@ function aiFrase(n){ // frase pequena sob a nota: cada parte numa linha (decisã
  if(n>=10)return ['Uma redação exemplar, parabéns!'];if(n>=9)return ['Sensacional!','Você escreveu muito bem!'];if(n>=8)return ['Excelente!','Continue assim, o caminho é esse!'];if(n>=7)return ['Bom trabalho!','Bastam apenas alguns ajustes!'];
  if(n>=6)return ['Você está na média!','Agora, vamos avançar!'];if(n>=5)return ['Quase lá!','Ainda temos trabalho pela frente!'];if(n>=3)return ['Não desanime!','Vamos superar esse texto juntos!'];return ['Calma, sempre é tempo de recomeçar!']}
 // cartão inicial = NOTA EM ANEL (decisão do dono): anel de progresso e frase pequena (sem os 5 quadrados e sem a seta lateral)
+/* 2ª versão: no lugar da frase da faixa de nota, o card mostra o DIAGNÓSTICO que o corretor marcou (mesmas frases do corretor, índice 0 a 4 em correcoes.diag) */
+var AI_DIAG=['Nenhuma das alterações indicadas na primeira versão foi realizada.','Somente as correções gramaticais apontadas na primeira versão foram efetuadas.','Parte das recomendações registradas na primeira versão foi atendida.','As modificações realizadas foram superficiais e não contemplaram as correções solicitadas.','Todas as recomendações apresentadas na primeira versão foram devidamente atendidas.'];
 function aiAnel(P){var nota=P.nota==null?0:P.nota,C=2*Math.PI*64;
  var anel='<div class="aiq-ring" role="img" aria-label="Nota '+aiF1(nota)+' de 10"><svg viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="64" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="12"/><circle cx="75" cy="75" r="64" fill="none" stroke="#fff" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-Math.max(0,Math.min(10,nota))/10)).toFixed(1)+'"/></svg><div class="aiq-n"><b>'+aiF1(nota)+'</b><small>de 10</small></div></div>';
- return anel+'<p class="aiq-fr">'+aiFrase(nota).map(function(l){return '<span>'+aiEsc(l)+'</span>'}).join('')+'</p>'}
+ var dg=P._v===2&&P.diag!=null&&AI_DIAG[P.diag],fr=dg?[AI_DIAG[P.diag]]:aiFrase(nota);
+ return anel+'<p class="aiq-fr'+(dg?' dg':'')+'">'+fr.map(function(l){return '<span>'+aiEsc(l)+'</span>'}).join('')+'</p>'}
 function aiSlides(k){
  var P=PROPS[k],tom=aiTom(P),nm=aiNome();
  if(tom==='anul'){var rees=PROPS.filter(function(q){return q._pid===P._pid&&q._v===2&&q.kind==='open'})[0];

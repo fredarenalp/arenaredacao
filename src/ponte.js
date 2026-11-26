@@ -306,7 +306,7 @@ const ARENA = {
     ARENA.aluno = al
     if (al.matricula === '20260187') await supabase.rpc('reiniciar_demo_aluno_teste') // conta de teste: a correção da Proposta 3 volta a aparecer como nova a cada login
     const { data: props } = await supabase.from('propostas').select('*').order('bimestre').order('id')
-    const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao,vista_em), marcacoes(dados)').eq('aluno_id', al.id)
+    const { data: reds } = await supabase.from('redacoes').select('*, correcoes(n1,n2,n3,n4,n5,nota,comentario,liberada,liberada_em,anulacao,vista_em,diag), marcacoes(dados)').eq('aluno_id', al.id)
     const { data: avs } = await supabase.from('avaliacoes_correcao').select('redacao_id, estrelas').eq('aluno_id', al.id)
     const { data: gens } = await supabase.from('generos').select('*')
     const genDe = (nome) => (gens ?? []).find((g) => g.nome === nome)
@@ -396,7 +396,8 @@ const ARENA = {
         return {
           ...base, g, t: rot, s: `Entregue em ${r.enviada_em.slice(8, 10)}/${r.enviada_em.slice(5, 7)} · corrigida`, st: 'ok',
           l: `Corrigida · nota ${novaNota(c.anulacao ? 0 : c.nota)}`, kind: 'corr', cta: 'Ver correção', niv: c.anulacao ? [0, 0, 0, 0, 0] : [c.n1, c.n2, c.n3, c.n4, c.n5],
-          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario), adic: parseAdic(c.comentario),
+          circ, cmts, fotoUrl, data: `${dd.slice(8, 10)}/${dd.slice(5, 7)}`, obsCrit: parseObs(c.comentario), adic: parseAdic(c.comentario), diag: c.diag ?? null, // diagnóstico da 2ª versão marcado pelo corretor (0 a 4)
+          
           nota: c.anulacao ? 0 : Number(c.nota), anul: c.anulacao || null, rid: r.id, vista: !!c.vista_em, aval: (avs ?? []).find((x) => x.redacao_id === r.id)?.estrelas ?? null, liberadaEm: c.liberada_em ?? r.enviada_em,
         }
       }

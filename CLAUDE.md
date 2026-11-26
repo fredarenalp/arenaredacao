@@ -192,3 +192,6 @@ Redações · **Critérios** · **Boletim** · Propostas (Critérios e Boletim t
 
 ## Login: botão não volta a "Entrar" durante o carregamento (corrigido 26/11)
 Depois que a senha é aceita, `ok()` mantém o botão em "Verificando…" até o portal abrir (antes `setLoad(false)` rodava logo e o botão ficava parado ~3 s, e a pessoa clicava de novo: "tenho que clicar 2x").
+
+## Aluno: card da 2ª versão mostra o diagnóstico do corretor (decisão do dono, IMPLEMENTADO)
+No card "Sua redação voltou" de uma **2ª versão**, a frase pequena sob a nota é o **diagnóstico que o corretor marcou** (`correcoes.diag`, 0 a 4), com as mesmas frases do corretor: 0 "Nenhuma das alterações indicadas na primeira versão foi realizada." · 1 "Somente as correções gramaticais apontadas na primeira versão foram efetuadas." · 2 "Parte das recomendações registradas na primeira versão foi atendida." · 3 "As modificações realizadas foram superficiais e não contemplaram as correções solicitadas." · 4 "Todas as recomendações apresentadas na primeira versão foram devidamente atendidas." Na 1ª versão continua a frase da faixa de nota. Sem diagnóstico (correções antigas), cai na frase da nota. Código: `AI_DIAG` e `aiAnel(P)` em `app.html`; `ponte.carregarAluno` traz `diag`. Teste: `e2e/cartao-diagnostico.cjs`. As frases do corretor (`DIAG`) e do aluno (`AI_DIAG`) são cópias: se mudar uma, mude a outra.
