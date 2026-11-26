@@ -1449,8 +1449,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .right.caderno{background-image:repeating-linear-gradient(transparent 0 33px,rgba(60,118,120,.12) 33px 34px);background-position:0 18px}
 .right.caderno::before{content:"";position:absolute;left:64px;top:0;bottom:0;width:2px;background:rgba(217,128,111,.5);pointer-events:none}
 .right.caderno .form{position:relative}
-/* celular: login liso (decisão do dono), sem as linhas de caderno nem a margem rosa; no computador continua a folha de caderno */
-@media(max-width:640px){.right.caderno{background-image:none}.right.caderno::before{display:none}}
+/* login liso em todas as telas (decisão do dono): sem as linhas de caderno nem a margem rosa (a folha inclinada do painel verde continua) */
+.right.caderno{background-image:none}.right.caderno::before{display:none}
 
 /* "Ver proposta": botão de contorno em todos os estados (o hover genérico de .pbtn escurecia o fundo e sumia o texto) */
 
