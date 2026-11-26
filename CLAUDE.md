@@ -189,3 +189,6 @@ Redações · **Critérios** · **Boletim** · Propostas (Critérios e Boletim t
 
 ## Prazo de envio e atraso (decisão do dono, IMPLEMENTADO)
 **Depois do prazo o aluno ainda envia até a SEXTA-FEIRA da semana do prazo; se for feriado, o dia útil anterior** (prazo na sexta = sem atraso). Depois disso a proposta fecha sozinha: o aluno vê "Procure a coordenação" e o banco recusa o envio; só a coordenação libera (reabrir a proposta ou prazo individual). **"Fechar"/"Encerrar" proposta valem para o aluno; "rascunho" não aparece.** A antiga regra "dias de atraso permitidos (3 dias úteis)" **foi retirada**. Código: `fim_atraso()` e `trg_redacao_envio` (migração 0042), `fimAtrasoISO`/`hojeBR` em `ponte.js` (aluno), `fimAtraso(p)` em `app.html` (coordenação). Feriados: tabela `feriados`, editada em Ajustes → Regras → Envio em atraso. Teste: `e2e/envio-prazo-real.mjs`.
+
+## Login: botão não volta a "Entrar" durante o carregamento (corrigido 26/11)
+Depois que a senha é aceita, `ok()` mantém o botão em "Verificando…" até o portal abrir (antes `setLoad(false)` rodava logo e o botão ficava parado ~3 s, e a pessoa clicava de novo: "tenho que clicar 2x").

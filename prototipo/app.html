@@ -1983,7 +1983,12 @@ function erro(){
  var e=$('iPwd');e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');$('pwd').focus();
 }
 function sys(){setLoad(false);alertas('<div class="alert sys">'+ic('wifi')+'<span>Não foi possível conectar ao sistema agora. Não é problema da sua senha — verifique sua conexão e tente novamente.</span></div>');}
-function ok(){setLoad(false);if(cur==='corretor'){alertas('');window.ARENA.carregarCorretor().then(function(){window.abrePortal()},function(){sys()});return;}if(cur==='aluno'){alertas('');window.ARENA.carregarAluno().then(function(){window.abreAluno()},function(){sys()});return;}if(cur==='coord'||cur==='prof'){alertas('');window.ARENA.carregarCoord(cur).then(function(){window.__entraRole(cur)},function(e){console.error(e);sys()});return;}}
+function ok(){ // a senha foi aceita: o botão fica em "Verificando…" até o portal abrir (antes voltava a "Entrar" durante o carregamento e a pessoa clicava de novo)
+ var abre=function(f){setLoad(false);f()};
+ if(cur==='corretor'){alertas('');window.ARENA.carregarCorretor().then(function(){abre(window.abrePortal)},function(){sys()});return;}
+ if(cur==='aluno'){alertas('');window.ARENA.carregarAluno().then(function(){abre(window.abreAluno)},function(){sys()});return;}
+ if(cur==='coord'||cur==='prof'){alertas('');window.ARENA.carregarCoord(cur).then(function(){abre(function(){window.__entraRole(cur)})},function(e){console.error(e);sys()});return;}
+ setLoad(false)}
 
 document.addEventListener('click',function(e){
  var b=e.target.closest('.p');
