@@ -121,7 +121,7 @@ Resultado: níveis 0 a 2 = 4 × 4 = 16 combinações; nível 3 = 5 × 5 = 25; n�
 1. Diversifique os conectivos e use sinônimos que mantenham o sentido para evitar repetições. (já existe)
 2. Amplie os conectivos e use sinônimos adequados para evitar repetições. (já existe)
 3. Escolha o conectivo pela relação que você quer mostrar: causa, contraste, conclusão, exemplo.
-4. Releia o texto em voz alta e perceba onde as mesmas palavras voltam muito perto.
+4. Releia o texto procurando perceber onde as mesmas palavras voltam muito perto.
 
 ### Nível 3
 **Elogios**
