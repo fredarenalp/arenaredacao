@@ -2003,7 +2003,11 @@ $('esqueci').addEventListener('click',function(){alertas('<div class="alert sys"
 $('form').addEventListener('submit',function(e){
  e.preventDefault();if(loading)return;limpa();
  var v=$('pwd').value.trim();
- if(!v||(cur==='aluno'?!$('mat').value.trim():!$('email').value.trim())){erro();return;}
+ var uid=(cur==='aluno'?$('mat'):$('email')).value.trim();
+ if(!v||!uid){ // campo em branco: diz o que falta (não confunde com "senha incorreta")
+  var fal=(!uid&&!v)?(cur==='aluno'?'a matrícula e a senha':'o e-mail e a senha'):!uid?(cur==='aluno'?'a matrícula':'o e-mail'):'a senha';
+  if(!uid)$(cur==='aluno'?'iMat':'iEmail')&&$(cur==='aluno'?'iMat':'iEmail').classList.add('bad');if(!v)$('iPwd').classList.add('bad');
+  alertas('<div class="alert err">'+ic('alert')+'<span>Preencha '+fal+'.</span></div>');(!uid?(cur==='aluno'?$('mat'):$('email')):$('pwd')).focus();return;}
  setLoad(true);
  if(!window.ARENA){sys();return}
  window.ARENA.entrar(cur,{email:$('email').value.trim(),mat:$('mat').value.trim(),senha:v}).then(function(r){r==='ok'?ok():r==='sys'?sys():erro()});
@@ -4269,8 +4273,8 @@ function boletim(){
  var media=soma/QTD_BOL,faltam=Math.max(0,QTD_BOL-lanc),max=(soma+faltam*10)/QTD_BOL,pc=function(x){return Math.max(0,Math.min(100,x*10))};
  var regua='<div class="bn-rg"><i class="tr"></i>'+(faltam?'<i class="fu" style="left:'+pc(media)+'%;width:'+Math.max(0,pc(max)-pc(media))+'%"></i>':'')+'<i class="ho" style="width:'+pc(media)+'%"></i><i class="mk" style="left:'+pc(corte)+'%"></i><em class="mt" style="left:'+pc(corte)+'%">média '+f1(corte)+'</em><span class="l0">0</span><span class="lh" style="left:'+pc(media)+'%">hoje</span>'+(faltam?'<span class="lm" style="left:'+pc(max)+'%">máx. '+f1(max)+'</span>':'')+'</div>';
  var item=function(cls,o){return '<div class="bn-it"><i class="'+cls+'"></i><div><b>'+aiEsc(o.t)+'</b><span class="'+(cls==='am'?'am':'')+'">'+aiEsc(o.m)+'</span>'+(o.d?'<small>'+aiEsc(o.d)+'</small>':'')+'</div></div>'};
- var mA=bimMediaAtual(),pasN=[1,2,3,4].filter(function(b){return b<BATU&&BIMS[b]&&BIMS[b].notas.length}),ano=pasN.length?pasN.reduce(function(a,b){return a+bimMediaPas(b)},0)/pasN.length:0;
- var anoH='<div class="bol-ano"><div class="ba main"><small>Média dos bimestres encerrados</small><b>'+fmt1(ano)+'</b><span>de 10,0</span></div>'+[1,2,3,4].map(function(b){var pas=b<BATU,at=b===BATU;return '<div class="ba '+(pas?'ps':at?'at':'fu')+'"><small>'+b+'º bimestre</small><b>'+(pas?(BIMS[b]&&BIMS[b].notas.length?fmt1(bimMediaPas(b)):'–'):at?fmt1(mA):'–')+'</b><span>'+(pas?'encerrado':at?'em andamento':'começa em '+BINI[b])+'</span></div>'}).join('')+'</div>';
+ var mA=bimMediaAtual(),pasN=[1,2,3,4].filter(function(b){return b<BATU&&BIMS[b]&&BIMS[b].notas.length}),ano=pasN.length?pasN.reduce(function(a,b){return a+bimMediaPas(b)},0)/pasN.length:null;
+ var anoH='<div class="bol-ano"><div class="ba main"><small>Média dos bimestres encerrados</small><b>'+(ano==null?'–':fmt1(ano))+'</b><span>'+(ano==null?'ainda sem bimestre com nota':'de 10,0')+'</span></div>'+[1,2,3,4].map(function(b){var pas=b<BATU,at=b===BATU;return '<div class="ba '+(pas?'ps':at?'at':'fu')+'"><small>'+b+'º bimestre</small><b>'+(pas?(BIMS[b]&&BIMS[b].notas.length?fmt1(bimMediaPas(b)):'–'):at?fmt1(mA):'–')+'</b><span>'+(pas?'encerrado':at?'em andamento':'começa em '+BINI[b])+'</span></div>'}).join('')+'</div>';
  var det='<h3 class="bol-h3">'+BATU+'º bimestre em detalhe</h3>'+
  '<div class="bn-card"><div class="bn-lab">Sua média hoje</div><div class="bn-big"><b>'+f1(media)+'</b><span>de 10,0 · '+lanc+' de '+QTD_BOL+' redações corrigidas</span></div>'+regua+'</div>'+
  (faltam?'<div class="bn-info"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4" fill="#d6ecee"/><path d="M12 11v6M12 7.5v.5" fill="none" stroke="#6aa9b4" stroke-width="2.2" stroke-linecap="round"/></svg><p>Faltam <b>'+faltam+' redações</b> para o cálculo completo.</p></div>':'')+
@@ -4332,7 +4336,7 @@ var PASSOS=[
 ];
 function instrucoes(k,late){
  var P=PROPS[k];
- $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas propostas</button>'+
+ $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas redações</button>'+
  '<h2>Como tirar a foto da sua redação</h2><p class="lead">'+P.t+'. Leva 1 minuto e evita que a redação volte por foto ruim.</p>'+
  (late?'<div class="lbn"><b>Envio em atraso.</b> Motivo informado: '+late.mot+(late.txt?' — “'+late.txt+'”':'')+'. A coordenação avalia a justificativa antes de liberar a redação para correção.</div>':'')+
  '<div class="al-grid"><div><div class="steps">'+PASSOS.map(function(p,k){return '<div class="stp"><div class="n">'+(k+1)+'</div><div style="flex:1"><b>'+p[1]+'</b><p>'+p[2]+'</p></div><div class="ill" aria-hidden="true">'+IL[p[0]]+'</div></div>'}).join('')+'</div>'+
@@ -4375,7 +4379,7 @@ function instrucoes(k,late){
 var MOTIVOS=[['saude','Problema de saúde'],['viagem','Viagem'],['esq','Esqueci ou perdi o prazo'],['outro','Outro motivo']];
 function atraso(k){
  var P=PROPS[k],sel=null;
- $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas propostas</button><h2>Esta proposta está em atraso</h2><p class="lead">'+P.t+' · '+P.s+'. Você ainda pode enviar. Conte o motivo para a coordenação avaliar.</p>'+
+ $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas redações</button><h2>Esta proposta está em atraso</h2><p class="lead">'+P.t+' · '+P.s+'. Você ainda pode enviar. Conte o motivo para a coordenação avaliar.</p>'+
  '<div class="atr"><div class="lbl2">Por que a redação não foi entregue no prazo?</div>'+MOTIVOS.map(function(m){return '<label class="rd"><input type="radio" name="mot" value="'+m[0]+'"> '+m[1]+'</label>'+(m[0]==='viagem'?'<div class="atd hide" id="atViagem"><label for="atIda">Quando você viajou?<input type="date" id="atIda"></label><label for="atVolta">Quando você voltou?<input type="date" id="atVolta"></label><div class="atde" id="atDe"></div></div>':'')}).join('')+
  '<label class="lbl2" for="atT" id="atTl" style="margin-top:12px">Quer explicar melhor? (opcional)</label><textarea id="atT" rows="3" placeholder="Ex.: fiquei doente de 22 a 28/10."></textarea>'+
  '<button type="button" class="btn" id="atGo" disabled>Continuar e enviar a foto</button>'+
@@ -4516,7 +4520,7 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  var adic=(P.adic||[]).filter(function(t){var n=nrm(t);return n&&jaNoCrit.indexOf(n)<0&&obsAll.indexOf(n)<0}); // o que já aparece num critério não repete em "Comentários adicionais"
  var adH='<div class="crc cradc'+(adic.length?'':' vazio')+'"><div class="crh"><b>Comentários adicionais</b></div>'+(adic.length?adic.map(function(t){return '<p>'+esc(t)+'</p>'}).join(''):'<p>Não há comentários adicionais.</p>')+'</div>';
  var barrasHtml='<div class="crs-b"><div class="lab">Seus 5 critérios · toque para abrir</div><div class="crs-t">'+A.COMPS.map(function(c,j){var n=NIV[j];return '<button type="button" class="crs-r'+(n<ESPERADO?' abx':'')+'" data-cj="'+j+'"><span class="rn">'+['I','II','III','IV','V'][j]+'</span><b>'+n+'<small>/4</small></b><span class="nm">'+c.nome+'</span><span class="sg">'+[0,1,2,3].map(function(q){return '<i'+(q<n?' class="fl"':'')+'></i>'}).join('')+'</span></button>'}).join('')+'</div>'+'<button type="button" class="crs-add" id="crAdBtn"><b>Comentários adicionais</b></button>'+'</div>';
- $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas propostas</button><h2>Correção · '+String(P.t).replace(/^(Proposta \d+) · /,'$1<br>')+'</h2>'+verSw+'<p class="lead"><b class="volta">Sua redação voltou da correção!</b><br></p>'+
+ $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas redações</button><h2>Correção · '+String(P.t).replace(/^(Proposta \d+) · /,'$1<br>')+'</h2>'+verSw+'<p class="lead"><b class="volta">Sua redação voltou da correção!</b><br></p>'+
  '<div class="cr-grid"><div class="cr-left"><div class="cr-tb"><button type="button" id="crM" aria-label="Diminuir zoom">−</button><span id="crZ">80%</span><button type="button" id="crP" aria-label="Aumentar zoom">+</button><span id="crFb"></span></div><div class="crf" id="crF" role="group" aria-label="Mostrar marcações da folha por critério"></div><div class="crfn hide" id="crFn"></div><div class="cr-photo" id="crPh"><div class="cr-pg" id="crPg"><img id="crImg" alt="Sua redação corrigida"><svg id="crK" class="crk" viewBox="0 0 210 297" preserveAspectRatio="none"></svg><div id="crPop" class="crpop hide" role="dialog" aria-label="Comentário"></div></div></div></div>'+
  '<aside class="cr-right"><div class="cr-nota"><div><div class="lab" style="margin:0 0 2px">Nota final</div><div class="cr-big">'+A.fmt(total)+'<small> / 10</small></div></div><div class="cr-pill">Corrigida</div></div>'+barrasHtml+
  '<div id="crT1">'+cmpHtml+(abaixo(P).length?'<div class="crwarn"><b>Atenção:</b> '+(abaixo(P).length>1?'os critérios '+jn(abaixo(P).map(function(j){return CRIT[j]}))+' ficaram abaixo do esperado':'o critério '+CRIT[abaixo(P)[0]]+' ficou abaixo do esperado')+'. Leia os comentários e use a reescrita para melhorar.</div>':'')+'<h3>Competências</h3>'+comps+adH+(finA.length?'<div class="crwarn finw">'+finA.map(function(t){return '<p>'+esc(t)+'</p>'}).join('')+'</div>':'')+

@@ -528,50 +528,6 @@ const ARENA = {
     }
     return data
   },
-  async carregarFeed() {
-    const al = ARENA.aluno
-    const [meus, feed, erros, serie] = await Promise.all([
-      supabase.from('destaques').select('id, tipo, titulo, texto, nota_elogio, status, resposta_em, criado_em').order('criado_em', { ascending: false }),
-      supabase.rpc('feed_destaques'),
-      supabase.rpc('feed_erros_serie'),
-      supabase.rpc('feed_serie'),
-    ])
-    const { data: auth } = await supabase.from('alunos').select('autoriza_destaque').eq('id', al.id).maybeSingle()
-    return { meus: meus.data ?? [], feed: feed.data ?? [], erros: erros.data ?? [], serie: (serie.data ?? [])[0] ?? null, autoriza: !!auth?.autoriza_destaque }
-  },
-  async responderDestaque(id, aceita) {
-    return !(await supabase.rpc('responder_destaque', { p_id: id, p_aceita: aceita })).error
-  },
-  // Coordenação/professor: destaques, alunos (com a autorização da família) e elogios dos corretores.
-  async carregarDestaques() {
-    const [d, a] = await Promise.all([
-      supabase.from('destaques').select('id, redacao_id, aluno_id, serie, tipo, titulo, texto, nota_elogio, status, resposta_em, criado_em').order('criado_em', { ascending: false }),
-      supabase.from('alunos').select('id, nome, autoriza_destaque, saiu, turmas(serie, nome)').order('nome'),
-    ])
-    if (d.error) throw d.error
-    const alunos = (a.data ?? []).map((x) => ({ id: x.id, nome: x.nome, aut: !!x.autoriza_destaque, saiu: !!x.saiu, serie: x.turmas?.serie ?? '', turma: x.turmas ? `${x.turmas.serie}º ${x.turmas.nome}` : '' }))
-    const porId = Object.fromEntries(alunos.map((x) => [x.id, x]))
-    return { destaques: (d.data ?? []).map((x) => ({ ...x, aluno: porId[x.aluno_id]?.nome ?? '' })), alunos }
-  },
-  async redacoesAluno(aid) {
-    const { data } = await supabase.from('redacoes').select('id, versao, propostas(numero, titulo), correcoes(liberada)').eq('aluno_id', aid).order('id')
-    return (data ?? []).filter((r) => (Array.isArray(r.correcoes) ? r.correcoes[0] : r.correcoes)?.liberada)
-      .map((r) => ({ id: r.id, rot: `Proposta ${r.propostas?.numero ?? '?'} · ${r.versao === 2 ? '2ª' : '1ª'} versão${r.propostas?.titulo ? ' — ' + r.propostas.titulo : ''}`, tema: r.propostas?.titulo ?? '' }))
-  },
-  async autorizarAluno(id, aut) {
-    return !(await supabase.from('alunos').update({ autoriza_destaque: aut }).eq('id', id)).error
-  },
-  async salvarDestaque({ redacao_id, aluno_id, serie, tipo, titulo, texto, nota_elogio }) {
-    const { error } = await supabase.from('destaques').insert({ redacao_id, aluno_id, serie: String(serie), tipo, titulo: titulo || null, texto, nota_elogio: nota_elogio || null, criado_por: ARENA.perfil?.id ?? null })
-    return !error
-  },
-  async statusDestaque(id, status) {
-    return !(await supabase.from('destaques').update({ status, resposta_em: new Date().toISOString() }).eq('id', id)).error
-  },
-  async removerDestaque(id) {
-    return !(await supabase.from('destaques').delete().eq('id', id)).error
-  },
-
   // O aluno viu a correção (a primeira tela só comemora uma vez).
   async marcarVista(rids) {
     try {

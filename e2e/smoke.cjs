@@ -38,6 +38,8 @@ const ok = (c, m) => { console.log(c ? 'ok   ' : 'FALHA', m); if (!c) falhas++ }
   await p.click('#restrBtn'); await p.fill('#email', 'teste@arena.com'); await p.fill('#pwd', 'teste'); await p.click('#entrar')
   await p.waitForSelector('body.in-coord', { timeout: 25000 }); await p.waitForTimeout(1200)
   for (const t of ['acessos', 'entregas', 'turmas', 'avisos', 'corretores', 'relatorios', 'propostas', 'pessoas', 'regras', 'hist']) {
+    // os itens de "Consultar" e "Ajustes" ficam recolhidos: abre o grupo pelo primeiro item e depois vai ao item
+    if (!(await p.locator(`#coBar [data-top="${t}"]`).count())) { await p.locator('#coBar button', { hasText: ['propostas', 'pessoas', 'regras', 'hist'].includes(t) ? 'Ajustes' : 'Consultar' }).first().click(); await p.waitForTimeout(400) }
     await p.locator(`#coBar [data-top="${t}"]`).first().click(); await p.waitForTimeout(500)
   }
   ok(p.erros.length === 0, 'coordenação: 10 abas sem erros ' + p.erros.join('|'))
