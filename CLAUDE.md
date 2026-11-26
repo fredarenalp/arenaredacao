@@ -209,3 +209,6 @@ Oralidade (`desTxt`): "Há uma marca de oralidade na linha N, ou seja, você aca
 
 ## Conferência da correção: "nível baixo sem comentário" só para IV e V (decisão do dono, 26/11)
 O aviso "As competências … estão no nível 0 ou 1 e não há nenhum comentário por linha" só vale para os critérios IV (Proposta) e V (Abordagem). Em I a III as marcações já explicam o motivo ao aluno.
+
+## Aluno: setas de repetição e parágrafo desalinhado (26/11)
+Na tela do aluno e na impressão/PDF, os círculos de **Repetição** (`rp`, mesma palavra) agora são ligados por setas tracejadas laranja na ordem da leitura (`window.rpSetasCirc`, marcador `#rpHa`; os círculos `rp` ficaram laranja como no corretor). O **Parágrafo desalinhado** já tinha a linha roxa (`pdLinhaSvg`). Teste: `e2e/cacabugs-aluno.cjs` (2 setas para 3 círculos da mesma palavra, tela e impressão).

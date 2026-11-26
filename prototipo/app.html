@@ -1501,6 +1501,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .vbody{padding:12px 18px 16px}.vcard .vsum{font-size:15px;margin:2px 0 10px}.vcard .vsum b{font-size:26px;color:#2f5f61;margin-right:4px}.vcard .vsum small{color:#6b7280}.vleg{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:#5d584a;margin-bottom:10px}.vleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
 .vrow{display:grid;grid-template-columns:92px 1fr 130px;gap:12px;align-items:center;padding:5px 0;font-size:13.5px}.vrow>span{color:#3a3a32;text-align:right}.vrow small{color:#8a8578}.vbar{display:flex;height:16px;border-radius:5px;overflow:hidden;background:#ece7da}.vbar i,.vleg i.t,.vbar i.t{background:#2f855a}.vbar i.p,.vleg i.p{background:#d9a441}.vbar i.n,.vleg i.n{background:#d9d3c3}
 @media(max-width:640px){.vrow{grid-template-columns:70px 1fr}.vrow>span{grid-column:1/-1;text-align:left}}
+.crk .rpar,.pr-pg .rpar{fill:none;stroke:#f08300;stroke-width:.9;stroke-dasharray:2.4 1.6;pointer-events:none}
 .mk .pdl,.crk .pdl,.pr-pg .pdl{fill:none;stroke:#b0307a;stroke-width:1.3;stroke-linecap:round;opacity:.85;pointer-events:none}
 .mk .pdn,.crk .pdn,.pr-pg .pdn{pointer-events:none}.mk .pdn circle,.crk .pdn circle,.pr-pg .pdn circle{fill:#b0307a;stroke:none}.mk .pdn text,.crk .pdn text,.pr-pg .pdn text{fill:#fff;stroke:none;font:700 3px 'DM Sans',sans-serif;text-anchor:middle}
 .mk .xm path.xx.ln,.crk .xm path.xx.ln,.pr-pg .xm path.xx.ln,.al .xm path.xx.ln{stroke-width:1}
@@ -2976,6 +2977,13 @@ window.pdLinhaSvg=function(pts){if(!pts||!pts.length)return '';var P=pts.slice()
  for(var k=1;k<P.length;k++)o+='<line class="pdl" x1="'+P[k-1].x+'" y1="'+P[k-1].y+'" x2="'+P[k].x+'" y2="'+P[k].y+'"/>';
  P.forEach(function(q){o+='<g class="pdn"><circle cx="18.2" cy="'+q.yn+'" r="3.1"/><text x="18.2" y="'+(q.yn+1.1)+'">'+q.l+'</text></g>'});
  return o};
+/* Setas de repetição para o aluno e a impressão: ligam, na ordem da leitura, os círculos da mesma palavra (mesma geometria do corretor; círculo do aluno tem rx 8 e ry 2,9) */
+window.rpSetasCirc=function(circ,lineY){var g={},o='';(circ||[]).forEach(function(c){if(c.c==='rp'&&c.w&&String(c.w).trim()){var k=String(c.w).trim().toLowerCase();(g[k]=g[k]||[]).push({cx:c.x,cy:lineY(c.l)-2.4,rx:8,ry:2.9,l:c.l})}});
+ Object.keys(g).forEach(function(k){var ms=g[k].sort(function(x,y){return (x.l-y.l)||(x.cx-y.cx)});for(var q=1;q<ms.length;q++){var A=ms[q-1],B=ms[q],dx=B.cx-A.cx,dy=B.cy-A.cy,d=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/d,uy=dy/d;
+  var ta=1/Math.sqrt(Math.pow(ux/A.rx,2)+Math.pow(uy/A.ry,2)),tb=1/Math.sqrt(Math.pow(ux/B.rx,2)+Math.pow(uy/B.ry,2));
+  var x1=A.cx+ux*(ta+.6),y1=A.cy+uy*(ta+.6),x2=B.cx-ux*(tb+.9),y2=B.cy-uy*(tb+.9),nx=-uy,ny=ux,sg=ny>0?-1:1,cx=(x1+x2)/2+nx*sg*d*.18,cy=(y1+y2)/2+ny*sg*d*.18,r=function(v){return Math.round(v*10)/10};
+  o+='<path class="rpar" d="M'+r(x1)+' '+r(y1)+' Q'+r(cx)+' '+r(cy)+' '+r(x2)+' '+r(y2)+'" marker-end="url(#rpHa)"/>'}});
+ return o?'<defs><marker id="rpHa" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0L5 2.5L0 5z" fill="#f08300"/></marker></defs>'+o:''};
 function rpSetas(src){
  var g=repGrupos(null,src,true),o=''; // as setas ligam também o círculo do título; ele só não entra na contagem
  Object.keys(g).forEach(function(k){var ms=g[k];for(var q=1;q<ms.length;q++){var A=ms[q-1],B=ms[q],dx=B.cx-A.cx,dy=B.cy-A.cy,d=Math.sqrt(dx*dx+dy*dy)||1,ux=dx/d,uy=dy/d;
@@ -4452,7 +4460,7 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  var okF=function(c){return fj===null||(fj==='cv'?(c==='ce'||c==='ca'):critDe(c)===fj)};
  var okC=function(c){return fj===null||(fj!=='cv'&&c.j===fj)};
  var NR=function(k,w){return w?w:k==='el'?'✓':['I','II','III','IV','V'][critDe(k)]};
- var gX=function(c,cy){var k=c.c,cls=(k==='ra'||k==='ti'||isMg(k)?' est'+(isMg(k)&&k!=='mr'&&k!=='ma'?' gpg':isMg(k)?' gmg':''):'')+(k==='ca'?' cv ca':k==='ce'?' cv':'')+(k==='el'?' elg':'')+(k==='or'&&c.w?' cor':'')+(k==='lac'?' lac':'')+(k==='ele'?' ele':k==='eli'?' eli':'');return '<g class="xm'+cls+'">'+(c.xm?xmSvg(c.x,cy,8,2.9):c.ln?lnSvg(c.x,cy,8,2.9):'<ellipse cx="'+c.x+'" cy="'+cy+'" rx="8" ry="2.9"/>')+'<text class="cl" x="'+(c.xm?c.x+xmD(8,2.9):(k==='or'&&c.w)?c.x:c.x+4.4)+'" y="'+(c.xm?cy-xmD(8,2.9)-.5:cy-3.4)+'">'+esc(NR(k,k==='or'?c.w:''))+'</text>'+(k==='ca'?'<text class="cg" x="'+c.x+'" y="'+(cy+2.1)+'">C</text>':'')+'</g>'};
+ var gX=function(c,cy){var k=c.c,cls=(k==='ra'||k==='ti'||isMg(k)?' est'+(isMg(k)&&k!=='mr'&&k!=='ma'?' gpg':isMg(k)?' gmg':''):'')+(k==='ca'?' cv ca':k==='ce'?' cv':'')+(k==='rp'?' rp':'')+(k==='el'?' elg':'')+(k==='or'&&c.w?' cor':'')+(k==='lac'?' lac':'')+(k==='ele'?' ele':k==='eli'?' eli':'');return '<g class="xm'+cls+'">'+(c.xm?xmSvg(c.x,cy,8,2.9):c.ln?lnSvg(c.x,cy,8,2.9):'<ellipse cx="'+c.x+'" cy="'+cy+'" rx="8" ry="2.9"/>')+'<text class="cl" x="'+(c.xm?c.x+xmD(8,2.9):(k==='or'&&c.w)?c.x:c.x+4.4)+'" y="'+(c.xm?cy-xmD(8,2.9)-.5:cy-3.4)+'">'+esc(NR(k,k==='or'?c.w:''))+'</text>'+(k==='ca'?'<text class="cg" x="'+c.x+'" y="'+(cy+2.1)+'">C</text>':'')+'</g>'};
  var cntF=function(f){var n=0;circ.forEach(function(c){var o=fj;fj=f;if(okF(c.c))n++;fj=o});cmts.forEach(function(c){if(f!=='cv'&&c.j===f)n++});return n};
 
  var pad=function(l){return (l<10?'0':'')+l},sorted=function(a){return a.slice().sort(function(x,y){return x-y})};
@@ -4515,7 +4523,7 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  function montaImpressao(){
   var el=document.getElementById('printArea');if(!el){el=document.createElement('div');el.id='printArea';document.body.appendChild(el);}
   var logo=(document.querySelector('.al .ph img')||{}).src||'';
-  var marks=pdLinhaSvg(circ.filter(function(c){return c.c==='pd'}).map(function(c){return {x:c.x,y:A.lineY(c.l)-2.4,l:c.l,yn:A.lineY(c.l)-3.4}}));circ.forEach(function(c){var cy=A.lineY(c.l)-2.4,est2=c.c==='ra'||isMg(c.c);marks+=gX(c,cy);});
+  var marks=pdLinhaSvg(circ.filter(function(c){return c.c==='pd'}).map(function(c){return {x:c.x,y:A.lineY(c.l)-2.4,l:c.l,yn:A.lineY(c.l)-3.4}}));circ.forEach(function(c){var cy=A.lineY(c.l)-2.4,est2=c.c==='ra'||isMg(c.c);marks+=gX(c,cy);});marks+=window.rpSetasCirc(circ,A.lineY);
   cmts.forEach(function(c){var y=A.lineY(c.l)-3.4;marks+='<g class="pin"><circle cx="'+c.x+'" cy="'+y+'" r="3.7"/><text x="'+c.x+'" y="'+(y+1.25)+'">'+c.l+'</text></g>';});
   var tab=A.COMPS.map(function(c,j){return '<tr><td><b>'+c.id+' · '+c.nome+'</b></td><td>'+A.NIVEIS[NIV[j]]+' (nível '+NIV[j]+' de 4)</td><td>'+A.fmt(NIV[j]*.5)+' de 2,0</td></tr>'}).join('');
   el.innerHTML='<div class="pr-page"><div class="pr-head">'+(logo?'<img src="'+logo+'" alt="">':'')+'<div><div class="pr-t">Correção da redação</div><div class="pr-s">Arena Redação · Colégio Arena</div></div></div>'+
@@ -4550,6 +4558,7 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
   cmts.forEach(function(c){if(c.l2&&okC(c)){var y0=A.lineY(c.l)-6.8+.8,hh=6.8*(c.l2-c.l+1)-1.6;h+='<g class="rgb"><rect x="13.2" y="'+y0+'" width="1.3" height="'+hh+'"/><rect x="196" y="'+y0+'" width="1.3" height="'+hh+'"/></g>';}});
   h+=pdLinhaSvg(circ.filter(function(c){return c.c==='pd'&&okF('pd')}).map(function(c){return {x:c.x,y:A.lineY(c.l)-2.4,l:c.l,yn:A.lineY(c.l)-3.4}}));
   circ.forEach(function(c){if(!okF(c.c))return;h+=gX(c,A.lineY(c.l)-2.4)});
+  h+=window.rpSetasCirc(circ.filter(function(c){return okF(c.c)}),A.lineY);
   cmts.forEach(function(c){if(!okC(c))return;var y=A.lineY(c.l)-3.4;h+='<g class="pin" data-l="'+c.l+'" tabindex="0" role="button" aria-label="Ver comentário: '+rot(c)+'"><circle cx="'+c.x+'" cy="'+y+'" r="3.7"/><text x="'+c.x+'" y="'+(y+1.25)+'">'+(c.par?'¶'+c.par:c.l)+'</text></g>';});
   var po=$('crPop'),cc=sel?cmts.filter(function(c){return c.l===sel})[0]:null;
   if(po){if(cc){po.innerHTML='<button type="button" class="px" aria-label="Fechar">×</button><b>'+rot(cc)+'</b><span>'+cc.t+'</span>';po.style.left=(cc.x/210*100)+'%';po.style.top=((A.lineY(cc.l)-3.4)/297*100)+'%';po.classList.toggle('esq',cc.x>105);po.classList.remove('hide');}else po.classList.add('hide');}
