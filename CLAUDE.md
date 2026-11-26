@@ -202,3 +202,7 @@ No login do Aluno Teste (matrícula 20260187) os cartões são **sempre**: Propo
 
 ## PDF do bimestre: 2 páginas por proposta (corrigido 26/11)
 Cada correção no PDF do bimestre deve ocupar 2 páginas (texto + folha com marcações); a capa é à parte. A página de texto passava para 3 páginas por poucas linhas da tabela de critérios; o CSS de impressão (`#printArea`, `.pr-*`, perto de `@page`) ficou mais compacto (fonte 10pt, margens e tabelas menores). Comentários muito longos ainda podem estourar a página. Conferir com `page.pdf()` (capa + 2 por correção).
+
+## Corretor: marcas já feitas só eram clicáveis com a ferramenta Círculo; texto de oralidade (26/11)
+Ao abrir uma redação a ferramenta é a "mão" (`tool='pan'`) e, nela, clicar numa marca existente não fazia nada (a marca virava "parte da imagem"; só funcionava depois de escolher Círculo/O). Agora, no computador, clicar numa marca com a mão a seleciona e troca para Círculo/Marca-texto (no celular não muda: gestos de arrastar a folha e a gaveta). Não era problema do rascunho.
+Oralidade (`desTxt`): "Há uma marca de oralidade na linha N, ou seja, você acabou escrevendo da mesma maneira que fala." (plural: "Há marcas de oralidade nas linhas N e M, …"); as outras categorias seguem "Há desvio de …".

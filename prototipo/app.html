@@ -2296,6 +2296,7 @@ function desTxt(a){ // desvios de escrita circulados (os de sinal inserido e os 
  var P={},ord=function(x){return x.slice().sort(function(p,q){return p-q})};
  var W=[];(a.marks||[]).forEach(function(m){if(m.t!=='o'||m.sinal||m.inad||!DES_TX[m.cat])return;if(m.cat==='or'&&m.cor){if(W.map(function(q){return q.toLowerCase()}).indexOf(m.cor.toLowerCase())<0)W.push(m.cor);return}var L=P[m.cat]=P[m.cat]||[];if(L.indexOf(m.line)<0)L.push(m.line)});
  var out=[];DES_ORD.forEach(function(c){if(c==='or'&&W.length){var q=W.map(function(x){return '“'+x+'”'});out.push('Atenção à grafia '+(W.length>1?'das palavras ':'da palavra ')+(q.length<2?q[0]:q.slice(0,-1).join(', ')+' e '+q[q.length-1])+'.')}var L=P[c];if(!L)return;L=ord(L);var lst=L.length<2?L.join(''):L.slice(0,-1).join(', ')+' e '+L[L.length-1];
+  if(c==='ol'){out.push(L.length>1?'Há marcas de oralidade nas linhas '+lst+', ou seja, você acabou escrevendo da mesma maneira que fala.':'Há uma marca de oralidade na linha '+lst+', ou seja, você acabou escrevendo da mesma maneira que fala.');return}
   out.push('Há desvio de '+DES_TX[c][0]+' '+(L.length>1?'nas linhas ':'na linha ')+lst+'. '+DES_TX[c][1])});
  return out}
 window.PROG_SR=['Ligue as ideias com conectivos, entre os parágrafos e dentro deles.','Fortaleça a ligação entre as ideias com conectivos variados.','Diversifique os conectivos para ligar melhor as ideias, entre os parágrafos e dentro deles.','Amplie a variedade de conectivos para ligar ainda melhor as ideias.']; // Progressão sem repetição marcada: nada sobre sinônimos ou repetições
@@ -3276,7 +3277,8 @@ function selAtiva(){return selC&&ALUNOS[i].marks.indexOf(selC)>=0}
 $('mk').addEventListener('pointerdown',function(e){
  if(verOrig)return;
  if(upMode){upClick(e);return;}
- if(tool==='pan')return;
+ if(tool==='pan'){ // com a mão (nenhuma ferramenta), clicar numa marca já feita seleciona a marca (antes ela virava parte da imagem até escolher o Círculo)
+  if(typeof mobOn==='function'&&mobOn())return;var q0=pt(e);if(!(q0&&hitCirc(q0)))return;setTool(ALUNOS[i]&&hitCirc(q0).f==='h'?'h':'o');}
  if(e.target.closest('.pin'))return; // tratado no click
  if(e.target.closest('.nh')){var pn0=pt(e);if(!(pn0&&(tool==='o'||tool==='h')&&hitCirc(pn0)))return;} // número da linha: abre o comentário no click, mas um círculo que está em cima dele tem prioridade (dá para selecionar e editar)
  var p=pt(e);if(!p)return;e.preventDefault();
