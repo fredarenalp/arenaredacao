@@ -13,6 +13,7 @@ const { data: todas } = await coord.from('propostas').select('id, status, prazo,
 const alvo = todas.find((p) => !jaEnv.some((r) => r.proposta_id === p.id && r.versao === 1) && (p.series ?? []).includes(8))
 if (!alvo) { console.log('pulou: sem proposta livre do 8º ano para o aluno de teste'); process.exit(0) }
 const orig = { status: alvo.status, prazo: alvo.prazo }
+await coord.from("prazos_individuais").delete().eq("aluno_id", al.id).eq("proposta_id", alvo.id) // o login do Aluno Teste (demo) cria prazo individual: sai antes do teste
 const dia = (n) => { const d = new Date(new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }) + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10) }
 const cfg = (status, prazo) => coord.from('propostas').update({ status, prazo }).eq('id', alvo.id)
 const tenta = async () => { const r = await aluno.from('redacoes').insert({ aluno_id: al.id, proposta_id: alvo.id, versao: 1, foto_path: 'teste/envio-prazo.jpg' }).select().single(); if (r.data) await coord.from('redacoes').delete().eq('id', r.data.id); return r }
