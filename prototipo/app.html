@@ -5004,7 +5004,7 @@ function renderCorretores(){
 }
 /* ===== Coordenação ampliada: propostas, avisos, distribuição, pessoas, regras, histórico ===== */
 S.x={np:null,prr:null,psub:'alunos',qa:'',ac:{n:'',e:''},ae:{n:'',e:'',r:window.__real?'prof':'leit'},hk:'todos',avf:'pend',chk:{}};
-var R=window.__regras=window.__regras||{};R.corte=6;R.devolve=5;R.reesc=7;R.alerta=2;R.meta=35;R.pol='turma';R.janela=3;R.uteis='uteis';R.email=true;R.mail='coordenacao@colegioarena.exemplo';R.hora='07:30';
+var R=window.__regras=window.__regras||{};R.corte=6;R.devolve=5;R.reesc=7;R.alerta=2;R.meta=35;R.pol='turma';R.email=true;R.mail='coordenacao@colegioarena.exemplo';R.hora='07:30';
 var HOJE=new Date();HOJE.setHours(0,0,0,0);
 function agora(){var d=new Date();return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)+' · '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)}
 var LOG=[
@@ -5036,7 +5036,9 @@ PRP.forEach(function(q){if(!q.elem)q.elem=(ELEM_PADRAO[q.g]||[]).slice()});
 var FICHAS={'Crônica':1,'Dissertativo-argumentativo':1,'Carta de leitor':1},prId=5;
 function serTxt(p){return p.ser.length===3?'todas as séries (7º ao 9º)':p.ser.map(function(s){return s+'º'}).join(', ')}
 function prazoD(p){var m=/(\d{2})\/(\d{2})/.exec(p.p1||'');return m?new Date(2026,+m[2]-1,+m[1]):null}
-function fimAtraso(p){var d=prazoD(p);if(!d)return null;var n=R.janela;if(R.uteis==='uteis'){while(n>0){d.setDate(d.getDate()+1);if(d.getDay()!==0&&d.getDay()!==6)n--}}else d.setDate(d.getDate()+n);return d}
+function isoD(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)}
+/* REGRA DO DONO: o envio com atraso vai até a SEXTA-FEIRA da semana do prazo; se for feriado, vale o dia útil anterior (igual ao banco: fim_atraso) */
+function fimAtraso(p){var d0=prazoD(p);if(!d0)return null;var d=new Date(d0.getTime()),dow=d.getDay()||7,F={};(window.__feriados||[]).forEach(function(f){F[f.d]=1});d.setDate(d.getDate()+((5-dow+7)%7));while(d.getDay()===0||d.getDay()===6||F[isoD(d)])d.setDate(d.getDate()-1);return d<d0?d0:d}
 function fmtDM(d){return ('0'+d.getDate()).slice(-2)+'/'+('0'+(d.getMonth()+1)).slice(-2)}
 function fase(p){if(p.st==='rascunho'||p.st==='encerrada'||p.st==='fechada')return p.st;var d=prazoD(p);if(!d||HOJE<=d)return 'aberta';return HOJE<=fimAtraso(p)?'atraso':'fechada'}
 function syncAl(p){if(p.bim===bimAtual()&&p.n<=4&&window.__aluno&&__aluno.setAberta){var f=fase(p);if(f==='aberta')__aluno.setAberta(p.n,true,p.p1);else if(f==='atraso')__aluno.setFase(p.n,'late',p.p1,fmtDM(fimAtraso(p)));else if(f==='fechada')__aluno.setFase(p.n,'closed',p.p1)}if(p.bim===bimAtual()&&p.n<=4&&window.__aluno&&__aluno.setSemRe)__aluno.setSemRe(p.n,!!p.semRe,p.p2)}
@@ -5062,7 +5064,7 @@ function renderPropostas(){
    var d=dias(p.p1),pz=p.st==='aberta'&&d!=null&&d<=3&&d>=0?' <span class="pill a">fecha em '+d+(d===1?' dia':' dias')+'</span>':'';
    var ac={rascunho:[['abrir','Abrir'],['excluir','Excluir']],aberta:[['prorrogar','Prorrogar'],['fechar','Fechar']],fechada:[['prorrogar','Reabrir'],['encerrar','Encerrar']],encerrada:[['reabrir','Reabrir']]}[fase(p)==='fechada'&&p.st==='aberta'?'fechada':p.st].concat([['elem','Elementos']]);
    return '<tr><td><b>Proposta '+p.n+'</b></td><td>'+esc(p.g)+(FICHAS[p.g]?'':' <span class="pill a" title="Defina os elementos deste gênero em Elementos">ficha pendente</span>')+'<small style="display:block;color:#6a6a60">'+((p.elem&&p.elem.length)?p.elem.length+' elementos':'elementos a definir')+'</small></td><td>'+esc(p.t)+'</td><td>'+serTxt(p)+'</td><td>'+p.p1+pz+'</td><td>'+(p.semRe?'<span class="pill d">Sem reescrita</span>':(p.p2||'a definir'))+'</td><td>'+estPill2(p)+'</td><td class="acs">'+ac.map(function(a){return '<button type="button" class="cobtn" data-x-pa="'+a[0]+':'+p.id+'">'+a[1]+'</button>'}).join('')+'</td></tr>'}).join('')+'</tbody></table></div>'});
- h+='<p class="note"><b>Aberta:</b> o aluno envia dentro do prazo. <b>Em atraso:</b> o prazo passou, mas o aluno ainda envia por mais '+R.janela+(R.uteis==='uteis'?(R.janela===1?' dia útil':' dias úteis'):(R.janela===1?' dia':' dias'))+' e a decisão de aceitar ou recusar vem para Demandas. <b>Fechada:</b> acabou a janela de atraso (ou você fechou). O aluno vê “Procure a coordenação” e só volta a enviar se você liberar para ele (Prorrogar → Só um aluno) ou reabrir a proposta. A janela é definida em Regras. <b>Encerrada:</b> a proposta acabou e só aparece para consulta.</p>';
+ h+='<p class="note"><b>Aberta:</b> o aluno envia dentro do prazo. <b>Em atraso:</b> o prazo passou, mas o aluno ainda envia até a sexta-feira da semana do prazo (se for feriado, o dia útil anterior) e a decisão de aceitar ou recusar vem para Demandas. <b>Fechada:</b> acabou a janela de atraso (ou você fechou). O aluno vê “Procure a coordenação” e só volta a enviar se você liberar para ele (Prorrogar → Só um aluno) ou reabrir a proposta. Os feriados são definidos em Regras. <b>Encerrada:</b> a proposta acabou e só aparece para consulta.</p>';
  $('coMain').innerHTML=h}
 function paAct(a,id){var p=PRP.filter(function(x){return x.id===id})[0];if(!p)return;
  if(a==='abrir')ask('Abrir a Proposta '+p.n+'?','Os alunos de '+serTxt(p)+' passam a ver “Enviar redação” agora. Prazo: '+p.p1+'.','Abrir',function(){p.st='aberta';syncAl(p);reg('Abriu a Proposta '+p.n+' · '+p.g+' ('+p.bim+'º bimestre), prazo '+p.p1,'prop');toast('Proposta aberta');render()});
@@ -5213,11 +5215,13 @@ function renderRegras(){
  '<div class="card pnl"><h3>Pagamento</h3><div class="frm">'+f('r1','Valor por redação corrigida (R$)',String(S.r1).replace('.',','),'O gancho é pago pela metade (50%).','text')+'</div></div>'+
  '<div class="card pnl"><h3>Correção</h3><div class="frm">'+f('corte','Nota abaixo da qual o aluno é orientado ao plantão',String(R.corte).replace('.',','),'Aparece no comentário final da correção.','text')+f('devolve','Prazo para o corretor devolver o pacote (dias)',R.devolve,'Contado a partir da entrega do pacote.')+f('reesc','Prazo da reescrita (dias)',R.reesc,'Contado a partir da devolução da correção.')+'</div></div>'+
  '<div class="card pnl"><h3>Distribuição</h3><div class="frm">'+f('meta','Meta semanal por corretor no modo livre (redações)',R.meta)+'<label>Destino padrão das atrasadas liberadas<select data-x-r="pol"><option value="turma"'+(R.pol==='turma'?' selected':'')+'>Corretor da turma do aluno</option><option value="menor"'+(R.pol==='menor'?' selected':'')+'>Corretor com a menor fila de atrasadas</option><option value="escolher"'+(R.pol==='escolher'?' selected':'')+'>Eu escolho a cada liberação</option></select></label></div></div>'+
- '<div class="card pnl"><h3>Envio em atraso</h3><div class="frm">'+f('janela','Dias de atraso permitidos depois do prazo',R.janela,'Depois desse período a proposta fecha sozinha e o aluno vê “Procure a coordenação”. Use 0 para fechar no dia seguinte.')+'<label>Como contar os dias<select data-x-r="uteis"><option value="uteis"'+(R.uteis==='uteis'?' selected':'')+'>Dias úteis (sem sábado e domingo)</option><option value="corridos"'+(R.uteis==='corridos'?' selected':'')+'>Dias corridos</option></select></label></div></div>'+
+ '<div class="card pnl"><h3>Envio em atraso <small>até a sexta-feira da semana do prazo</small></h3><p class="sm" style="margin:0 0 8px">Depois do prazo o aluno ainda envia até a <b>sexta-feira daquela semana</b>. Se a sexta for feriado, vale o dia útil anterior. Depois disso a proposta fecha sozinha e o aluno vê “Procure a coordenação”.</p><div class="wd"><b>Feriados</b></div>'+feriadosHtml()+'<div class="frm" style="margin-top:8px"><label>Data<input type="date" id="ferD"></label><label>Nome<input type="text" id="ferN" placeholder="Ex.: Recesso escolar"></label><button type="button" class="cobtn" data-x-feradd>Adicionar feriado</button></div></div>'+
 
  '<div class="card pnl"><h3>Limites das marcações <small>quantas marcações levam a cada nível máximo sugerido</small></h3><div class="frm">'+limCampos()+'</div></div>'+
  '<div class="card pnl"><h3>Avisos</h3><div class="frm">'+f('alerta','Destacar em Demandas o que estiver parado há mais de (dias)',R.alerta,'Vale para avisos de alunos sem decisão, fila do professor e pacotes sem corretor.')+'</div></div>'}
 
+function feriadosHtml(){var L=(window.__feriados||[]).slice().sort(function(x,y){return x.d<y.d?-1:1});
+ return '<ul class="ferl" style="list-style:none;margin:0;padding:0;max-height:210px;overflow:auto">'+(L.length?L.map(function(f){return '<li style="display:flex;justify-content:space-between;gap:8px;padding:4px 0;border-bottom:1px solid #ebe9e0"><span>'+f.d.slice(8,10)+'/'+f.d.slice(5,7)+'/'+f.d.slice(0,4)+' · '+esc(f.n)+'</span><button type="button" class="link" data-x-ferdel="'+f.d+'">remover</button></li>'}).join(''):'<li class="sm">Nenhum feriado cadastrado.</li>')+'</ul>'}
 function limCampos(){var L=window.__lim,f=function(path,l,v){return '<label>'+l+'<input type="number" min="0" step="1" data-x-lim="'+path+'" value="'+v+'"></label>'};
  var h='<div class="wd"><b>Linguagem · desvios de escrita</b><small style="display:block;color:#6a6a60">Nível 4 até X desvios, nível 3 até Y, nível 2 até Z. Acima disso, nível 1.</small></div>'+f('ling:0','Nível 4 até',L.ling[0])+f('ling:1','Nível 3 até',L.ling[1])+f('ling:2','Nível 2 até',L.ling[2]);
  h+='<div class="wd" style="margin-top:8px"><b>Progressão · falhas de coesão</b><small style="display:block;color:#6a6a60">Conta palavras repetidas + conectivos marcados (errado e ausente), todos com o mesmo peso. Até X falhas = nível 3, até Y = nível 2, até Z = nível 1, acima = nível 0. Uma palavra repetida W ou mais vezes tira um nível.</small></div>'+f('con:0','Nível 3 até',L.con[0])+f('con:1','Nível 2 até',L.con[1])+f('con:2','Nível 1 até',L.con[2])+f('rep:3','Palavra repetida a partir de (vezes)',L.rep[3]);
@@ -5230,14 +5234,24 @@ function setLim(path,el){var L=window.__lim,a=path.split(':'),v=path.indexOf('el
  var nv=arr.slice();nv[k]=v;var ok=v>=0&&el.value!==''&&(a[0]==='rep'?v>=1:nv.every(function(x,i){return i===0||x>=nv[i-1]}));
  if(!ok){toast('Cada limite precisa ser maior ou igual ao anterior');render();return}
  if(ant===v)return;arr[k]=v;reg('Alterou o limite “'+nome+'” (posição '+(k+1)+'): de '+ant+' para '+v,'regra');toast('Limite salvo');render()}
-var RLAB={janela:'Dias de atraso permitidos',uteis:'Contagem dos dias de atraso',r1:'Valor por redação',corte:'Nota de corte para o plantão',devolve:'Prazo de devolução do pacote',reesc:'Prazo da reescrita',meta:'Meta semanal (modo livre)',pol:'Destino das atrasadas',alerta:'Dias para aviso de pendência'};
+var RLAB={r1:'Valor por redação',corte:'Nota de corte para o plantão',devolve:'Prazo de devolução do pacote',reesc:'Prazo da reescrita',meta:'Meta semanal (modo livre)',pol:'Destino das atrasadas',alerta:'Dias para aviso de pendência'};
 function setRegra(k,el){var v,ant;if(el.type==='checkbox')v=el.checked;else v=el.value;
  if(k==='r1'||k==='corte'){v=parseFloat(String(v).replace(',','.'));if(!(v>=0)){toast('Valor inválido');render();return}}
- else if(k==='janela'){v=Math.round(+v);if(!(v>=0&&v<=30)){toast('Valor inválido');render();return}}
+
  else if(k==='devolve'||k==='reesc'||k==='meta'||k==='alerta'){v=Math.round(+v);if(!(v>0)){toast('Valor inválido');render();return}}
  ant=k==='r1'?S.r1:R[k];if(k==='r1')S.r1=v;else R[k]=v;
  var fm=function(x){return typeof x==='boolean'?(x?'ligado':'desligado'):(x==='uteis'?'dias úteis':x==='corridos'?'dias corridos':x==='turma'?'corretor da turma':x==='menor'?'menor fila':x==='escolher'?'escolher a cada vez':String(x).replace('.',','))};
- if(String(ant)!==String(v)){reg('Alterou a regra “'+RLAB[k]+'”: de '+fm(ant)+' para '+fm(v),'regra');toast('Regra salva');if(k==='janela'||k==='uteis')PRP.forEach(syncAl)}render()}
+ if(String(ant)!==String(v)){reg('Alterou a regra “'+RLAB[k]+'”: de '+fm(ant)+' para '+fm(v),'regra');toast('Regra salva');}render()}
+/* ---- feriados (Regras): contam para o fim do envio com atraso ---- */
+$('coMain').addEventListener('click',function(e){
+ var dl=e.target.closest('[data-x-ferdel]');
+ if(dl){var dt=dl.dataset.xFerdel;if(!window.ARENA||!ARENA.removerFeriado){window.__feriados=(window.__feriados||[]).filter(function(f){return f.d!==dt});render();return}
+  ARENA.removerFeriado(dt).then(function(ok){if(!ok){toast('Não foi possível remover o feriado');return}window.__feriados=(window.__feriados||[]).filter(function(f){return f.d!==dt});reg('Removeu o feriado de '+dt.slice(8,10)+'/'+dt.slice(5,7)+'/'+dt.slice(0,4),'regra');PRP.forEach(syncAl);toast('Feriado removido');render()});return}
+ if(e.target.closest('[data-x-feradd]')){var v=($('ferD')||{}).value,n=(($('ferN')||{}).value||'').trim();if(!v||!n){toast('Informe a data e o nome do feriado');return}
+  var fim=function(){window.__feriados=(window.__feriados||[]).filter(function(f){return f.d!==v}).concat([{d:v,n:n}]);reg('Cadastrou o feriado '+n+' ('+v.slice(8,10)+'/'+v.slice(5,7)+'/'+v.slice(0,4)+')','regra');PRP.forEach(syncAl);toast('Feriado salvo');render()};
+  if(!window.ARENA||!ARENA.salvarFeriado){fim();return}
+  ARENA.salvarFeriado(v,n).then(function(ok){if(!ok){toast('Não foi possível salvar o feriado');return}fim()})}
+});
 /* ---- histórico ---- */
 function renderHist(){var F=[['todos','Tudo'],['prop','Propostas'],['aluno','Alunos'],['dist','Distribuição'],['pess','Pessoas'],['regra','Regras'],['nota','Notas']],cur=bimAtual(),hb=S.x.hb||cur;if(S.x.hb===undefined)S.x.hb=cur;hb=S.x.hb;
  var L=LOG.filter(function(l){return (hb==='todos'||l.bim===hb)&&(S.x.hk==='todos'||l.k===S.x.hk)});

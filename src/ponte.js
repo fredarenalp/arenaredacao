@@ -6,6 +6,19 @@ const emailAluno = (matricula) => `${String(matricula).trim().toLowerCase()}@alu
 
 const serTur = (a) => [a.s ?? Number(/(\d)º/.exec(a.turma || '')?.[1]), a.t ?? String(a.turma || '').trim().slice(-1)]
 const fmtData = (d) => (d ? `${d.slice(8, 10)}/${d.slice(5, 7)}` : '')
+// Hoje no horário de Brasília (YYYY-MM-DD): o prazo vale até 23h59 daqui, não do UTC.
+const hojeBR = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+// REGRA DO DONO: o envio com atraso vai até a SEXTA-FEIRA da semana do prazo; se for feriado, vale o dia útil anterior (igual ao banco: fim_atraso).
+// feriados: Set de 'YYYY-MM-DD'. Devolve 'YYYY-MM-DD'.
+const fimAtrasoISO = (prazo, feriados) => {
+  if (!prazo) return null
+  const d = new Date(prazo + 'T12:00:00Z')
+  const dow = ((d.getUTCDay() + 6) % 7) + 1 // 1=segunda … 7=domingo
+  d.setUTCDate(d.getUTCDate() + ((5 - dow + 7) % 7))
+  const iso = () => d.toISOString().slice(0, 10)
+  while (((d.getUTCDay() + 6) % 7) + 1 > 5 || (feriados && feriados.has(iso()))) d.setUTCDate(d.getUTCDate() - 1)
+  return iso() < prazo ? prazo : iso()
+}
 
 // Estado só da tela (chaves que começam com _) não vai para o banco.
 const semTemp = (m) => Object.fromEntries(Object.entries(m).filter(([k]) => !k.startsWith('_')))
@@ -305,7 +318,10 @@ const ARENA = {
     document.getElementById('alAv').textContent = al.nome.split(' ').filter(Boolean).slice(0, 2).map((x) => x[0].toUpperCase()).join('')
 
     const urlsAluno = await assinarFotos(reds.map((r) => r.foto_path))
-    const hoje = new Date().toISOString().slice(0, 10)
+    const hoje = hojeBR()
+    const { data: fer } = await supabase.from('feriados').select('data')
+    const feriados = new Set((fer ?? []).map((x) => x.data))
+    const fimDe = (prazo) => fimAtrasoISO(prazo, feriados)
     const PROPS = window.__aluno.PROPS
     const ESSAYS = window.__aluno.ESSAYS
     PROPS.length = 0
@@ -339,7 +355,7 @@ const ARENA = {
     for (const k of Object.keys(BINI)) delete BINI[k]
 
     // bimestre atual: cartões
-    for (const p of props.filter((x) => x.bimestre === bimAtual).sort((x, y) => x.numero - y.numero)) {
+    for (const p of props.filter((x) => x.bimestre === bimAtual && x.status !== 'rascunho').sort((x, y) => x.numero - y.numero)) {
       const num = p.numero
       const orig = reds.find((r) => r.proposta_id === p.id && r.versao === 1)
       const re = reds.find((r) => r.proposta_id === p.id && r.versao === 2)
@@ -354,13 +370,17 @@ const ARENA = {
             if (p.sem_reescrita) return { ...base, g, t: rot, s: 'Esta proposta não tem reescrita', st: 'bl', l: 'Sem reescrita', kind: 'norew' }
             const c1 = lib(orig)
             if (!c1) return { ...base, g, t: rot, s: `Libera depois da correção da Proposta ${num}`, st: 'bl', l: 'Ainda não liberada', kind: 'block' }
+            const indRe = (prazosInd ?? []).find((x) => x.proposta_id === p.id && x.ate >= hoje)
+            if (!indRe && (p.status === 'encerrada' || p.status === 'fechada' || (p.prazo2 && hoje > fimDe(p.prazo2)))) return { ...base, g, t: rot, s: 'Prazo encerrado. Procure a coordenação.', st: 'at', l: 'Envio fechado', kind: 'closed' }
             return { ...base, g, t: rot, s: 'Aberta para envio', st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação', dl: p.prazo2 || null }
           }
           const ind = (prazosInd ?? []).find((x) => x.proposta_id === p.id && x.ate >= hoje)
           if (ind) return { ...base, g, t: rot, s: `Envio liberado até ${ind.ate.slice(8, 10)}/${ind.ate.slice(5, 7)}${ind.vale_nota ? '' : ' · não vale nota'}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação', dl: ind.ate }
+          // fechada/encerrada pela coordenação, ou passou da sexta da semana do prazo (REGRA DO DONO): o envio acabou, só a coordenação libera
+          if (p.status === 'encerrada' || p.status === 'fechada' || (p.prazo && hoje > fimDe(p.prazo))) return { ...base, g, t: rot, s: 'Prazo encerrado. Procure a coordenação.', st: 'at', l: 'Envio fechado', kind: 'closed', dl: p.prazo }
           const atrasada = p.prazo && p.prazo < hoje
           return atrasada
-            ? { ...base, g, t: rot, s: `Prazo encerrado em ${prazo}`, st: 'at', l: 'Atrasada · ainda dá para enviar', kind: 'late', cta: 'Enviar com atraso', dl: p.prazo }
+            ? { ...base, g, t: rot, s: `Prazo encerrado em ${prazo} · dá para enviar até ${fmtData(fimDe(p.prazo))}`, st: 'at', l: 'Atrasada · ainda dá para enviar', kind: 'late', cta: 'Enviar com atraso', dl: p.prazo }
             : { ...base, g, t: rot, s: `Tema: ${p.titulo}${prazo ? ' · prazo ' + prazo : ''}`, st: 'ab', l: 'Aberta para envio', kind: 'open', cta: 'Enviar redação', dl: p.prazo || null }
         }
         const c = lib(r)
@@ -528,6 +548,14 @@ const ARENA = {
     }
     return data
   },
+  // Coordenação: feriados que contam para o fim do envio com atraso.
+  async salvarFeriado(data, nome) {
+    return !(await supabase.from('feriados').upsert({ data, nome })).error
+  },
+  async removerFeriado(data) {
+    return !(await supabase.from('feriados').delete().eq('data', data)).error
+  },
+
   // O aluno viu a correção (a primeira tela só comemora uma vez).
   async marcarVista(rids) {
     try {
@@ -686,6 +714,7 @@ const ARENA = {
     // agrupa em pacotes as redações já vencidas e ainda sem pacote (só a coordenação executa)
     if (ARENA.perfil.tipo === 'coordenacao') await supabase.rpc('gerar_pacotes')
     const q = (t, sel = '*') => supabase.from(t).select(sel).limit(5000)
+    window.__feriados = ((await supabase.from('feriados').select('data, nome').order('data')).data ?? []).map((x) => ({ d: x.data, n: x.nome })) // o envio com atraso vai até a sexta da semana do prazo (feriado: dia útil anterior)
     const desde = new Date(Date.now() - 70 * 86400000).toISOString()
     const [perf, turm, alun, prop, pacs, reds, avis, even, ptur, acess, aeeRes, genRes] = await Promise.all([
       q('perfis'), q('turmas'), q('alunos', '*, turmas(serie, nome)'), q('propostas'), q('pacotes'),

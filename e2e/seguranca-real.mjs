@@ -55,15 +55,24 @@ ok(!!up.error, 'aluno não grava foto na pasta de outro aluno')
 ok(!!(await aluno.functions.invoke('criar-usuario', { body: { tipo: 'coordenacao', email: 'x@x.com', senha: 'abc123', nome: 'X' } })).error, 'aluno não cria usuário pela função')
 
 // envio: prazo calculado no servidor e reescrita só depois da 1ª versão liberada
-const { data: props } = await aluno.from('propostas').select('id, prazo, bimestre').order('id')
-const vencida = props.find((p) => p.prazo && p.prazo < new Date().toISOString().slice(0, 10))
+const { data: props } = await aluno.from('propostas').select('id, prazo, bimestre, status').order('id')
 const { data: jaEnv } = await aluno.from('redacoes').select('proposta_id, versao')
-const livre = vencida && !jaEnv.some((r) => r.proposta_id === vencida.id && r.versao === 1) ? vencida : null
-if (livre) {
-  const mentira = await aluno.from('redacoes').insert({ aluno_id: al[0].id, proposta_id: livre.id, versao: 1, fora_do_prazo: false }).select().single()
-  ok(!mentira.error && mentira.data.fora_do_prazo === true, 'servidor marca "fora do prazo" mesmo se o aluno disser que não')
+const livres = props.filter((p) => !jaEnv.some((r) => r.proposta_id === p.id && r.versao === 1))
+// REGRA DO DONO: proposta encerrada/fechada/rascunho não recebe envio do aluno
+const enc = livres.find((p) => p.status === 'encerrada')
+if (enc) {
+  const r = await aluno.from('redacoes').insert({ aluno_id: al[0].id, proposta_id: enc.id, versao: 1 }).select().single()
+  ok(!!r.error, 'o banco recusa envio em proposta encerrada' + (r.error ? ' (' + r.error.message.slice(0, 50) + ')' : ''))
+  if (r.data) await coord.from('redacoes').delete().eq('id', r.data.id)
+} else console.log('pulou: sem proposta encerrada livre para o aluno de teste')
+// proposta aberta: o servidor calcula "fora do prazo" sozinho, mesmo se o aluno mentir
+const ab = livres.find((p) => p.status === 'aberta')
+if (ab) {
+  const hoje = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' })
+  const mentira = await aluno.from('redacoes').insert({ aluno_id: al[0].id, proposta_id: ab.id, versao: 1, fora_do_prazo: !(ab.prazo && ab.prazo < hoje) }).select().single()
+  ok(!mentira.error && mentira.data.fora_do_prazo === !!(ab.prazo && ab.prazo < hoje), 'servidor calcula "fora do prazo" mesmo se o aluno disser outra coisa' + (mentira.error ? ': ' + mentira.error.message : ''))
   if (mentira.data) await coord.from('redacoes').delete().eq('id', mentira.data.id)
-} else console.log('pulou: sem proposta vencida livre para o aluno de teste')
+} else console.log('pulou: sem proposta aberta livre para o aluno de teste')
 const semV1 = props.find((p) => !jaEnv.some((r) => r.proposta_id === p.id))
 if (semV1) {
   const v2 = await aluno.from('redacoes').insert({ aluno_id: al[0].id, proposta_id: semV1.id, versao: 2 })

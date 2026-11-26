@@ -28,5 +28,9 @@ Método: testes automáticos em navegador (celular 320/390, tablet 768, notebook
 - **Bug meu achado por esses testes e já corrigido (migração 0040 atualizada):** a trava do corretor dava erro ao salvar QUALQUER correção ("record new has no field id"). Os testes de bloqueio que eu tinha feito antes passaram pelo erro, não pelo motivo certo. Agora o corretor salva normalmente antes da liberação e é bloqueado depois, e a coordenação continua podendo alterar.
 - **Relatórios no celular:** corrigido (os seletores rolam por dentro; a página não estoura mais).
 
-## Ainda aguardando a sua resposta
-**Envio do aluno em proposta fechada/encerrada** (explicado na conversa; SQL pronto em `docs/PENDENTE-trava-de-envio-do-aluno.sql`).
+## Envio do aluno e prazo de atraso (decisão do dono, IMPLEMENTADO em 26/11)
+Regra: **depois do prazo, o aluno ainda envia até a SEXTA-FEIRA daquela semana; se a sexta for feriado, vale o dia útil anterior.** Prazo numa sexta = sem dias de atraso. Passada essa data a proposta fecha sozinha (o aluno vê "Procure a coordenação"). "Fechar" e "Encerrar" na coordenação também valem para o aluno (proposta em rascunho nunca aparece). Só a coordenação libera de novo: reabrindo a proposta ou dando prazo individual (Prorrogar → Só um aluno).
+- Banco (migração 0042): tabela `feriados`, função `fim_atraso(prazo)`, trava em `trg_redacao_envio` (estado da proposta, série do aluno, prazo no horário de Brasília). As Propostas 1 e 4 do 4º bimestre foram reabertas (as 2 e 3 já tinham vencido).
+- Aluno (`ponte.carregarAluno`): cartão "Prazo encerrado. Procure a coordenação." quando fechada/encerrada/depois da sexta; "dá para enviar até DD/MM" enquanto está no atraso.
+- Coordenação: Ajustes → Regras → "Envio em atraso" ganhou a lista de **feriados** (adicionar/remover); saiu a regra antiga "dias de atraso permitidos" (3 dias úteis). Os feriados de 2026 já vêm cadastrados (nacionais + 24/10 Goiânia): **conferir a lista**.
+- Testes: `e2e/envio-prazo-real.mjs` (altera uma proposta de teste e restaura) e `e2e/seguranca-real.mjs`.
