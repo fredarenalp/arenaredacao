@@ -28,7 +28,6 @@ Para aprovar ou ajustar. Nada disso está no app ainda.
 ### 4. Conteúdo bom, gramática fraca (IV e V em 3 ou 4; II em 0 a 2)
 - "Você tem boas ideias e cumpre bem a proposta. Falta uma revisão final da gramática antes de entregar."
 - "O conteúdo está encaminhado. Reserve os últimos minutos para reler procurando acentos, pontuação e ortografia."
-- "Suas ideias são seu ponto forte, e os desvios gramaticais atrapalham a leitura. Leia o texto em voz alta para encontrá-los."
 - "Muito bom o que você diz. Cuide agora de como escreve: uma revisão atenta já melhora bastante a nota."
 
 ### 5. Um critério muito abaixo dos outros (um critério pelo menos 2 níveis abaixo da média dos outros quatro)
