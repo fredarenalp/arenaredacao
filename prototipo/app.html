@@ -3684,7 +3684,7 @@ function parseCm(l){
  if(m=l.match(/^(Reescrita – )/))return {tag:'R',pref:m[1],cls:'',txt:l.slice(m[1].length),tip:'Diagnóstico da 2ª versão'};
  if(m=l.match(/^(Final – )/))return {tag:'auto',pref:m[1],cls:'au',txt:l.slice(m[1].length),tip:'Orientação automática pela nota'};
  if(m=l.match(/^(Redação anulada – [^:]+: )/))return {tag:'ANUL',pref:m[1],cls:'anl',txt:l.slice(m[1].length),tip:'Redação anulada'};
- return {tag:'·',pref:'',cls:'fr',txt:l,tip:'Observação livre'};
+ return {tag:'G',pref:'',cls:'fr',txt:l,tip:'Comentário geral'};
 }
 function ordenados(){return coments().filter(function(m){return (m.txt||'').trim()}).sort(function(p,q){return p.line-q.line||p.id-q.id})}
 var CRIT_OPTS='<option value="" disabled hidden selected>Critério…</option><option value="0">I · Estética</option><option value="1">II · Linguagem</option><option value="2">III · Progressão</option><option value="3">IV · Proposta</option><option value="4">V · Abordagem</option>';
