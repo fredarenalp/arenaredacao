@@ -676,6 +676,30 @@ body{-webkit-font-smoothing:antialiased}
 .anb{padding:8px 12px;font-size:13px}
 .crpop{position:absolute;z-index:6;width:min(240px,62%);background:#fff;color:#1c1c19;border-radius:var(--r-md);padding:10px 12px 11px;box-shadow:var(--sh2);transform:translate(10px,-50%);font-size:13px;line-height:1.45;border:1.5px solid #b02818}
 .crk .cxh{cursor:pointer}.crpop b.cw{display:inline;padding:0;margin:0;text-transform:none;letter-spacing:0;color:#1c1c19;font:800 13px 'DM Sans'}.crk .cxh .hit{fill:transparent;stroke:none;pointer-events:all}.crpop .cw{color:#1c1c19;font:700 13px 'DM Sans';display:inline}
+.crpop.bl{transform:none;border:0;box-shadow:0 8px 24px rgba(0,0,0,.38);padding:9px 12px 10px;width:auto}
+.crpop.bl:before{content:"";position:absolute;top:-7px;left:var(--ax,40px);border:7px solid transparent;border-top:0;border-bottom-color:#fff}
+.crpop.bl.up:before{top:auto;bottom:-7px;border-bottom:0;border-top:7px solid #fff}
+.crpop.bl .blt{font:800 14px 'DM Sans';padding-right:22px}.crpop.bl .blc{font-size:11px;color:#6a6a60;font-weight:600;margin:1px 0 5px}
+.crpop.bl .bld{font-size:12.5px;line-height:1.45}.crpop.bl .bld.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.crpop.bl .blm{border:0;background:none;color:#3c7678;font:800 12px 'DM Sans';padding:5px 0 0;cursor:pointer}
+body.fm-open{overflow:hidden}
+.fm{position:fixed;inset:0;z-index:95;background:#171716;color:#fff;font-family:'DM Sans',Arial,sans-serif}
+.fm-sc{position:absolute;inset:0;overflow:auto;-webkit-overflow-scrolling:touch}.fm-pg{position:relative;width:100%;margin:0 auto}.fm-pg img{display:block;width:100%;height:auto}
+.fm-pg .crk{position:absolute;inset:0;width:100%;height:100%}.fmring{fill:none;stroke:#ff9a1f;stroke-width:1.1;filter:drop-shadow(0 0 1.6px #ff9a1f)}
+.fm-top{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;align-items:center;gap:8px;padding:10px 12px;pointer-events:none}
+.fm-top>*{pointer-events:auto}.fm-cnt{background:rgba(0,0,0,.6);border-radius:14px;padding:4px 10px;font:700 12px 'DM Sans'}.fm-z{margin-left:auto;display:flex;gap:6px}
+.fm-z button,.fm-x{width:34px;height:34px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:20px;line-height:1;cursor:pointer}
+.fm-sh{position:absolute;left:0;right:0;bottom:0;z-index:3;background:#fff;color:#1c1c19;border-radius:18px 18px 0 0;padding:8px 16px calc(12px + env(safe-area-inset-bottom));max-height:46%;overflow:auto;box-shadow:0 -8px 24px rgba(0,0,0,.35)}
+.fm-sh .h{display:block;width:34px;height:4px;border-radius:2px;background:#d8d6cc;margin:0 auto 8px}
+.fm-sh .tt{font-weight:800;font-size:17px;line-height:1.2}.fm-sh .cr2{font-size:12px;color:#6a6a60;font-weight:600;margin:2px 0 8px}
+.fm-sh .tx{font-size:14.5px;line-height:1.5}.fm-sh .tx .cw,.fm-sh .tx b{color:#0f7c7e;font-weight:800}
+.fm-sh .sg{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.fm-sh .sg span{background:#e0f2f2;color:#1f6a6c;border-radius:12px;padding:3px 10px;font-weight:700;font-size:12px}
+.fm-sh .ft{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:9px;border-top:1px solid #eeece4}
+.fm-sh .ft .c{font-size:12px;color:#6a6a60;font-weight:700}.fm-sh .ft .b{display:flex;gap:6px}
+.fm-sh .ft button{width:32px;height:28px;border-radius:8px;border:0;background:#e4eeee;color:#2f5f61;font:800 15px 'DM Sans';cursor:pointer}.fm-sh .ft button.nx{background:#3c7678;color:#fff}
+.fm-bar{position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(20,20,18,.92);font-size:12px}
+.fm-bar button{width:32px;height:28px;border-radius:8px;border:0;background:rgba(255,255,255,.16);color:#fff;font:800 15px 'DM Sans';cursor:pointer}
+.crfull{display:inline-flex;align-items:center;justify-content:center}
 .crpop.esq{transform:translate(calc(-100% - 10px),-50%)}
 .crpop b{display:block;color:#b02818;font:800 11px 'DM Sans';letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;padding-right:18px}
 .crpop .px{position:absolute;right:6px;top:5px;border:0;background:none;font-size:16px;line-height:1;color:#6a6a60;cursor:pointer;width:22px;height:22px;border-radius:var(--r-sm)}
@@ -4564,7 +4588,7 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  var adH='<div class="crc cradc'+(adic.length?'':' vazio')+'"><div class="crh"><b>Comentários adicionais</b></div>'+(adic.length?adic.map(function(t){return '<p>'+esc(t)+'</p>'}).join(''):'<p>Não há comentários adicionais.</p>')+'</div>';
  var barrasHtml='<div class="crs-b"><div class="lab">Seus 5 critérios · toque para abrir</div><div class="crs-t">'+A.COMPS.map(function(c,j){var n=NIV[j];return '<button type="button" class="crs-r'+(n<ESPERADO?' abx':'')+'" data-cj="'+j+'"><span class="rn">'+['I','II','III','IV','V'][j]+'</span><b>'+n+'<small>/4</small></b><span class="nm">'+c.nome+'</span><span class="sg">'+[0,1,2,3].map(function(q){return '<i'+(q<n?' class="fl"':'')+'></i>'}).join('')+'</span></button>'}).join('')+'</div>'+'<button type="button" class="crs-add" id="crAdBtn"><b>Comentários adicionais</b></button>'+'</div>';
  $('alMain').innerHTML='<button type="button" class="crumb" id="alVolta">← Minhas redações</button><h2>Correção · '+String(P.t).replace(/^(Proposta \d+) · /,'$1<br>')+'</h2>'+verSw+cmpHtml+'<p class="lead"><b class="volta">Sua redação voltou da correção!</b><br></p>'+
- '<div class="cr-grid"><div class="cr-left"><div class="cr-tb"><button type="button" id="crM" aria-label="Diminuir zoom">−</button><span id="crZ">80%</span><button type="button" id="crP" aria-label="Aumentar zoom">+</button><span id="crFb"></span></div><div class="crf" id="crF" role="group" aria-label="Mostrar marcações da folha por critério"></div><div class="crfn hide" id="crFn"></div><div class="cr-photo" id="crPh"><div class="cr-pg" id="crPg"><img id="crImg" alt="Sua redação corrigida"><svg id="crK" class="crk" viewBox="0 0 210 297" preserveAspectRatio="none"></svg><div id="crPop" class="crpop hide" role="dialog" aria-label="Comentário"></div></div></div></div>'+
+ '<div class="cr-grid"><div class="cr-left"><div class="cr-tb"><button type="button" id="crM" aria-label="Diminuir zoom">−</button><span id="crZ">80%</span><button type="button" id="crP" aria-label="Aumentar zoom">+</button><button type="button" id="crFull" class="crfull" aria-label="Tela cheia" title="Tela cheia: ver os círculos um a um"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button><span id="crFb"></span></div><div class="crf" id="crF" role="group" aria-label="Mostrar marcações da folha por critério"></div><div class="crfn hide" id="crFn"></div><div class="cr-photo" id="crPh"><div class="cr-pg" id="crPg"><img id="crImg" alt="Sua redação corrigida"><svg id="crK" class="crk" viewBox="0 0 210 297" preserveAspectRatio="none"></svg><div id="crPop" class="crpop hide" role="dialog" aria-label="Comentário"></div></div></div></div>'+
  '<aside class="cr-right"><div class="cr-nota"><div><div class="lab" style="margin:0 0 2px">Nota final</div><div class="cr-big">'+A.fmt(total)+'<small> / 10</small></div></div><div class="cr-pill">Corrigida</div></div>'+barrasHtml+
  '<div id="crT1">'+(abaixo(P).length?'<div class="crwarn"><b>Atenção:</b> '+(abaixo(P).length>1?'os critérios '+jn(abaixo(P).map(function(j){return CRIT[j]}))+' ficaram abaixo do esperado':'o critério '+CRIT[abaixo(P)[0]]+' ficou abaixo do esperado')+'. Leia os comentários e use a reescrita para melhorar.</div>':'')+'<h3>Competências</h3>'+comps+adH+(finA.length?'<div class="crwarn finw">'+finA.map(function(t){return '<p>'+esc(t)+'</p>'}).join('')+'</div>':'')+
  '<h3>Comentários por linha</h3><div id="crC">'+cmts.map(function(c){return '<button type="button" class="crcm" data-l="'+c.l+'"><b>'+(c.par?'Parágrafo '+c.par:c.l2?'Parágrafo (linhas '+c.l+' a '+c.l2+')':'Linha '+c.l)+'</b><span>'+c.t+'</span></button>'}).join('')+'</div></div></aside></div>';
@@ -4572,12 +4596,14 @@ circ=circ.filter(function(c){return !!c.c}); // círculo sem tipo escolhido não
  if(semFoto){var cl=document.querySelector('.cr-left');if(cl){cl.classList.add('semfoto');cl.insertAdjacentHTML('afterbegin','<div class="crsf"><b>A foto desta redação foi arquivada.</b><span>A escola guarda só a nota e os comentários. Eles continuam aqui ao lado.</span></div>')}}
 var selK=null;
  var catD={ac:'Falta o acento, ou ele está errado, nesta palavra.',pt:'Falta um sinal de pontuação, ou ele está no lugar errado.',or:'Palavra escrita de forma diferente da norma da língua.',cj:'A forma do verbo não está correta.',cn:'O verbo não concorda com o sujeito da frase.',rg:'A preposição que o verbo pede não está correta.',cr:'Uso incorreto do acento grave (crase).',ol:'Expressão de fala usada em um texto que pede escrita formal.',pr:'Palavra imprecisa. Procure uma palavra mais específica.',tr:'Palavra escrita pela metade (truncada). Escreva por inteiro.',il:'Letra difícil de ler. Capriche na letra para o trecho poder ser lido.',vi:'Vírgula faltando ou no lugar errado.',mi:'Letra maiúscula faltando ou usada onde não era necessária.',ra:'Rasura. Em vez de riscar ou circular, faça um traço simples sobre a palavra.',ce:'Conectivo usado de forma incorreta neste ponto.',ca:'Falta um conectivo aqui para ligar as ideias.',mg:'Desrespeito às margens da folha.',mr:'Linha curta: a escrita parou antes do fim da linha. Escreva até o final.',ma:'A escrita passou da margem da folha.',pc:'Parágrafo curto: o parágrafo ficou com poucas linhas.',pe:'Parágrafo longo: considere dividir em mais de um.',pd:'Parágrafo desalinhado: o recuo no início do parágrafo não segue o mesmo padrão dos outros.',ss:'Separação de sílabas incorreta no fim da linha.',el:'Elogio: um ponto forte do seu texto.',lac:'Lacuna: falta explicar melhor esta ideia para o leitor.',ele:'Elemento do gênero ausente: a proposta pede algo que não aparece.',eli:'Elemento do gênero insuficiente: aparece, mas precisa ser mais completo.',rp:'Repetição de palavra. Use um sinônimo ou retome a ideia com um pronome.',ti:'Título ausente ou insuficiente.'};
- var catDesc=function(c){var k=c.c,t=(catN[k]||k)+' · '+(k==='el'?'ponto forte':'critério '+['I','II','III','IV','V'][critDe(k)]),d=catD[k]||'Marcação do corretor.';
+ var catDesc=function(c){var k=c.c,cj=critDe(k),nm=catN[k]||k,cr=(k==='el'?'Ponto forte':'Critério '+['I','II','III','IV','V'][cj]+' · '+FN[cj])+' · linha '+c.l,d=catD[k]||'Marcação do corretor.',sg=[];
   if(k==='or'&&c.w)d+=' A forma correta é <b class="cw">“'+esc(c.w)+'”</b>.';
   if(k==='rp'&&c.w)d='A palavra <b class="cw">“'+esc(c.w)+'”</b> se repete no texto. As setas laranja ligam as repetições. Use um sinônimo ou retome a ideia com um pronome.';
-  if(k==='pr'&&c.w)d='A palavra <b class="cw">“'+esc(c.w)+'”</b> é imprecisa.'+((c.s||[]).length?' Sugestões: '+esc(c.s.join(', '))+'.':' Procure uma mais específica.');
-  if((k==='ce'||k==='ca')&&(c.s||[]).length)d+=' Sugestões: '+esc(c.s.join(', '))+'.';
-  return {t:t,d:d}};
+  if(k==='pr'){if(c.w)d='A palavra <b class="cw">“'+esc(c.w)+'”</b> é imprecisa.';sg=c.s||[]}
+  if(k==='ce'||k==='ca')sg=c.s||[];
+  return {t:nm,c:cr,d:d,s:sg}};
+ var dBal=function(dK){return dK.d+(dK.s.length?' Experimente: '+esc(dK.s.join(', '))+'.':'')}; // balão: sugestões no texto
+
  function desenha(){
   var h='';if(sel){var cs=cmts.filter(function(c){return c.l===sel})[0],ext=(cs&&cs.l2)?cs.l2-sel+1:1;h+='<rect class="hl" x="26.6" y="'+(A.lineY(sel)-6.8)+'" width="156.8" height="'+(6.8*ext)+'"/>';}
   cmts.forEach(function(c){if(c.l2&&okC(c)){var y0=A.lineY(c.l)-6.8+.8,hh=6.8*(c.l2-c.l+1)-1.6;h+='<g class="rgb"><rect x="13.2" y="'+y0+'" width="1.3" height="'+hh+'"/><rect x="196" y="'+y0+'" width="1.3" height="'+hh+'"/></g>';}});
@@ -4586,19 +4612,64 @@ var selK=null;
   h+=window.rpSetasCirc(circ.filter(function(c){return okF(c.c)}),A.lineY);
   cmts.forEach(function(c){if(!okC(c))return;var y=A.lineY(c.l)-3.4;h+='<g class="pin" data-l="'+c.l+'" tabindex="0" role="button" aria-label="Ver comentário: '+rot(c)+'"><circle cx="'+c.x+'" cy="'+y+'" r="3.7"/><text x="'+c.x+'" y="'+(y+1.25)+'">'+(c.par?'¶'+c.par:c.l)+'</text></g>';});
   var po=$('crPop'),cc=sel?cmts.filter(function(c){return c.l===sel})[0]:null;
-  if(po){if(cc){po.innerHTML='<button type="button" class="px" aria-label="Fechar">×</button><b>'+rot(cc)+'</b><span>'+cc.t+'</span>';po.style.left=(cc.x/210*100)+'%';po.style.top=((A.lineY(cc.l)-3.4)/297*100)+'%';po.classList.toggle('esq',cc.x>105);po.classList.remove('hide');}else po.classList.add('hide');}
-  if(po&&selK!==null&&circ[selK]){var ck=circ[selK],cyK=A.lineY(ck.l)-2.4,dK=catDesc(ck);po.innerHTML='<button type="button" class="px" aria-label="Fechar">×</button><b>'+esc(dK.t)+'</b><span>'+dK.d+'</span>';po.style.left=(ck.x/210*100)+'%';po.style.top=(cyK/297*100)+'%';po.classList.toggle('esq',ck.x>105);po.classList.remove('hide')}
+  if(po){po.className='crpop'+(cc||selK!==null?'':' hide');po.style.width='';if(cc){po.innerHTML='<button type="button" class="px" aria-label="Fechar">×</button><b>'+rot(cc)+'</b><span>'+cc.t+'</span>';po.style.left=(cc.x/210*100)+'%';po.style.top=((A.lineY(cc.l)-3.4)/297*100)+'%';po.classList.toggle('esq',cc.x>105);po.classList.remove('hide');}else if(selK===null)po.classList.add('hide');}
+  if(po&&selK!==null&&circ[selK]){var ck=circ[selK],cyK=A.lineY(ck.l)-2.4,dK=catDesc(ck),d0=dBal(dK);
+   po.className='crpop bl';po.style.transform='';
+   po.innerHTML='<button type="button" class="px" aria-label="Fechar">×</button><div class="blt">'+esc(dK.t)+'</div><div class="blc">'+esc(dK.c)+'</div><div class="bld clamp">'+d0+'</div>';
+   var pgW=$('crPg').offsetWidth,pgH=$('crPg').offsetHeight,cxp=ck.x/210*pgW,cyp=cyK/297*pgH,wB=Math.min(310,pgW*.96),lf=Math.max(4,Math.min(pgW-wB-4,cxp-wB/2));
+   po.style.width=wB+'px';po.style.left=lf+'px';po.style.top=(cyp+14)+'px';po.classList.remove('hide');
+   var bd=po.querySelector('.bld');if(bd.scrollHeight>bd.clientHeight+1)po.insertAdjacentHTML('beforeend','<button type="button" class="blm" data-fm="'+selK+'">ver mais ›</button>');else bd.classList.remove('clamp'); // só corta (e oferece "ver mais") quando passa de 2 linhas
+po.style.setProperty('--ax',Math.max(14,Math.min(wB-28,cxp-lf-7))+'px');
+   if(cyp+14+po.offsetHeight>pgH+40){po.style.top=Math.max(2,cyp-po.offsetHeight-14)+'px';po.classList.add('up')}}
   $('crK').innerHTML=h;
   document.querySelectorAll('.crcm').forEach(function(b){b.classList.toggle('on',+b.dataset.l===sel)});
  }
  function foco(l){sel=sel===l?null:l;desenha();if(sel){var pg=$('crPg'),ph=$('crPh'),y=(A.lineY(sel)/297)*pg.offsetHeight,vis=y>ph.scrollTop+100&&y<ph.scrollTop+ph.clientHeight-100;if(!vis)ph.scrollTo({top:Math.max(0,y-ph.clientHeight/2),behavior:'smooth'});var it=document.querySelector('.crcm.on');if(it&&it.scrollIntoView)it.scrollIntoView({block:'nearest',behavior:'smooth'});}}
  $('crK').addEventListener('click',function(e){var p=e.target.closest('.pin');if(p){selK=null;foco(+p.dataset.l);return}var cx=e.target.closest('.cxh');if(cx){sel=null;selK=selK===+cx.dataset.ci?null:+cx.dataset.ci;desenha();return}if(sel||selK!==null){sel=null;selK=null;desenha();}});
  $('crK').addEventListener('keydown',function(e){var p=e.target.closest('.pin');if(p&&(e.key==='Enter'||e.key===' ')){e.preventDefault();foco(+p.dataset.l);}});
- $('crPop').addEventListener('click',function(e){if(e.target.closest('.px')){sel=null;selK=null;desenha();}});
+ $('crPop').addEventListener('click',function(e){var vm=e.target.closest('[data-fm]');if(vm){fmAbre({k:'c',ix:+vm.dataset.fm});return}if(e.target.closest('.px')){sel=null;selK=null;desenha();}});
  document.addEventListener('keydown',function esc(e){if(!$('crPop')){document.removeEventListener('keydown',esc);return;}if(e.key==='Escape'&&(sel||selK!==null)){sel=null;selK=null;desenha();}});
  $('crC').addEventListener('click',function(e){var b=e.target.closest('.crcm');if(b)foco(+b.dataset.l);});
  function z(d){zoom=Math.max(50,Math.min(200,zoom+d));$('crPg').style.width=zoom+'%';$('crZ').textContent=zoom+'%';}
  $('crP').onclick=function(){z(15)};$('crM').onclick=function(){z(-15)};z(0);
+ /* ===== Modo tela cheia: a folha ocupa a tela e o aluno percorre os círculos um a um (gaveta com o comentário) ===== */
+ var FM=null;
+ function fmItens(){var it=[];circ.forEach(function(c,ix){if(okF(c.c))it.push({k:'c',ix:ix,l:c.l,x:c.x})});cmts.forEach(function(c,ix){if(okC(c))it.push({k:'p',ix:ix,l:c.l,x:c.x})});it.sort(function(a,b){return (a.l-b.l)||(a.x-b.x)});return it}
+ function fmPinta(){var o=FM,it=o.it[o.i],svg=o.el.querySelector('svg'),ring='';
+  if(it){if(it.k==='c'){var c=circ[it.ix];ring='<ellipse class="fmring" cx="'+c.x+'" cy="'+(A.lineY(c.l)-2.4)+'" rx="11.5" ry="4.6"/>'}else{var p=cmts[it.ix];ring='<circle class="fmring" cx="'+p.x+'" cy="'+(A.lineY(p.l)-3.4)+'" r="5.6"/>'}}
+  svg.innerHTML=o.marks+ring;
+  var sh=o.el.querySelector('.fm-sh'),bar=o.el.querySelector('.fm-bar'),n=o.it.length;
+  o.el.querySelector('.fm-cnt').textContent=it?(o.i+1)+' de '+n:n+(n===1?' marca':' marcas');
+  if(!it){sh.classList.add('hide');bar.classList.remove('hide');return}
+  var h;
+  if(it.k==='c'){var d=catDesc(circ[it.ix]);h='<div class="tt">'+esc(d.t)+'</div><div class="cr2">'+esc(d.c)+'</div><div class="tx">'+d.d+(d.s.length?' Experimente:':'')+'</div>'+(d.s.length?'<div class="sg">'+d.s.map(function(x){return '<span>'+esc(x)+'</span>'}).join('')+'</div>':'')}
+  else{var cm=cmts[it.ix];h='<div class="tt">'+esc(rot(cm))+'</div>'+(cm.j!=null&&FN[cm.j]?'<div class="cr2">Critério '+['I','II','III','IV','V'][cm.j]+' · '+FN[cm.j]+'</div>':'')+'<div class="tx">'+cm.t+'</div>'}
+  sh.innerHTML='<i class="h"></i>'+h+'<div class="ft"><span class="c">'+(o.i+1)+' de '+n+'</span><div class="b"><button type="button" data-fn="-1" aria-label="Anterior">‹</button><button type="button" class="nx" data-fn="1" aria-label="Próximo">›</button></div></div>';
+  sh.classList.remove('hide');bar.classList.add('hide')}
+ function fmVai(i,rola){var o=FM;o.i=i;fmPinta();if(rola===false)return;var it=o.it[i];if(!it)return;var sc=o.el.querySelector('.fm-sc'),pg=o.el.querySelector('.fm-pg'),y=(A.lineY(it.l)/297)*pg.offsetHeight,x=(it.x/210)*pg.offsetWidth;
+  sc.scrollTo({top:Math.max(0,y-sc.clientHeight*.3),left:Math.max(0,x-sc.clientWidth/2),behavior:'smooth'})}
+ function fmFecha(){if(!FM)return;document.removeEventListener('keydown',FM.key,true);FM.el.remove();document.body.classList.remove('fm-open');FM=null}
+ function fmAbre(ini){var it=fmItens();if(!it.length)return;sel=null;selK=null;desenha();
+  var i0=0;if(ini){var q=it.findIndex(function(x){return x.k===ini.k&&x.ix===ini.ix});if(q>=0)i0=q}
+  var el=document.createElement('div');el.id='crFM';el.className='fm';el.setAttribute('role','dialog');el.setAttribute('aria-label','Correção em tela cheia');
+  el.innerHTML='<div class="fm-top"><span class="fm-cnt"></span><div class="fm-z"><button type="button" data-fz="-1" aria-label="Diminuir zoom">−</button><button type="button" data-fz="1" aria-label="Aumentar zoom">+</button></div><button type="button" class="fm-x" aria-label="Fechar tela cheia">×</button></div>'+
+   '<div class="fm-sc"><div class="fm-pg"><img alt="" src="'+$('crImg').src+'"><svg class="crk" viewBox="0 0 210 297" preserveAspectRatio="none"></svg></div></div>'+
+   '<div class="fm-sh hide"></div><div class="fm-bar hide"><button type="button" data-fn="-1" aria-label="Anterior">‹</button><span>Toque num círculo ou use as setas</span><button type="button" data-fn="1" aria-label="Próximo">›</button></div>';
+  document.body.appendChild(el);document.body.classList.add('fm-open');
+  FM={el:el,it:it,i:i0,z:100,marks:$('crK').innerHTML,key:null};
+  FM.key=function(e){if(e.key==='Escape'){e.preventDefault();fmFecha()}else if(e.key==='ArrowRight'){fmNav(1)}else if(e.key==='ArrowLeft'){fmNav(-1)}};
+  document.addEventListener('keydown',FM.key,true);
+  el.addEventListener('click',function(e){
+   if(e.target.closest('.fm-x')){fmFecha();return}
+   var z=e.target.closest('[data-fz]');if(z){FM.z=Math.max(100,Math.min(320,FM.z+40*+z.dataset.fz));el.querySelector('.fm-pg').style.width=FM.z+'%';if(FM.it[FM.i])fmVai(FM.i);return}
+   var nb=e.target.closest('[data-fn]');if(nb){fmNav(+nb.dataset.fn);return}
+   var cx=e.target.closest('.cxh');if(cx){var q=FM.it.findIndex(function(x){return x.k==='c'&&x.ix===+cx.dataset.ci});if(q>=0){fmVai(q,false)}return}
+   var pn=e.target.closest('.pin');if(pn){var q2=FM.it.findIndex(function(x){return x.k==='p'&&x.l===+pn.dataset.l});if(q2>=0){fmVai(q2,false)}return}
+   if(e.target.closest('.fm-sc')){FM.i=-1;fmPinta()}});
+  fmVai(i0)}
+ function fmNav(d){var o=FM;if(!o||!o.it.length)return;var n=o.it.length,i=o.i<0?(d>0?0:n-1):(o.i+d+n)%n;fmVai(i)}
+ var bfm=$('crFull');if(bfm)bfm.onclick=function(){fmAbre(null)};
+
  document.querySelectorAll('[data-pl]').forEach(function(b){b.onclick=function(){var l=+b.dataset.pl;if(sel!==l)foco(l);$('crPh').scrollIntoView({block:'nearest',behavior:'smooth'});};});
  function crUm(q){var T=$('crT1'),cs=[].slice.call(document.querySelectorAll('#crT1 .crc')),c=cs[q];if(!c)return;var ja=T.classList.contains('one')&&c.classList.contains('crsel');cs.forEach(function(x){x.classList.toggle('crsel',!ja&&x===c)});T.classList.toggle('one',!ja)} // 1 toque mostra só aquele quadro; outro toque no mesmo volta a mostrar todos
  var adb=$('crAdBtn');if(adb)adb.onclick=function(){crUm(5)};
@@ -4616,7 +4687,7 @@ var selK=null;
  document.querySelectorAll('.crvm').forEach(function(b){b.onclick=function(){if(b.disabled)return;setF(+b.dataset.vm);$('crPh').scrollIntoView({block:'nearest',behavior:'smooth'})}});
  $('crFb').addEventListener('click',function(e){var b=e.target.closest('[data-f]');if(!b)return;var v=b.dataset.f;setF(v===''?null:v==='cv'?'cv':+v)});
  document.querySelectorAll('.crs-r').forEach(function(b){b.addEventListener('click',function(){var j=+b.dataset.cj;if(fj!==j){fj=j;sel=null;chips();desenha()}})});
- $('alVolta').onclick=lista;chips();desenha();
+ $('alVolta').onclick=lista;chips();desenha();if(bfm&&(semFoto||!fmItens().length))bfm.style.display='none';
 }
 $('alMain').addEventListener('click',function(e){var ab=e.target.closest('[data-al]');if(ab){if(ab.dataset.al==='bol')boletim();else if(ab.dataset.al==='crit')conhecer();else if(ab.dataset.al==='prop')propostas();else lista();return;}var bt=e.target.closest('[data-bt]');if(bt){BOLT=bt.dataset.bt;boletim();return;}var vk=e.target.closest('[data-vk]');if(vk){verCorrecao(+vk.dataset.vk);return;}var b=e.target.closest('button.pc,button.pbtn,button.plnk,button.stpb,button.cxn');if(!b)return;var k=+b.dataset.k,kd=PROPS[k]&&PROPS[k].cta?PROPS[k].kind:'';if(kd==='corr')verCorrecao(k);else if(kd==='late')atraso(k);else if(kd==='open')instrucoes(k,null);});
 $('alMx').onclick=function(){$('alMdl').classList.remove('on')};

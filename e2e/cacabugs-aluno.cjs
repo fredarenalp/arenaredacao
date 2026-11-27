@@ -35,6 +35,17 @@ if(ks.length)await passo('injeção: marcas de todos os tipos',async()=>{await p
   const nCx=await p.locator('#crK .cxh').count();if(nCx<10)throw new Error('poucas áreas de toque nos círculos: '+nCx);
   for(let i=0;i<nCx;i++){await p.evaluate((i)=>document.querySelectorAll('#crK .cxh')[i].dispatchEvent(new MouseEvent('click',{bubbles:true})),i);await p.waitForTimeout(60);const r=await p.evaluate(()=>{const po=document.getElementById('crPop');return {vis:!po.classList.contains('hide'),t:po.innerText}});if(!r.vis||!r.t.trim())throw new Error('balão do círculo '+i+' não abriu');if(/undefined|\[object/.test(r.t))throw new Error('texto ruim no balão: '+r.t)}
   await p.evaluate(()=>document.querySelector('#crPop .px').click());if(!(await p.evaluate(()=>document.getElementById('crPop').classList.contains('hide'))))throw new Error('o × não fechou o balão');
+  // modo tela cheia: botão ao lado do zoom, gaveta com o comentário, navegação ‹ › e Esc
+  if(!(await p.locator('#crFull').isVisible()))throw new Error('botão de tela cheia não aparece');
+  await p.click('#crFull');await p.waitForTimeout(400);
+  const fm1=await p.evaluate(()=>({aberto:!!document.getElementById('crFM'),cnt:(document.querySelector('.fm-cnt')||{}).innerText,sh:(document.querySelector('.fm-sh')||{}).innerText||''}));
+  if(!fm1.aberto||!/^1 de \d+$/.test(fm1.cnt)||!fm1.sh.trim())throw new Error('tela cheia não abriu direito: '+JSON.stringify(fm1));
+  if(/undefined|\[object/.test(fm1.sh))throw new Error('texto ruim na gaveta: '+fm1.sh);
+  await p.click('.fm-sh [data-fn="1"]');await p.waitForTimeout(250);
+  const fm2=await p.evaluate(()=>document.querySelector('.fm-cnt').innerText);if(!/^2 de /.test(fm2))throw new Error('o botão › não avançou: '+fm2);
+  await p.keyboard.press('Escape');await p.waitForTimeout(200);
+  if(await p.evaluate(()=>!!document.getElementById('crFM')))throw new Error('Esc não fechou a tela cheia');
+
   const imp=await p.evaluate(()=>{window.__arenaImp&&window.__arenaImp();return document.querySelectorAll('#printArea .pdl').length});if(imp!==1)throw new Error('Parágrafo desalinhado na impressão: '+imp+' linha(s)');
   const t=await T('#alMain');if(/undefined/.test(t))throw new Error('undefined na correção com marcas injetadas');
   const n=await p.locator('#alMain svg .xm').count();if(n<10)throw new Error('poucas marcas desenhadas: '+n);
