@@ -14,7 +14,7 @@ const passo=async(n,fn)=>{try{await fn();await ruim(n);ok(nome+' '+n)}catch(e){f
 await p.goto('http://localhost:4173');await p.waitForTimeout(500);await p.click('.p[data-k=aluno]');await p.fill('#mat','0000');await p.fill('#pwd','teste');await p.click('#entrar');
 await p.waitForSelector('body.in-aluno',{timeout:25000});await p.waitForTimeout(1500);
 await passo('abas principais',async()=>{for(const k of ['lista','bol','crit','prop','lista']){await p.click('[data-al="'+k+'"]');await p.waitForTimeout(800)}});
-await passo('boletim: subseções',async()=>{await p.click('[data-al="bol"]');await p.waitForTimeout(500);for(const k of ['at','evo','med','at']){await p.click('[data-bt="'+k+'"]');await p.waitForTimeout(300)}});
+await passo('boletim: subseções',async()=>{await p.click('[data-al="bol"]');await p.waitForTimeout(500);for(const k of ['at','evo','med','tr','at']){await p.click('[data-bt="'+k+'"]');await p.waitForTimeout(300)}});
 await passo('propostas: bimestres, detalhe e voltar',async()=>{await p.click('[data-al="prop"]');await p.waitForTimeout(500);for(const b of [1,2,4]){await p.click('[data-bim="'+b+'"]');await p.waitForTimeout(250)}await p.click('.pz-row[data-vp]');await p.waitForTimeout(400);await p.click('#vpVolta');await p.waitForTimeout(300);if(!(await p.locator('.pz-list').count()))throw new Error('voltar do detalhe não retornou à lista de Propostas');await p.click('[data-al="lista"]');await p.waitForTimeout(300);if(await p.locator('.pc2 [data-vp]').count())throw new Error('o card não deve ter botão de proposta (só a aba Propostas)')});
 // correções
 const ks=await p.evaluate(()=>window.__aluno.PROPS.map((q,k)=>({k,kind:q.kind,nota:q.nota})).filter(x=>x.kind==='corr').map(x=>x.k));

@@ -421,6 +421,12 @@ const ARENA = {
       ESSAYS.push({ n: num, g: p.genero, tema: p.titulo, o: io, r: ir })
     }
     window.__aluno.recalc()
+    // "Para treinar" (boletim): as marcações de todas as redações corrigidas e liberadas, por bimestre
+    window.__aluno.ERROS = reds.filter((r) => lib(r) && !lib(r).anulacao).map((r) => {
+      const p = props.find((x) => x.id === r.proposta_id)
+      const circ = (r.marcacoes ?? []).map((m) => m.dados).filter((m) => m && m.t === 'o' && m.cat && m.cat !== 'el').map((m) => ({ c: m.cat, ...((m.cor || m.pal) ? { w: m.cor || m.pal } : {}) }))
+      return { bim: p?.bimestre ?? bimAtual, ord: (p?.bimestre ?? 0) * 100 + (p?.numero ?? 0) * 2 + (r.versao ?? 1), circ }
+    }).sort((x, y) => x.ord - y.ord)
     window.__aluno.setBim(bimAtual)
   },
 
