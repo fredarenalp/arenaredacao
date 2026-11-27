@@ -215,4 +215,4 @@ Na tela do aluno e na impressão/PDF, os círculos de **Repetição** (`rp`, mes
 
 ## Aluno: tocar num círculo da folha mostra o que ele significa (decisão do dono, 26/11)
 Na tela "Ver a correção" do aluno, tocar/clicar em qualquer círculo (não só os que têm comentário) abre um balão (`#crPop`) com o tipo e o critério ("Ortografia · critério II"), uma frase do significado (`catD`/`catDesc`) e, quando há, a palavra certa, as sugestões ou a palavra repetida. Cada círculo é um `<g class="cxh" data-ci>` com área de toque maior; × ou Esc fecham. Teste: `e2e/cacabugs-aluno.cjs`.
-Pendente (aguardando aprovação do dono): trocar os rótulos vermelhos "Ortografia 4"/"Linhas: …" por rótulos por extenso e neutros ("4 erros de ortografia", "Nas linhas 2, 6, 11…").
+**Rótulos dos critérios (IMPLEMENTADO):** os chips vermelhos "Ortografia 4" viraram chips neutros (verde-água, **mesmo tamanho** de antes; o dono não quer chips maiores) por extenso: "4 erros de ortografia", "2 pontuações", "1 acento" (`CH`/`chT` em `app.html`), e "Linhas: 02 · 06…" virou "Nas linhas 2, 6, 11 e 12" (`lnsT`). Rasuras e margens usam a mesma cor.
