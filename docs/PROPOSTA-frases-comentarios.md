@@ -132,8 +132,8 @@ Resultado: níveis 0 a 2 = 4 × 4 = 16 combinações; nível 3 = 5 × 5 = 25; n�
 5. Você ligou as ideias com segurança e variou os recursos coesivos.
 
 **Orientações**
-1. Amplie a variedade de sinônimos e atenção às repetições que ainda aparecem. (já existe)
-2. Varie ainda mais os sinônimos e atenção às repetições que sobraram. (já existe)
+1. Amplie a variedade de sinônimos e dê atenção às repetições que ainda aparecem. (já existe)
+2. Varie ainda mais os sinônimos e dê atenção às repetições que sobraram. (já existe)
 3. Revise as poucas palavras que ainda se repetem e troque por sinônimos ou pronomes.
 4. Experimente conectivos menos comuns para dar mais precisão à ligação entre as ideias.
 5. Releia o texto procurando as últimas repetições para deixar a leitura ainda mais fluida.
